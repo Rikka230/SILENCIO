@@ -328,43 +328,53 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 /* --- 9.5. TRAILER (CORRIGÉ : PLEINE LARGEUR & SANS BORDURES) --- */
 .full-width-video {
     width: 100%;
-    background: transparent; /* Supprime le "cadre noir" parasite */
-    padding: 2rem 0 0 0; /* Colle au texte du dessus */
+    background: transparent;
+    
+    /* C'EST ICI LA SOLUTION : On tire le bloc vers le haut */
+    margin-top: -8rem; /* Essayez -5rem si c'est trop collé, ou -10rem si pas assez */
+    
+    padding: 0; /* Aucune marge intérieure */
     text-align: center;
-    border: none !important; /* Force la suppression du trait blanc */
-    margin: 0;
+    border: none !important;
+    position: relative;
+    z-index: 10; /* Passe par dessus si besoin */
 }
 
 .video-label {
     color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 4px;
-    font-size: 1rem;
-    margin-bottom: 2rem;
+    font-size: 0.9rem; /* Un peu plus discret */
+    margin-bottom: 1rem; /* Rapproche le titre de la vidéo */
     opacity: 0.7;
-    display: inline-block; /* Stabilise le titre */
+    display: inline-block;
+    
+    /* Petit fond noir flou pour que le titre reste lisible si ça chevauche */
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 4px;
+    backdrop-filter: blur(5px);
 }
 
 .video-wrapper {
     position: relative;
-    width: 100%; /* FORCE LA PLEINE LARGEUR */
-    max-width: none; /* Fait sauter la limite qui rendait la vidéo petite */
+    width: 100%;
+    max-width: none;
     aspect-ratio: 16 / 9;
     margin: 0;
     
-    /* LE MASQUE (Plus léger : 5% de flou seulement pour ne pas manger l'image) */
+    /* LE MASQUE FLOU (Toujours là) */
     -webkit-mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
         linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
     -webkit-mask-composite: source-in;
 
     mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
         linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
     mask-composite: intersect;
 }
 
-/* Force l'iframe à prendre toute la place disponible */
 .video-wrapper iframe {
     position: absolute; 
     top: 0; left: 0; 
@@ -505,6 +515,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
