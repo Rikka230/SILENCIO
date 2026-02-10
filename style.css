@@ -533,6 +533,91 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     text-decoration-color: var(--color-accent);
 }
 
+/* --- 13. MENU MOBILE (BURGER) --- */
+
+/* Par défaut (Desktop), on cache le bouton burger */
+.menu-toggle {
+    display: none;
+}
+
+/* RESPONSIVE MOBILE (Écrans < 768px) */
+@media (max-width: 768px) {
+    
+    /* 1. Ajustement du Header */
+    header {
+        padding: 1.5rem;
+        background: transparent; /* On garde la transparence */
+    }
+
+    /* On réduit un peu la taille du logo pour éviter qu'il prenne toute la place */
+    .logo {
+        font-size: 1rem;
+        z-index: 1001; /* Toujours visible par dessus le menu ouvert */
+    }
+
+    /* 2. Le Bouton Burger */
+    .menu-toggle {
+        display: block;
+        cursor: pointer;
+        z-index: 1001; /* Par dessus le menu ouvert */
+    }
+
+    .menu-toggle .bar {
+        display: block;
+        width: 25px;
+        height: 2px;
+        margin: 5px auto;
+        background-color: #fff;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* 3. Le Menu (Caché par défaut, plein écran quand ouvert) */
+    .nav-menu {
+        position: fixed;
+        left: -100%; /* Caché à gauche de l'écran */
+        top: 0;
+        gap: 0;
+        flex-direction: column;
+        background-color: rgba(0, 0, 0, 0.95); /* Fond noir quasi opaque */
+        width: 100%;
+        height: 100vh; /* Toute la hauteur */
+        text-align: center;
+        transition: 0.4s ease; /* Animation fluide */
+        padding-top: 8rem; /* Espace en haut pour ne pas coller au logo */
+        backdrop-filter: blur(10px); /* Effet flou sur le fond rouge derrière */
+    }
+
+    /* L'état "Actif" (quand on clique) */
+    .nav-menu.active {
+        left: 0; /* Le menu glisse sur l'écran */
+    }
+
+    .nav-item {
+        margin: 2rem 0;
+    }
+
+    /* Liens en très gros sur mobile */
+    .nav-link {
+        font-size: 1.5rem;
+        font-weight: 300;
+        display: block;
+        padding: 1rem;
+    }
+
+    /* 4. Animation du bouton burger en croix (X) */
+    .menu-toggle.is-active .bar:nth-child(2) {
+        opacity: 0; /* La barre du milieu disparaît */
+    }
+
+    .menu-toggle.is-active .bar:nth-child(1) {
+        transform: translateY(7px) rotate(45deg); /* Barre du haut pivote */
+    }
+
+    .menu-toggle.is-active .bar:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg); /* Barre du bas pivote */
+    }
+}
 .legal-block a:hover {
     color: var(--color-accent);
 }
+
