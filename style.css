@@ -660,7 +660,7 @@ a.logo {
 
 /* 2. On dimensionne l'image elle-même */
 .logo img {
-    height: 120px !important; /* Essayez 150px si c'est encore trop petit */
+    height: 200px !important; /* Essayez 150px si c'est encore trop petit */
     width: auto !important;   /* Garde les proportions */
     max-width: none;          /* Empêche le site de la compresser */
     object-fit: contain;
@@ -669,9 +669,10 @@ a.logo {
 /* 3. Ajustement Mobile */
 @media (max-width: 768px) {
     .logo img {
-        height: 60px !important; /* Ajustez ici pour le mobile */
+        height: 100px !important; /* Ajustez ici pour le mobile */
     }
 }
+
 
 
 
