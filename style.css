@@ -331,7 +331,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     background: transparent;
     
     /* C'EST ICI LA SOLUTION : On tire le bloc vers le haut */
-    margin-top: -8rem; /* Essayez -5rem si c'est trop collé, ou -10rem si pas assez */
+    margin-top: -15rem; /* Essayez -5rem si c'est trop collé, ou -10rem si pas assez */
     
     padding: 0; /* Aucune marge intérieure */
     text-align: center;
@@ -512,6 +512,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
