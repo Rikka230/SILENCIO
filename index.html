@@ -7,15 +7,13 @@
     <title>Silencio Pictures | Production de Films Indépendants - Paris</title>
     
     <meta name="description" content="Silencio Pictures est une société de production dirigée par Christophe Mongai. Cinéma audacieux et narrations visuelles entre illusion et réalité.">
-    
     <meta name="keywords" content="production cinéma, film indépendant, Christophe Mongai, Luca Mongai, arthouse, Paris, cinéma français">
-    
     <meta name="author" content="Christophe Mongai">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.silenciopictures.com/"> <meta property="og:title" content="Silencio Pictures | L'audace du cinéma indépendant">
+    <meta property="og:url" content="https://www.silenciopictures.com/">
+    <meta property="og:title" content="Silencio Pictures | L'audace du cinéma indépendant">
     <meta property="og:description" content="Découvrez nos productions. Une vision artistique portée par Christophe Mongai.">
-    
     <meta property="og:image" content="https://www.silenciopictures.com/share.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -24,13 +22,12 @@
     <meta name="twitter:image" content="https://www.silenciopictures.com/share.jpg">
 
     <link rel="icon" type="image/png" href="favicon.png">
-    
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body id="home">
 
     <div class="ambient-light"></div>
-
     <div class="corner-glow"></div>
 
     <div id="loader">
@@ -70,13 +67,13 @@
         <p class="subtitle">Production de films &bull; Paris</p>
     </section>
 
-<section id="projects">
+    <section id="projects">
         <div class="bento-container">
             <h2 class="section-title">En Production</h2>
             
             <div class="bento-grid">
                 <a href="projet1.html" class="bento-item bento-large">
-                    <img src="image/F1.jpg" alt="Film 1">
+                    <img src="image/F1.jpg" alt="Tales of Taipei">
                     <div class="bento-overlay">
                         <h3>TALES OF TAIPEI</h3>
                         <p>Joseph Hsu</p>
@@ -84,7 +81,7 @@
                 </a>
 
                 <a href="projet-detail.html" class="bento-item bento-tall">
-                    <img src="image/F2.jpg" alt="Film 2">
+                    <img src="image/F2.jpg" alt="L'Ombre">
                     <div class="bento-overlay">
                         <h3>L'OMBRE</h3>
                         <p>Drame / 2025</p>
@@ -92,7 +89,7 @@
                 </a>
 
                 <a href="projet-detail.html" class="bento-item">
-                    <img src="image/F3.jpg" alt="Film 3">
+                    <img src="image/F3.jpg" alt="Neon Nights">
                     <div class="bento-overlay">
                         <h3>NEON NIGHTS</h3>
                         <p>Court-métrage</p>
@@ -100,13 +97,12 @@
                 </a>
 
                 <a href="projet-detail.html" class="bento-item">
-                    <img src="image/F4.jpg" alt="Film 4">
+                    <img src="image/F4.jpg" alt="Silencio Doc">
                     <div class="bento-overlay">
                         <h3>SILENCIO</h3>
                         <p>Documentaire</p>
                     </div>
                 </a>
-                
             </div>
         </div>
     </section>
@@ -123,118 +119,87 @@
     <section id="contact">
         <div class="contact-info">
             <p style="color: var(--color-accent); font-weight: bold;">Luca MONGAI</p>
-            <p><a href="mailto:nassima10@icloud.com">contact@silencio.com</a></p>
+            <p><a href="mailto:luca.mongai@silencio-pictures.com">luca.mongai@silencio-pictures.com</a></p>
         </div>
-
-        <footer>
-            <a href="mentions-legales.html" class="legal-link">Mentions Légales</a>
-            <p class="legal-link" style="margin-top: 0.5rem;">© 2026 Silencio Pictures. All rights reserved.</p>
-        </footer>
     </section>
 
-    <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
+    <footer>
+        <a href="mentions-legales.html" class="legal-link">Mentions Légales</a>
+        <p class="legal-link" style="margin-top: 0.5rem;">© 2026 Silencio Pictures. All rights reserved.</p>
+    </footer>
 
     <script>
-        // 1. GESTION DU MENU MOBILE
-        const menuToggle = document.querySelector('#mobile-menu');
-        const navMenu = document.querySelector('.nav-menu');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        // Quand on clique sur le burger
-        menuToggle.addEventListener('click', function() {
-            menuToggle.classList.toggle('is-active'); // Transforme le burger en croix
-            navMenu.classList.toggle('active'); // Affiche le menu
-        });
-
-        // Quand on clique sur un lien, on ferme le menu automatiquement
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                menuToggle.classList.remove('is-active');
-                navMenu.classList.remove('active');
-            });
-        });
-
-        // 2. SCROLL FLUIDE (Votre ancien script)
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                // On vérifie si c'est un lien interne (commence par #)
-                const targetId = this.getAttribute('href').split('#')[1];
-                if (targetId) {
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        e.preventDefault();
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            });
-        });
-    </script>
-
-    <script>
-    // --- SCRIPT D'APPARITION AU SCROLL (MOBILE) ---
-    document.addEventListener("DOMContentLoaded", function() {
-        // On vérifie si on est sur mobile
-        if (window.innerWidth <= 768) {
+        document.addEventListener("DOMContentLoaded", function() {
             
-            const bentoItems = document.querySelectorAll('.bento-item');
+            // 1. GESTION DU MENU MOBILE
+            const menuToggle = document.querySelector('#mobile-menu');
+            const navMenu = document.querySelector('.nav-menu');
+            const navLinks = document.querySelectorAll('.nav-link');
 
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.2 // Se déclenche quand 20% de l'image est visible
-            };
+            if(menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    menuToggle.classList.toggle('is-active');
+                    navMenu.classList.toggle('active');
+                });
 
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    // Si l'élément entre dans l'écran
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                    } else {
-                        // Optionnel : Enlevez cette ligne si vous voulez que le titre RESTE affiché
-                        // une fois apparu, même si on scrolle plus loin.
-                        entry.target.classList.remove('is-visible'); 
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        menuToggle.classList.remove('is-active');
+                        navMenu.classList.remove('active');
+                    });
+                });
+            }
+
+            // 2. SCROLL FLUIDE (NAVIGATION)
+            document.querySelectorAll('a[href^="#"], a[href^="index.html#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    // On récupère juste la partie après le #
+                    const targetId = href.includes('#') ? href.split('#')[1] : null;
+
+                    if (targetId) {
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            e.preventDefault();
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                            
+                            // Si menu ouvert, on le ferme
+                            if(menuToggle) {
+                                menuToggle.classList.remove('is-active');
+                                navMenu.classList.remove('active');
+                            }
+                        }
                     }
                 });
-            }, observerOptions);
-
-            bentoItems.forEach(item => {
-                observer.observe(item);
             });
-        }
-    });
-</script>
-</body>
-</body>
 
+            // 3. APPARITION AU SCROLL (MOBILE BENTO)
+            if (window.innerWidth <= 768) {
+                const bentoItems = document.querySelectorAll('.bento-item');
+                
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.2
+                };
+
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        } else {
+                            // Enlever cette ligne si vous voulez que ça reste affiché
+                            entry.target.classList.remove('is-visible'); 
+                        }
+                    });
+                }, observerOptions);
+
+                bentoItems.forEach(item => {
+                    observer.observe(item);
+                });
+            }
+        });
+    </script>
+
+</body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
