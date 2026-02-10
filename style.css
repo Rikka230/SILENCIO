@@ -595,6 +595,16 @@ footer {
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
 
+/* DANS LE BLOC MOBILE UNIQUEMENT */
+    
+    .full-width-video {
+        /* On annule la remontée violente du PC (-8rem) */
+        margin-top: 0 !important; 
+        
+        /* On remet un petit espace normal pour que ça respire */
+        padding-top: 3rem; 
+    }
+
 /* --- MOBILE SCROLL REVEAL (BENTO GRID) --- */
 @media (max-width: 768px) {
     
@@ -623,6 +633,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
