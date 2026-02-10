@@ -1,5 +1,5 @@
 /* =========================================
-   SILENCIO PICTURES - STYLE MASTER (CLEAN)
+   SILENCIO PICTURES - STYLE MASTER (FINAL)
    ========================================= */
 
 /* --- 1. VARIABLES & RESET --- */
@@ -97,10 +97,10 @@ header {
     padding: 2rem;
     display: flex; justify-content: space-between; align-items: center;
     z-index: 100;
-    mix-blend-mode: exclusion; /* Effet d'inversion cool sur PC */
+    mix-blend-mode: exclusion;
 }
 
-/* Logo Image (Configuration de base) */
+/* Logo Image */
 a.logo {
     display: flex; align-items: center;
     height: auto; width: auto;
@@ -109,7 +109,7 @@ a.logo {
 }
 
 .logo img {
-    height: 200px; /* Taille Desktop */
+    height: 120px; /* Taille optimale Desktop */
     width: auto;
     display: block;
     transition: opacity 0.3s;
@@ -158,7 +158,7 @@ h1 {
 }
 
 /* Page Contact */
-#contact { text-align: center; border-top: none;}
+#contact { text-align: center; border-top: none; }
 .contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
 footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 
@@ -249,25 +249,33 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 }
 
 
-/* --- 9. PAGE DÉTAIL PROJET (FICHE FILM) --- */
+/* --- 9. PAGE DÉTAIL PROJET (RÉPARÉ + FONDU) --- */
+.project-hero {
+    height: 70vh; 
+    position: relative; /* CRUCIAL : C'est ça qui manquait pour tenir le texte */
+    overflow: hidden;
+    display: block;
+}
+
 .project-hero img {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: cover;
-    /* On garde une légère transparence globale pour assombrir */
     opacity: 0.8; 
 
-    /* --- LE MASQUE MAGIQUE --- */
-    /* Cela dit au navigateur : "Le centre de l'image est visible (black), 
-       mais les bords deviennent progressivement transparents." */
+    /* EFFET FONDU (VIGNETTE) */
+    -webkit-mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
     
-    /* Pour Chrome/Safari */
-    -webkit-mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
-    /* Pour Firefox et standard */
-    mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
-    
-    /* Petit bonus : adoucir la transition si l'image bouge */
     transition: all 0.5s ease;
+}
+
+/* Le conteneur du titre sur l'image */
+.project-header-content {
+    position: absolute; /* Place le texte par-dessus l'image */
+    bottom: 0; left: 0; width: 100%;
+    padding: 4rem 2rem;
+    z-index: 2;
+    background: linear-gradient(to top, var(--color-bg), transparent);
 }
 
 .project-title {
@@ -290,10 +298,13 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 .back-btn:hover::before { transform: translateX(-5px); }
 .back-btn::before { content: '←'; font-size: 1.2rem; transition: transform 0.3s; }
 
+/* Contenu Principal */
 .project-content {
     max-width: 1000px; margin: 0 auto;
     padding: 4rem 2rem 1rem 2rem;
     display: grid; grid-template-columns: 2fr 1fr; gap: 4rem;
+    position: relative; 
+    z-index: 5; /* Assure que le texte passe devant le fond */
 }
 .synopsis { font-size: 1.2rem; line-height: 1.8; color: #ddd; }
 .tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
@@ -384,7 +395,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     }
     
     .logo img {
-        height: 100px !important; /* Taille Mobile Forcée */
+        height: 80px !important; /* Taille Mobile Forcée (sécurité anti-chevauchement) */
         width: auto !important;
         margin: 0;
         object-fit: contain;
@@ -442,13 +453,10 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
     
-    /* E. AJUSTEMENTS PAGES INTERNES */
+    /* E. AJUSTEMENTS PAGES INTERNES MOBILE */
     .back-btn { top: 2rem; left: 2rem; }
     .project-content { grid-template-columns: 1fr; gap: 2rem; }
     .project-hero { height: 50vh; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
-
-
-
