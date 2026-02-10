@@ -128,16 +128,32 @@
         <p class="legal-link" style="margin-top: 0.5rem;">© 2026 Silencio Pictures. All rights reserved.</p>
     </footer>
 
-    <script>
+   <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // Éléments globaux
-            const transitionOverlay = document.querySelector('.page-transition');
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
-            const navLinks = document.querySelectorAll('.nav-link');
+            const transitionOverlay = document.querySelector('.page-transition');
+            
+            // --- 1. FONCTIONS UTILES ---
+            
+            // Fonction pour fermer le menu mobile
+            function closeMenu() {
+                if(menuToggle) menuToggle.classList.remove('is-active');
+                if(navMenu) navMenu.classList.remove('active');
+            }
 
-            // --- 1. GESTION DU MENU MOBILE (OUVERTURE/FERMETURE) ---
+            // Fonction pour activer le fondu au noir
+            function fadeToBlack(callback) {
+                if(transitionOverlay) {
+                    transitionOverlay.classList.add('active'); // Devient noir
+                    setTimeout(callback, 500); // Attend 0.5s puis exécute l'action
+                } else {
+                    callback(); // Si pas de transition, on y va direct
+                }
+            }
+
+            // --- 2. GESTION DU BURGER (OUVERTURE) ---
             if(menuToggle) {
                 menuToggle.addEventListener('click', function() {
                     menuToggle.classList.toggle('is-active');
@@ -145,93 +161,69 @@
                 });
             }
 
-            // Fonction pour fermer le menu mobile proprement
-            function closeMobileMenu() {
-                if(menuToggle && navMenu.classList.contains('active')) {
-                    menuToggle.classList.remove('is-active');
-                    navMenu.classList.remove('active');
-                }
-            }
+            // --- 3. GESTION DES CLICS SUR LES LIENS ---
+            const allLinks = document.querySelectorAll('a');
 
-
-            // --- 2. NAVIGATION INTERNE (Onglets : Accueil, Contact...) ---
-            // C'est ici qu'on fait l'effet "Fade to Black" au lieu du scroll
-            document.querySelectorAll('a[href^="#"], a[href^="index.html#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    // Récupère l'ID (ex: "about")
-                    const targetId = href.includes('#') ? href.split('#')[1] : null;
-
-                    if (targetId) {
-                        const targetElement = document.getElementById(targetId);
-                        
-                        if (targetElement) {
-                            e.preventDefault(); // Bloque le scroll standard
-                            
-                            // A. On baisse le rideau noir
-                            transitionOverlay.style.visibility = 'visible';
-                            transitionOverlay.style.opacity = '1';
-                            
-                            // B. On ferme le menu mobile tout de suite
-                            closeMobileMenu();
-
-                            // C. On attend que le noir soit total (500ms)
-                            setTimeout(() => {
-                                // D. On saute instantanément à la section
-                                targetElement.scrollIntoView({ behavior: 'auto' });
-                                
-                                // E. On relève le rideau (Fade In)
-                                setTimeout(() => {
-                                    transitionOverlay.style.opacity = '0';
-                                    // Une fois fini, on cache l'élément pour pouvoir cliquer dessous
-                                    setTimeout(() => {
-                                        transitionOverlay.style.visibility = 'hidden';
-                                    }, 500);
-                                }, 100); // Petite pause technique
-                                
-                            }, 500); // Temps du fondu noir
-                        }
-                    }
-                });
-            });
-
-
-            // --- 3. NAVIGATION EXTERNE (Vers pages Projet) ---
-            document.querySelectorAll('a:not([href^="#"]):not([href^="mailto:"])').forEach(link => {
+            allLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
-                    const target = this.getAttribute('href');
-                    if (target) {
-                        e.preventDefault();
-                        
-                        // Fondu au noir
-                        transitionOverlay.style.visibility = 'visible';
-                        transitionOverlay.style.opacity = '1';
-                        
-                        // Changement de page après 500ms
-                        setTimeout(() => {
-                            window.location.href = target;
-                        }, 500);
+                    const href = this.getAttribute('href');
+
+                    // A. Si c'est un mailto ou un lien vide, on ne fait rien
+                    if (!href || href.startsWith('mailto:') || href === '#') return;
+
+                    // B. On empêche le comportement par défaut pour gérer l'anim
+                    e.preventDefault();
+
+                    // C. On ferme le menu mobile TOUT DE SUITE
+                    closeMenu();
+
+                    // D. ANALYSE DU LIEN
+                    
+                    // CAS 1 : C'est une ancre sur la même page (ex: #contact ou index.html#about)
+                    if (href.includes('#')) {
+                        // On extrait l'ID (ex: "about")
+                        const targetId = href.split('#')[1];
+                        const targetElement = document.getElementById(targetId);
+
+                        if (targetElement) {
+                            // On fait le fondu noir
+                            fadeToBlack(() => {
+                                // On scroll
+                                targetElement.scrollIntoView({ behavior: 'auto' });
+                                // On relève le rideau (Fade In)
+                                transitionOverlay.classList.remove('active');
+                            });
+                        } else {
+                            // Si l'élément n'existe pas (ex: on est sur projet.html et on clique Accueil#contact)
+                            // On redirige comme une page normale
+                            fadeToBlack(() => { window.location.href = href; });
+                        }
+                    } 
+                    // CAS 2 : C'est une autre page (ex: projet1.html)
+                    else {
+                        fadeToBlack(() => {
+                            window.location.href = href;
+                        });
                     }
                 });
             });
 
-
-            // --- 4. ANIMATION BENTO (MOBILE) ---
+            // --- 4. ANIMATION BENTO MOBILE (Optionnel) ---
             if (window.innerWidth <= 768) {
                 const bentoItems = document.querySelectorAll('.bento-item');
                 const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+                    entries.forEach(e => {
+                        if (e.isIntersecting) e.target.classList.add('is-visible');
                     });
                 }, { threshold: 0.2 });
-                bentoItems.forEach(item => observer.observe(item));
+                bentoItems.forEach(i => observer.observe(i));
             }
-
         });
     </script>
 
 </body>
 </html>
+
 
 
 
