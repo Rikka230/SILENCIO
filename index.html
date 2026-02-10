@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Silencio Pictures - Société de production cinéma indépendant.">
+    <title>Silencio Pictures</title>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <div class="corner-glow"></div>
+
+    <div id="loader">
+        <div class="loader-logo">SILENCIO</div>
+    </div>
+    
+    <header>
+        <a href="#production" class="logo">SILENCIO PICTURES</a>
+        <nav>
+            <ul>
+                <li><a href="#about">À propos</a></li>
+                <li><a href="#production">Production</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="production">
+        <div class="hero-video-container">
+            <div class="video-placeholder"></div> 
+        </div>
+        <h1>Silencio</h1>
+        <p style="margin-top: 1rem; letter-spacing: 2px;">CINÉMA INDÉPENDANT</p>
+    </section>
+
+    <section id="about">
+        <div class="about-text">
+            <p>La nuit s'est installée.</p><br>
+            <p>Silencio est une société de production qui se distingue par son audace et son esprit novateur.</p>
+            <br>
+            <p>Toujours à la recherche de nouvelles frontières créatives, elle intrigue par son mystère et inspire par sa volonté de repousser les limites.</p>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="contact-info">
+            <p style="color: var(--color-accent); font-weight: bold;">Badjelmane Nassima</p>
+            <p><a href="mailto:nassima10@icloud.com">nassima10@icloud.com</a></p>
+            <p><a href="tel:+33603616134">+33 6 03 61 61 34</a></p>
+        </div>
+
+        <footer>
+            <a href="#" class="legal-link">Mentions Légales</a>
+            <p class="legal-link" style="margin-top: 0.5rem;">© 2024 Silencio Pictures. All rights reserved.</p>
+        </footer>
+    </section>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

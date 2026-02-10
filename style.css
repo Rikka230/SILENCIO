@@ -1,0 +1,201 @@
+/* --- style.css (VERSION CORRIGÉE) --- */
+
+/* 1. VARIABLES & CONFIGURATION */
+:root {
+    --color-bg: #000000;
+    --color-text: #ffffff;
+    --color-accent: #D72725; /* Rouge Silencio */
+    --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-main);
+    overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+}
+
+a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
+a:hover { opacity: 0.7; }
+
+/* 2. AMBIENT LIGHT (Le flou rouge mouvant en arrière-plan) */
+.ambient-light {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -2; /* Tout au fond */
+    background: #000; /* Fond noir de base */
+    pointer-events: none;
+}
+
+/* Lumière mouvante 1 */
+.ambient-light::before {
+    content: '';
+    position: absolute;
+    width: 150vw;
+    height: 150vw;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle, rgba(215, 39, 37, 0.4) 0%, rgba(0,0,0,0) 60%);
+    filter: blur(80px);
+    animation: drift1 12s infinite alternate ease-in-out;
+}
+
+/* Lumière mouvante 2 */
+.ambient-light::after {
+    content: '';
+    position: absolute;
+    width: 120vw;
+    height: 120vw;
+    bottom: -20%;
+    right: -20%;
+    background: radial-gradient(circle, rgba(180, 20, 20, 0.3) 0%, rgba(0,0,0,0) 60%);
+    filter: blur(60px);
+    animation: drift2 15s infinite alternate-reverse ease-in-out;
+}
+
+/* --- 3. CORNER GLOW (AVEC RESPIRATION) --- */
+.corner-glow {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; 
+    pointer-events: none;
+    z-index: 10;
+    mix-blend-mode: screen;
+    
+    background: 
+        radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.6) 0%, transparent 40%),
+        radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.6) 0%, transparent 40%);
+        
+    /* C'est ici que l'on branche l'animation "breathe" */
+    animation: breathe 5s infinite alternate ease-in-out;
+}
+
+/* 4. LOADER / INTRO (Le logo qui apparaît puis disparaît) */
+#loader {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: var(--color-bg);
+    display: flex; /* IMPORTANT pour le centrage */
+    justify-content: center; /* Centre horizontalement */
+    align-items: center; /* Centre verticalement */
+    z-index: 9999; /* Toujours au-dessus de tout */
+    animation: fadeOut 1s ease-out 3.5s forwards; /* Disparition */
+    pointer-events: none; /* Permet de cliquer à travers une fois disparu (sécurité) */
+}
+
+.loader-logo {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: bold;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: blurPulse 3s infinite alternate;
+}
+
+/* 5. HEADER & NAV */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    mix-blend-mode: exclusion;
+}
+
+.logo {
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+nav ul { display: flex; gap: 2rem; list-style: none; }
+nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+
+/* 6. SECTIONS */
+section {
+    min-height: 100vh;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1; /* Le contenu passe devant les lumières */
+}
+
+#production { align-items: center; text-align: center; }
+
+h1 {
+    font-size: clamp(3rem, 10vw, 8rem);
+    text-transform: uppercase;
+    letter-spacing: -3px;
+    line-height: 0.9;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 30px rgba(215, 39, 37, 0.4);
+}
+
+.subtitle {
+    font-size: 1rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+#about { max-width: 900px; margin: 0 auto; text-align: center; }
+.about-text {
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-weight: 300;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+.highlight { color: var(--color-accent); }
+
+#contact { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); }
+.contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
+footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
+
+/* ANIMATIONS (KEYFRAMES) */
+@keyframes drift1 {
+    0% { transform: translate(10%, 10%) scale(1); }
+    50% { transform: translate(40%, 20%) scale(1.1); }
+    100% { transform: translate(20%, 50%) scale(0.9); }
+}
+
+@keyframes drift2 {
+    0% { transform: translate(-10%, -10%) scale(0.9); }
+    50% { transform: translate(-30%, -40%) scale(1.2); }
+    100% { transform: translate(-10%, -60%) scale(1); }
+}
+
+@keyframes blurPulse {
+    0% { filter: blur(15px); opacity: 0.4; }
+    50% { filter: blur(0px); opacity: 1; }
+    100% { filter: blur(8px); opacity: 0.7; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    header { flex-direction: column; gap: 1.5rem; padding: 1.5rem; }
+    nav ul { gap: 1.5rem; font-size: 0.8rem; }
+}
+
