@@ -433,28 +433,28 @@ footer {
    AJOUTS : TRANSITIONS
    ========================================= */
 
-/* --- 1. TRANSITION DE PAGE (FADE TO BLACK) --- */
+/* --- TRANSITION DE PAGE (RIDEAU NOIR) --- */
 .page-transition {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background-color: #000; /* Le noir profond */
-    z-index: 99999; /* Au-dessus de ABSOLUMENT TOUT */
-    pointer-events: none; /* Laisse passer les clics quand il est invisible */
-    opacity: 1;
-    /* L'animation d'ouverture (le rideau se lève) */
+    background-color: #000;
+    z-index: 99999;
+    pointer-events: none;
+    
+    /* On démarre visible pour l'intro */
+    opacity: 1; 
+    
+    /* Animation d'intro au chargement de la page */
     animation: pageReveal 0.8s ease-out forwards;
-}
-
-/* Classe qu'on ajoute en JS quand on quitte la page */
-.page-transition.active {
-    opacity: 1;
-    pointer-events: all; /* Bloque les clics pendant la transition */
-    animation: none; /* On force l'opacité sans animation automatique */
+    
+    /* AJOUT IMPORTANT : Permet de réutiliser le fondu via le Javascript */
+    transition: opacity 0.5s ease-in-out;
 }
 
 @keyframes pageReveal {
     0% { opacity: 1; }
+    99% { opacity: 0; }
     100% { opacity: 0; visibility: hidden; }
 }
 
@@ -577,6 +577,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
