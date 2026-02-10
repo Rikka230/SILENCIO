@@ -648,7 +648,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 
 /* --- 14. LOGO IMAGE (Remplacement du texte) --- */
 .logo img {
-    height: 40px; /* Hauteur idéale sur ordinateur */
+    height: 120px; /* Hauteur idéale sur ordinateur */
     width: auto;  /* La largeur s'adapte automatiquement */
     display: block; /* Supprime les petits espaces fantômes sous l'image */
     transition: opacity 0.3s;
@@ -661,8 +661,9 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 /* Ajustement SPÉCIFIQUE Mobile */
 @media (max-width: 768px) {
     .logo img {
-        height: 30px; /* Un peu plus petit sur mobile pour laisser de la place au burger */
+        height: 100px; /* Un peu plus petit sur mobile pour laisser de la place au burger */
     }
 }
+
 
 
