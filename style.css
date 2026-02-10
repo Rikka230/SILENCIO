@@ -375,19 +375,28 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 }
 
 /* Le bouton "Retour" */
+/* --- BOUTON RETOUR (FICHE PROJET) --- */
 .back-btn {
-    position: fixed; /* Il vous suit quand vous scrollez */
+    position: fixed;
     top: 2rem;
     left: 2rem;
-    z-index: 100;
+    /* On passe le z-index à 1001 pour être sûr qu'il soit AU-DESSUS de l'image */
+    z-index: 1001; 
     color: #fff;
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    mix-blend-mode: exclusion;
+    mix-blend-mode: exclusion; /* Inverse la couleur selon le fond */
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
+    
+    /* Optionnel : petit fond pour sécuriser le clic sur mobile */
+    padding: 10px 15px;
+    border-radius: 30px;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(5px);
 }
 
 .back-btn::before {
@@ -397,7 +406,17 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 }
 
 .back-btn:hover::before {
-    transform: translateX(-5px); /* Petite flèche qui bouge */
+    transform: translateX(-5px);
+}
+
+/* RESPONSIVE BOUTON RETOUR */
+@media (max-width: 768px) {
+    .back-btn {
+        top: 1.5rem; /* Un peu plus haut sur mobile */
+        left: 1.5rem;
+        font-size: 0.8rem; /* Un peu plus petit */
+        padding: 8px 12px;
+    }
 }
 
 /* Contenu (Synopsis + Infos) */
@@ -626,5 +645,6 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 .legal-block a:hover {
     color: var(--color-accent);
 }
+
 
 
