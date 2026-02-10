@@ -647,21 +647,29 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 }
 
 /* --- 14. LOGO IMAGE (Remplacement du texte) --- */
+/* --- 14. LOGO IMAGE (CORRIGÉ & FORCÉ) --- */
+
+/* 1. On débloque le conteneur (le lien <a>) */
+a.logo {
+    display: flex;       /* Permet à l'image de prendre sa place */
+    align-items: center; 
+    height: auto;        /* On laisse la hauteur libre */
+    width: auto;
+    text-decoration: none;
+}
+
+/* 2. On dimensionne l'image elle-même */
 .logo img {
-    height: 120px; /* Hauteur idéale sur ordinateur */
-    width: auto;  /* La largeur s'adapte automatiquement */
-    display: block; /* Supprime les petits espaces fantômes sous l'image */
-    transition: opacity 0.3s;
+    height: 120px !important; /* Essayez 150px si c'est encore trop petit */
+    width: auto !important;   /* Garde les proportions */
+    max-width: none;          /* Empêche le site de la compresser */
+    object-fit: contain;
 }
 
-.logo:hover img {
-    opacity: 0.8; /* Petit effet au survol */
-}
-
-/* Ajustement SPÉCIFIQUE Mobile */
+/* 3. Ajustement Mobile */
 @media (max-width: 768px) {
     .logo img {
-        height: 100px; /* Un peu plus petit sur mobile pour laisser de la place au burger */
+        height: 60px !important; /* Ajustez ici pour le mobile */
     }
 }
 
