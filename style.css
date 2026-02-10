@@ -160,7 +160,13 @@ h1 {
 /* Page Contact */
 #contact { text-align: center; border-top: none; }
 .contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
-footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
+footer { 
+    margin-top: 0; /* On colle le footer à la vidéo sans espace */
+    padding-bottom: 2rem; /* Un peu d'espace en bas de page */
+    font-size: 0.8rem; 
+    opacity: 0.5; 
+    border: none !important; /* Sécurité */
+}
 
 
 /* --- 7. VIDÉO D'ARRIÈRE-PLAN (HOME) --- */
@@ -512,6 +518,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
