@@ -166,6 +166,8 @@ footer {
     font-size: 0.8rem; 
     opacity: 0.5; 
     border: none !important; /* Sécurité */
+    text-align: center; 
+    width: 100%;
 }
 
 
@@ -547,6 +549,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
