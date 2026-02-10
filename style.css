@@ -440,16 +440,17 @@ footer {
     width: 100%; height: 100%;
     background-color: #000;
     z-index: 99999;
-    pointer-events: none;
     
-    /* On démarre visible pour l'intro */
-    opacity: 1; 
-    
-    /* Animation d'intro au chargement de la page */
-    animation: pageReveal 0.8s ease-out forwards;
-    
-    /* AJOUT IMPORTANT : Permet de réutiliser le fondu via le Javascript */
+    /* CRUCIAL : Par défaut, on peut cliquer à travers (car transparent) */
+    pointer-events: none; 
+    opacity: 0; 
     transition: opacity 0.5s ease-in-out;
+}
+
+/* Quand on ajoute cette classe en JS, le rideau devient noir et bloque les clics */
+.page-transition.active {
+    opacity: 1;
+    pointer-events: all;
 }
 
 @keyframes pageReveal {
@@ -577,6 +578,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
