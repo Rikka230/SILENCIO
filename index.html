@@ -131,29 +131,41 @@
    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
+            // --- 0. GESTION DE L'INTRO (Une seule fois par session) ---
+            const loader = document.getElementById('loader');
+            
+            // On vérifie si la mémoire contient la preuve qu'on a déjà vu l'intro
+            if (sessionStorage.getItem('silencioIntroPlayed')) {
+                // Si oui, on cache le loader IMMÉDIATEMENT
+                if(loader) loader.style.display = 'none';
+            } else {
+                // Si non, on enregistre l'info pour la prochaine page
+                sessionStorage.setItem('silencioIntroPlayed', 'true');
+            }
+
+
+            // --- 1. VARIABLES GLOBALES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
             const transitionOverlay = document.querySelector('.page-transition');
             
-            // --- 1. FONCTIONS UTILES ---
+            // --- 2. FONCTIONS UTILES ---
             
-            // Fonction pour fermer le menu mobile
             function closeMenu() {
                 if(menuToggle) menuToggle.classList.remove('is-active');
                 if(navMenu) navMenu.classList.remove('active');
             }
 
-            // Fonction pour activer le fondu au noir
             function fadeToBlack(callback) {
                 if(transitionOverlay) {
-                    transitionOverlay.classList.add('active'); // Devient noir
-                    setTimeout(callback, 500); // Attend 0.5s puis exécute l'action
+                    transitionOverlay.classList.add('active'); 
+                    setTimeout(callback, 500); 
                 } else {
-                    callback(); // Si pas de transition, on y va direct
+                    callback();
                 }
             }
 
-            // --- 2. GESTION DU BURGER (OUVERTURE) ---
+            // --- 3. MENU MOBILE ---
             if(menuToggle) {
                 menuToggle.addEventListener('click', function() {
                     menuToggle.classList.toggle('is-active');
@@ -161,54 +173,42 @@
                 });
             }
 
-            // --- 3. GESTION DES CLICS SUR LES LIENS ---
+            // --- 4. GESTION DES CLICS (TRANSITIONS) ---
             const allLinks = document.querySelectorAll('a');
 
             allLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
 
-                    // A. Si c'est un mailto ou un lien vide, on ne fait rien
+                    // On ignore les liens vides ou mailto
                     if (!href || href.startsWith('mailto:') || href === '#') return;
 
-                    // B. On empêche le comportement par défaut pour gérer l'anim
                     e.preventDefault();
-
-                    // C. On ferme le menu mobile TOUT DE SUITE
                     closeMenu();
 
-                    // D. ANALYSE DU LIEN
-                    
-                    // CAS 1 : C'est une ancre sur la même page (ex: #contact ou index.html#about)
+                    // CAS 1 : ANCRE INTERNE (#contact, etc.)
                     if (href.includes('#')) {
-                        // On extrait l'ID (ex: "about")
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
 
                         if (targetElement) {
-                            // On fait le fondu noir
                             fadeToBlack(() => {
-                                // On scroll
                                 targetElement.scrollIntoView({ behavior: 'auto' });
-                                // On relève le rideau (Fade In)
-                                transitionOverlay.classList.remove('active');
+                                transitionOverlay.classList.remove('active'); // On relève le rideau
                             });
                         } else {
-                            // Si l'élément n'existe pas (ex: on est sur projet.html et on clique Accueil#contact)
-                            // On redirige comme une page normale
+                            // Si l'ancre n'est pas sur cette page, on charge la page
                             fadeToBlack(() => { window.location.href = href; });
                         }
                     } 
-                    // CAS 2 : C'est une autre page (ex: projet1.html)
+                    // CAS 2 : LIEN EXTERNE (Page Projet)
                     else {
-                        fadeToBlack(() => {
-                            window.location.href = href;
-                        });
+                        fadeToBlack(() => { window.location.href = href; });
                     }
                 });
             });
 
-            // --- 4. ANIMATION BENTO MOBILE (Optionnel) ---
+            // --- 5. ANIMATION BENTO (MOBILE) ---
             if (window.innerWidth <= 768) {
                 const bentoItems = document.querySelectorAll('.bento-item');
                 const observer = new IntersectionObserver((entries) => {
@@ -220,9 +220,10 @@
             }
         });
     </script>
-
+    
 </body>
 </html>
+
 
 
 
