@@ -250,22 +250,11 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 
 
 /* --- 9. PAGE DÉTAIL PROJET (RÉPARÉ + FONDU) --- */
-.project-hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.8; 
-
-    /* --- NOUVEAU MASQUE (LINÉAIRE) --- */
-    /* Cela force la transparence sur la ligne tout en haut (0%) et tout en bas (100%) */
-    
-    /* Pour Chrome/Safari/Mobile */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
-    
-    /* Pour Firefox et Standard */
-    mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
-    
-    transition: all 0.5s ease;
+.project-hero {
+    height: 70vh; 
+    position: relative; /* CRUCIAL : C'est ça qui manquait pour tenir le texte */
+    overflow: hidden;
+    display: block;
 }
 
 .project-hero img {
@@ -471,5 +460,6 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
