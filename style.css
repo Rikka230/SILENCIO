@@ -1,6 +1,8 @@
-/* --- style.css (VERSION CORRIGÉE) --- */
+/* =========================================
+   SILENCIO PICTURES - STYLE MASTER (CLEAN)
+   ========================================= */
 
-/* 1. VARIABLES & CONFIGURATION */
+/* --- 1. VARIABLES & RESET --- */
 :root {
     --color-bg: #000000;
     --color-text: #ffffff;
@@ -24,76 +26,59 @@ body {
 a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
 a:hover { opacity: 0.7; }
 
-/* 2. AMBIENT LIGHT (Le flou rouge mouvant en arrière-plan) */
+/* --- 2. AMBIENT LIGHT (FOND) --- */
 .ambient-light {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     overflow: hidden;
-    z-index: -2; /* Tout au fond */
-    background: #000; /* Fond noir de base */
+    z-index: -2;
+    background: #000;
     pointer-events: none;
 }
 
-/* Lumière mouvante 1 */
 .ambient-light::before {
-    content: '';
-    position: absolute;
-    width: 150vw;
-    height: 150vw;
-    top: -50%;
-    left: -50%;
+    content: ''; position: absolute;
+    width: 150vw; height: 150vw;
+    top: -50%; left: -50%;
     background: radial-gradient(circle, rgba(215, 39, 37, 0.4) 0%, rgba(0,0,0,0) 60%);
     filter: blur(80px);
     animation: drift1 12s infinite alternate ease-in-out;
 }
 
-/* Lumière mouvante 2 */
 .ambient-light::after {
-    content: '';
-    position: absolute;
-    width: 120vw;
-    height: 120vw;
-    bottom: -20%;
-    right: -20%;
+    content: ''; position: absolute;
+    width: 120vw; height: 120vw;
+    bottom: -20%; right: -20%;
     background: radial-gradient(circle, rgba(180, 20, 20, 0.3) 0%, rgba(0,0,0,0) 60%);
     filter: blur(60px);
     animation: drift2 15s infinite alternate-reverse ease-in-out;
 }
 
-/* --- 3. CORNER GLOW (AVEC RESPIRATION) --- */
+/* --- 3. CORNER GLOW (LUMIÈRES COINS) --- */
 .corner-glow {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; 
+    bottom: 0; left: 0;
+    width: 100%; height: 100%; 
     pointer-events: none;
     z-index: 10;
     mix-blend-mode: screen;
-    
     background: 
         radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.6) 0%, transparent 40%),
         radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.6) 0%, transparent 40%);
-        
-    /* C'est ici que l'on branche l'animation "breathe" */
     animation: breathe 5s infinite alternate ease-in-out;
 }
 
-/* 4. LOADER / INTRO (Le logo qui apparaît puis disparaît) */
+/* --- 4. LOADER / INTRO --- */
 #loader {
     position: fixed;
     top: 0; left: 0; 
     width: 100%; height: 100%;
     background: var(--color-bg);
-    display: flex; /* IMPORTANT pour le centrage */
-    justify-content: center; /* Centre horizontalement */
-    align-items: center; /* Centre verticalement */
-    z-index: 9999; /* Toujours au-dessus de tout */
-    animation: fadeOut 1s ease-out 3.5s forwards; /* Disparition */
-    pointer-events: none; /* Permet de cliquer à travers une fois disparu (sécurité) */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
+    animation: fadeOut 1s ease-out 3.5s forwards;
+    pointer-events: none;
 }
 
 .loader-logo {
@@ -105,41 +90,49 @@ a:hover { opacity: 0.7; }
     animation: blurPulse 3s infinite alternate;
 }
 
-/* 5. HEADER & NAV */
+/* --- 5. HEADER (DESKTOP) --- */
 header {
     position: fixed;
-    top: 0;
-    width: 100%;
+    top: 0; width: 100%;
     padding: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
     z-index: 100;
-    mix-blend-mode: exclusion;
+    mix-blend-mode: exclusion; /* Effet d'inversion cool sur PC */
 }
 
-.logo {
-    font-weight: bold;
-    letter-spacing: 1px;
-    font-size: 1.1rem;
-    text-transform: uppercase;
+/* Logo Image (Configuration de base) */
+a.logo {
+    display: flex; align-items: center;
+    height: auto; width: auto;
+    text-decoration: none;
+    z-index: 1001;
 }
 
+.logo img {
+    height: 120px; /* Taille Desktop */
+    width: auto;
+    display: block;
+    transition: opacity 0.3s;
+}
+
+.logo:hover img { opacity: 0.8; }
+
+/* Menu Desktop */
 nav ul { display: flex; gap: 2rem; list-style: none; }
 nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
 
-/* 6. SECTIONS */
+/* Bouton Burger (Caché sur Desktop) */
+.menu-toggle { display: none; }
+
+
+/* --- 6. SECTIONS GÉNÉRALES --- */
 section {
     min-height: 100vh;
     padding: 4rem 2rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: flex; flex-direction: column; justify-content: center;
     position: relative;
-    z-index: 1; /* Le contenu passe devant les lumières */
+    z-index: 1;
 }
-
-#production { align-items: center; text-align: center; }
 
 h1 {
     font-size: clamp(3rem, 10vw, 8rem);
@@ -151,216 +144,120 @@ h1 {
 }
 
 .subtitle {
-    font-size: 1rem;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    opacity: 0.8;
+    font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;
 }
 
+/* Page Accueil */
+#production { align-items: center; text-align: center; }
+
+/* Page À Propos */
 #about { max-width: 900px; margin: 0 auto; text-align: center; }
 .about-text {
     font-size: clamp(1.2rem, 2vw, 1.8rem);
-    font-weight: 300;
-    line-height: 1.4;
-    opacity: 0.9;
+    font-weight: 300; line-height: 1.4; opacity: 0.9;
 }
-.highlight { color: var(--color-accent); }
 
+/* Page Contact */
 #contact { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); }
 .contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
 footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 
-/* ANIMATIONS (KEYFRAMES) */
-@keyframes drift1 {
-    0% { transform: translate(10%, 10%) scale(1); }
-    50% { transform: translate(40%, 20%) scale(1.1); }
-    100% { transform: translate(20%, 50%) scale(0.9); }
-}
 
-@keyframes drift2 {
-    0% { transform: translate(-10%, -10%) scale(0.9); }
-    50% { transform: translate(-30%, -40%) scale(1.2); }
-    100% { transform: translate(-10%, -60%) scale(1); }
-}
-
-@keyframes blurPulse {
-    0% { filter: blur(15px); opacity: 0.4; }
-    50% { filter: blur(0px); opacity: 1; }
-    100% { filter: blur(8px); opacity: 0.7; }
-}
-
-@keyframes fadeOut {
-    to { opacity: 0; visibility: hidden; }
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    header { flex-direction: column; gap: 1.5rem; padding: 1.5rem; }
-    nav ul { gap: 1.5rem; font-size: 0.8rem; }
-}
-
-/* --- 8. VIDÉO D'ARRIÈRE-PLAN --- */
+/* --- 7. VIDÉO D'ARRIÈRE-PLAN (HOME) --- */
 .hero-video-container {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    z-index: -1; /* Derrière le titre */
-    overflow: hidden;
+    z-index: -1; overflow: hidden;
 }
 
 .hero-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* La vidéo remplit tout l'écran sans se déformer */
-    opacity: 0.5; /* On règle l'opacité pour bien voir le texte par dessus */
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
 }
 
-/* Filtre supplémentaire (Dégradé Cinéma) */
 .video-overlay {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    /* Un dégradé subtil pour assombrir le bas de la vidéo */
     background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
     pointer-events: none;
 }
 
-/* --- 9. BENTO GRID (GRILLE PROJETS) --- */
-#projects {
-    padding: 6rem 2rem;
-    min-height: auto; /* La hauteur s'adapte au contenu */
-}
+
+/* --- 8. BENTO GRID (EN PRODUCTION) --- */
+#projects { padding: 6rem 2rem; min-height: auto; }
 
 .section-title {
     font-size: clamp(2rem, 4vw, 3rem);
     text-transform: uppercase;
     margin-bottom: 3rem;
-    border-left: 4px solid var(--color-accent); /* Petite barre rouge à gauche */
+    border-left: 4px solid var(--color-accent);
     padding-left: 1rem;
 }
 
-.bento-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
+.bento-container { max-width: 1200px; margin: 0 auto; width: 100%; }
 
 .bento-grid {
     display: grid;
-    /* Création automatique des colonnes (minimum 300px de large) */
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    /* Espace entre les cases */
     gap: 20px;
-    grid-auto-flow: dense; /* Optimise le remplissage des trous */
+    grid-auto-flow: dense;
 }
 
-/* --- STYLE DES ITEMS (CARTES) --- */
 .bento-item {
     position: relative;
     border-radius: 12px;
-    overflow: hidden; /* Pour que l'image ne dépasse pas au zoom */
+    overflow: hidden;
     background: #111;
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Transition fluide */
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     cursor: pointer;
     min-height: 300px;
-    display: block; /* Important pour le lien <a> */
+    display: block;
     border: 1px solid rgba(255,255,255,0.1);
 }
 
 .bento-item img {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: cover;
     transition: transform 0.6s ease;
-    opacity: 0.7; /* Image un peu sombre par défaut */
+    opacity: 0.7;
 }
 
-/* --- LE TEXTE PAR DESSUS (OVERLAY) --- */
 .bento-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    position: absolute; bottom: 0; left: 0; width: 100%;
     padding: 2rem;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    transform: translateY(20px); /* Légèrement caché vers le bas */
-    opacity: 0; /* Invisible par défaut */
+    transform: translateY(20px); opacity: 0;
     transition: all 0.4s ease;
 }
 
-.bento-overlay h3 {
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    color: #fff;
-}
+.bento-overlay h3 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 0.5rem; color: #fff; }
+.bento-overlay p { color: var(--color-accent); font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; }
 
-.bento-overlay p {
-    color: var(--color-accent); /* Rouge Silencio */
-    font-size: 0.9rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
+.bento-item:hover { transform: scale(1.02); z-index: 2; border-color: var(--color-accent); box-shadow: 0 10px 40px rgba(215, 39, 37, 0.4); }
+.bento-item:hover img { transform: scale(1.1); opacity: 1; }
+.bento-item:hover .bento-overlay { transform: translateY(0); opacity: 1; }
+.bento-item:active { transform: scale(0.98); transition: transform 0.1s; }
 
-/* --- ANIMATIONS AU SURVOL (HOVER) --- */
-.bento-item:hover {
-    transform: scale(1.02); /* Léger grossissement de la boîte */
-    z-index: 2; /* Passe par dessus les autres */
-    border-color: var(--color-accent); /* Bordure rouge */
-    /* Le fameux Halo de lumière  */
-    box-shadow: 0 10px 40px rgba(215, 39, 37, 0.4); 
-}
-
-.bento-item:hover img {
-    transform: scale(1.1); /* Zoom dans l'image */
-    opacity: 1; /* L'image devient nette et lumineuse */
-}
-
-.bento-item:hover .bento-overlay {
-    transform: translateY(0);
-    opacity: 1; /* Le texte apparaît */
-}
-
-/* --- ANIMATION AU CLIC (ACTIVE) --- */
-.bento-item:active {
-    transform: scale(0.98); /* Petit effet d'enfoncement quand on clique */
-    transition: transform 0.1s;
-}
-
-/* --- VARIATIONS DE TAILLE (BENTO LOGIC) --- */
-/* Pour écrans larges seulement (Desktop) */
+/* Bento Sizes (Desktop only) */
 @media (min-width: 768px) {
-    .bento-large {
-        grid-column: span 2; /* Prend 2 colonnes de large */
-        grid-row: span 2;    /* Prend 2 lignes de haut */
-    }
-    .bento-wide {
-        grid-column: span 2; /* Largeur double */
-    }
-    .bento-tall {
-        grid-row: span 2;    /* Hauteur double */
-    }
+    .bento-large { grid-column: span 2; grid-row: span 2; }
+    .bento-wide { grid-column: span 2; }
+    .bento-tall { grid-row: span 2; }
 }
 
-/* --- 10. PAGE DÉTAIL PROJET (FICHE FILM) --- */
+
+/* --- 9. PAGE DÉTAIL PROJET (FICHE FILM) --- */
 .project-hero {
-    height: 70vh; /* L'image prend 70% de la hauteur */
-    position: relative;
-    overflow: hidden;
+    height: 70vh; position: relative; overflow: hidden;
 }
 
-.project-hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.8;
-}
+.project-hero img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
 
 .project-header-content {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    position: absolute; bottom: 0; left: 0; width: 100%;
     padding: 4rem 2rem;
     background: linear-gradient(to top, var(--color-bg), transparent);
 }
@@ -368,311 +265,179 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 .project-title {
     font-size: clamp(3rem, 6vw, 5rem);
     text-transform: uppercase;
-    line-height: 1;
-    margin-bottom: 1rem;
-    color: #fff;
+    line-height: 1; margin-bottom: 1rem; color: #fff;
     text-shadow: 0 0 30px rgba(215, 39, 37, 0.6);
 }
 
-/* Le bouton "Retour" */
-/* --- BOUTON RETOUR (FICHE PROJET) --- */
+/* Bouton Retour */
 .back-btn {
-    position: fixed;
-    top: 2rem;
-    left: 2rem;
-    /* On passe le z-index à 1001 pour être sûr qu'il soit AU-DESSUS de l'image */
-    z-index: 1001; 
-    color: #fff;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    mix-blend-mode: exclusion; /* Inverse la couleur selon le fond */
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    
-    /* Optionnel : petit fond pour sécuriser le clic sur mobile */
-    padding: 10px 15px;
-    border-radius: 30px;
-    background: rgba(0,0,0,0.2);
-    backdrop-filter: blur(5px);
+    position: fixed; top: 2rem; left: 2rem;
+    z-index: 1001;
+    color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+    mix-blend-mode: exclusion;
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    padding: 10px 15px; border-radius: 30px;
+    background: rgba(0,0,0,0.2); backdrop-filter: blur(5px);
 }
+.back-btn:hover::before { transform: translateX(-5px); }
+.back-btn::before { content: '←'; font-size: 1.2rem; transition: transform 0.3s; }
 
-.back-btn::before {
-    content: '←';
-    font-size: 1.2rem;
-    transition: transform 0.3s;
-}
-
-.back-btn:hover::before {
-    transform: translateX(-5px);
-}
-
-/* RESPONSIVE BOUTON RETOUR */
-@media (max-width: 768px) {
-    .back-btn {
-        top: 1.5rem; /* Un peu plus haut sur mobile */
-        left: 1.5rem;
-        font-size: 0.8rem; /* Un peu plus petit */
-        padding: 8px 12px;
-    }
-}
-
-/* Contenu (Synopsis + Infos) */
 .project-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    /* On change le padding: 4rem 2rem; par ceci : */
-    padding: 4rem 2rem 1rem 2rem; /* Haut | Droite | Bas (réduit) | Gauche */
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 4rem;
+    max-width: 1000px; margin: 0 auto;
+    padding: 4rem 2rem 1rem 2rem;
+    display: grid; grid-template-columns: 2fr 1fr; gap: 4rem;
 }
-
-.synopsis {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #ddd;
-}
-
-.tech-specs h4 {
-    color: var(--color-accent);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    margin-top: 1.5rem;
-}
-
+.synopsis { font-size: 1.2rem; line-height: 1.8; color: #ddd; }
+.tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
 .tech-specs h4:first-child { margin-top: 0; }
+.tech-specs p { color: #888; margin-bottom: 0.5rem; }
 
-.tech-specs p {
-    color: #888;
-    margin-bottom: 0.5rem;
-}
-
-/* Responsive pour mobile */
-@media (max-width: 768px) {
-    .project-content { grid-template-columns: 1fr; gap: 2rem; }
-    .project-hero { height: 50vh; }
-}
-
-/* --- 11. BLOC VIDÉO PLEINE LARGEUR (TRAILER) --- */
+/* Trailer Block */
 .full-width-video {
-    width: 100%;
-    background: #000;
-    /* On change le padding: 4rem 0; par ceci : */
-    padding: 2rem 0 4rem 0; /* Haut (réduit) | Droite | Bas | Gauche */
-    text-align: center;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    width: 100%; background: #000;
+    padding: 2rem 0 4rem 0;
+    text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
 }
-
-.video-label {
-    color: var(--color-text);
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    font-size: 1rem;
-    margin-bottom: 2rem;
-    opacity: 0.7;
-}
-
-/* Conteneur intelligent pour garder le format 16/9 */
+.video-label { color: var(--color-text); text-transform: uppercase; letter-spacing: 4px; font-size: 1rem; margin-bottom: 2rem; opacity: 0.7; }
 .video-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 1400px; /* On limite un peu pour les écrans géants */
-    margin: 0 auto;
-    aspect-ratio: 16 / 9; /* PROPRIÉTÉ MAGIQUE : Force le ratio rectangulaire */
+    position: relative; width: 100%; max-width: 1400px; margin: 0 auto;
+    aspect-ratio: 16 / 9;
 }
-
 .video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 50px rgba(215, 39, 37, 0.1); /* Petite lueur rouge autour */
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    box-shadow: 0 0 50px rgba(215, 39, 37, 0.1);
 }
 
-/* Sur mobile, on colle la vidéo aux bords */
-@media (max-width: 768px) {
-    .full-width-video { padding: 2rem 0; }
-    .video-wrapper { aspect-ratio: 1 / 1; /* Plus carré sur mobile si besoin */ } 
-}
 
-/* --- 12. PAGE MENTIONS LÉGALES --- */
+/* --- 10. PAGE MENTIONS LÉGALES --- */
 .legal-section {
-    padding: 8rem 2rem 4rem; /* Marge haute pour ne pas être caché par le menu */
-    max-width: 800px;
-    margin: 0 auto;
-    color: #ccc; /* Gris clair pour la lecture */
+    padding: 8rem 2rem 4rem; max-width: 800px; margin: 0 auto; color: #ccc;
 }
-
 .legal-section h1 {
-    color: #fff;
-    text-transform: uppercase;
-    text-align: center;
-    margin-bottom: 4rem;
-    font-size: clamp(2rem, 4vw, 3rem);
-    text-shadow: 0 0 20px rgba(215, 39, 37, 0.4); /* Petite lueur rouge */
+    color: #fff; text-transform: uppercase; text-align: center; margin-bottom: 4rem;
+    font-size: clamp(2rem, 4vw, 3rem); text-shadow: 0 0 20px rgba(215, 39, 37, 0.4);
+}
+.legal-block { margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; }
+.legal-block:last-child { border-bottom: none; }
+.legal-block h2 { color: var(--color-accent); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.legal-block p { line-height: 1.8; margin-bottom: 1rem; font-weight: 300; }
+.legal-block strong { color: #fff; font-weight: 500; }
+.legal-block a { text-decoration: underline; text-decoration-color: var(--color-accent); }
+.legal-block a:hover { color: var(--color-accent); }
+
+
+/* --- 11. ANIMATIONS KEYFRAMES --- */
+@keyframes drift1 {
+    0% { transform: translate(10%, 10%) scale(1); }
+    50% { transform: translate(40%, 20%) scale(1.1); }
+    100% { transform: translate(20%, 50%) scale(0.9); }
+}
+@keyframes drift2 {
+    0% { transform: translate(-10%, -10%) scale(0.9); }
+    50% { transform: translate(-30%, -40%) scale(1.2); }
+    100% { transform: translate(-10%, -60%) scale(1); }
+}
+@keyframes breathe {
+    0% { opacity: 0.4; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.05); }
+}
+@keyframes blurPulse {
+    0% { filter: blur(15px); opacity: 0.4; }
+    50% { filter: blur(0px); opacity: 1; }
+    100% { filter: blur(8px); opacity: 0.7; }
+}
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
 }
 
-.legal-block {
-    margin-bottom: 3rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 2rem;
-}
 
-.legal-block:last-child {
-    border-bottom: none;
-}
-
-.legal-block h2 {
-    color: var(--color-accent); /* Rouge Silencio */
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
-}
-
-.legal-block p {
-    line-height: 1.8;
-    margin-bottom: 1rem;
-    font-weight: 300;
-}
-
-.legal-block strong {
-    color: #fff;
-    font-weight: 500;
-}
-
-.legal-block a {
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-}
-
-/* --- 13. MENU MOBILE (BURGER) --- */
-
-/* Par défaut (Desktop), on cache le bouton burger */
-.menu-toggle {
-    display: none;
-}
-
-/* RESPONSIVE MOBILE (Écrans < 768px) */
-/* --- RESPONSIVE MOBILE (Écrans < 768px) --- */
+/* =========================================================
+   12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
+   C'est ici que tout se règle pour les écrans < 768px
+   ========================================================= */
 @media (max-width: 768px) {
     
-    /* 1. Ajustement du Header */
+    /* A. HEADER MOBILE */
     header {
+        flex-direction: column; /* On empile Logo puis Burger */
+        justify-content: center;
+        align-items: center;
+        gap: 1.5rem; /* Espace entre Logo et Croix */
         padding: 1.5rem;
         background: transparent;
-        /* IMPORTANT : On désactive l'effet de fusion pour que le menu ait un vrai fond */
-        mix-blend-mode: normal; 
+        mix-blend-mode: normal; /* CRUCIAL pour que le menu noir soit visible */
     }
 
-    /* On réduit le logo */
-    .logo {
-        font-size: 1rem;
-        z-index: 1001; /* Toujours visible par dessus le menu */
+    /* B. LOGO MOBILE (FORCÉ) */
+    a.logo {
         position: relative;
+        z-index: 1001; /* Toujours visible par dessus le menu */
+        margin: 0;
+    }
+    
+    .logo img {
+        height: 80px !important; /* Taille Mobile Forcée */
+        width: auto !important;
+        margin: 0;
+        object-fit: contain;
     }
 
-    /* 2. Le Bouton Burger */
+    /* C. MENU BURGER */
     .menu-toggle {
         display: block;
         cursor: pointer;
-        z-index: 1001; /* Par dessus le menu */
-        position: relative;
+        z-index: 1001;
+        margin: 0;
     }
 
     .menu-toggle .bar {
         display: block;
-        width: 25px;
-        height: 2px;
-        margin: 5px auto;
-        background-color: #fff; /* Barres blanches */
+        width: 30px; height: 2px; margin: 6px auto;
+        background-color: #fff;
         transition: all 0.3s ease-in-out;
     }
 
-    /* 3. Le Menu (Le fond noir plein écran) */
+    /* D. NAVIGATION (MENU OUVERT) */
     .nav-menu {
         position: fixed;
-        left: -100%; /* Caché à gauche */
-        top: 0;
-        gap: 0;
+        left: -100%; top: 0;
+        width: 100%; height: 100vh;
+        
+        background-color: #000000; /* Noir opaque */
+        
+        display: flex;
         flex-direction: column;
-        /* Fond noir PROFOND et SOLIDE */
-        background-color: #000000; 
-        width: 100%;
-        height: 100vh;
-        text-align: center;
-        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Animation fluide */
-        padding-top: 8rem;
-        z-index: 1000; /* Juste en dessous du logo et du burger */
+        align-items: center;
+        justify-content: flex-start; /* On empile depuis le haut */
+        
+        /* LA SOLUTION DU TEXTE QUI NE TOUCHE PAS LA CROIX */
+        padding-top: 40vh; 
+        gap: 2.5rem;
+        
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
     }
 
-    /* L'état "Actif" (quand on clique) */
-    .nav-menu.active {
-        left: 0;
-    }
-
-    .nav-item {
-        margin: 2rem 0;
-    }
+    .nav-menu.active { left: 0; }
 
     .nav-link {
-        font-size: 2rem; /* Plus gros pour le style "Cinéma" */
+        font-size: 1.8rem;
         font-weight: 300;
-        display: block;
-        padding: 1rem;
         color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        display: block;
     }
 
-    /* 4. Animation du burger en croix (X) */
-    .menu-toggle.is-active .bar:nth-child(2) {
-        opacity: 0;
-    }
-
-    .menu-toggle.is-active .bar:nth-child(1) {
-        transform: translateY(7px) rotate(45deg);
-    }
-
-    .menu-toggle.is-active .bar:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg);
-    }
+    /* Animation Croix */
+    .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    
+    /* E. AJUSTEMENTS PAGES INTERNES */
+    .back-btn { top: 2rem; left: 2rem; }
+    .project-content { grid-template-columns: 1fr; gap: 2rem; }
+    .project-hero { height: 50vh; }
+    .full-width-video { padding: 2rem 0; }
+    .video-wrapper { aspect-ratio: 1 / 1; } 
 }
-.legal-block a:hover {
-    color: var(--color-accent);
-}
-
-/* --- 14. LOGO IMAGE (Remplacement du texte) --- */
-/* --- 14. LOGO IMAGE (CORRIGÉ & FORCÉ) --- */
-
-/* 1. On débloque le conteneur (le lien <a>) */
-a.logo {
-    display: flex;       /* Permet à l'image de prendre sa place */
-    align-items: center; 
-    height: auto;        /* On laisse la hauteur libre */
-    width: auto;
-    text-decoration: none;
-}
-
-/* 2. On dimensionne l'image elle-même */
-.logo img {
-    height: 200px !important; /* Essayez 150px si c'est encore trop petit */
-    width: auto !important;   /* Garde les proportions */
-    max-width: none;          /* Empêche le site de la compresser */
-    object-fit: contain;
-}
-
-/* 3. Ajustement Mobile */
-@media (max-width: 768px) {
-    .logo img {
-        height: 100px !important; /* Ajustez ici pour le mobile */
-    }
-}
-
-
-
-
