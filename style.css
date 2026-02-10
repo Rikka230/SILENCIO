@@ -263,8 +263,8 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     opacity: 0.8; 
 
     /* EFFET FONDU (VIGNETTE) */
-    -webkit-mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
-    mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
     
     transition: all 0.5s ease;
 }
@@ -460,6 +460,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
