@@ -482,3 +482,57 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .video-wrapper { aspect-ratio: 1 / 1; /* Plus carré sur mobile si besoin */ } 
 }
 
+/* --- 12. PAGE MENTIONS LÉGALES --- */
+.legal-section {
+    padding: 8rem 2rem 4rem; /* Marge haute pour ne pas être caché par le menu */
+    max-width: 800px;
+    margin: 0 auto;
+    color: #ccc; /* Gris clair pour la lecture */
+}
+
+.legal-section h1 {
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 4rem;
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-shadow: 0 0 20px rgba(215, 39, 37, 0.4); /* Petite lueur rouge */
+}
+
+.legal-block {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 2rem;
+}
+
+.legal-block:last-child {
+    border-bottom: none;
+}
+
+.legal-block h2 {
+    color: var(--color-accent); /* Rouge Silencio */
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.legal-block p {
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-weight: 300;
+}
+
+.legal-block strong {
+    color: #fff;
+    font-weight: 500;
+}
+
+.legal-block a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+}
+
+.legal-block a:hover {
+    color: var(--color-accent);
+}
