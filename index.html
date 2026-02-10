@@ -180,10 +180,45 @@
             });
         });
     </script>
+
+    <script>
+    // --- SCRIPT D'APPARITION AU SCROLL (MOBILE) ---
+    document.addEventListener("DOMContentLoaded", function() {
+        // On vérifie si on est sur mobile
+        if (window.innerWidth <= 768) {
+            
+            const bentoItems = document.querySelectorAll('.bento-item');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.2 // Se déclenche quand 20% de l'image est visible
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    // Si l'élément entre dans l'écran
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        // Optionnel : Enlevez cette ligne si vous voulez que le titre RESTE affiché
+                        // une fois apparu, même si on scrolle plus loin.
+                        entry.target.classList.remove('is-visible'); 
+                    }
+                });
+            }, observerOptions);
+
+            bentoItems.forEach(item => {
+                observer.observe(item);
+            });
+        }
+    });
+</script>
 </body>
 </body>
 
 </html>
+
 
 
 
