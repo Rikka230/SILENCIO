@@ -430,7 +430,7 @@ footer {
 }
 
 /* =========================================
-   AJOUTS : TRANSITIONS & CURSEUR
+   AJOUTS : TRANSITIONS
    ========================================= */
 
 /* --- 1. TRANSITION DE PAGE (FADE TO BLACK) --- */
@@ -456,34 +456,6 @@ footer {
 @keyframes pageReveal {
     0% { opacity: 1; }
     100% { opacity: 0; visibility: hidden; }
-}
-
-/* --- 2. CURSEUR PERSONNALISÉ --- */
-.custom-cursor {
-    position: fixed;
-    top: 0; left: 0;
-    width: 20px; height: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.8); /* Cercle fin */
-    border-radius: 50%;
-    pointer-events: none; /* Indispensable pour pouvoir cliquer à travers */
-    z-index: 10000;
-    transform: translate(-50%, -50%); /* Pour centrer sur la souris */
-    transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.2s;
-    mix-blend-mode: difference; /* Effet d'inversion des couleurs cool */
-}
-
-/* Effet quand on survole un lien */
-.custom-cursor.hovered {
-    width: 50px; /* Il grossit */
-    height: 50px;
-    background: rgba(215, 39, 37, 0.4); /* Il se remplit en rouge transparent */
-    border-color: transparent;
-    mix-blend-mode: normal;
-}
-
-/* IMPORTANT : On cache le curseur perso sur Mobile/Tablette */
-@media (max-width: 1024px) {
-    .custom-cursor { display: none; }
 }
 
 /* =========================================================
@@ -605,6 +577,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
