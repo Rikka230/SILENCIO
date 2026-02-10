@@ -141,9 +141,49 @@
             });
         });
     </script>
+
+    <script>
+        // 1. GESTION DU MENU MOBILE
+        const menuToggle = document.querySelector('#mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        // Quand on clique sur le burger
+        menuToggle.addEventListener('click', function() {
+            menuToggle.classList.toggle('is-active'); // Transforme le burger en croix
+            navMenu.classList.toggle('active'); // Affiche le menu
+        });
+
+        // Quand on clique sur un lien, on ferme le menu automatiquement
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('is-active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // 2. SCROLL FLUIDE (Votre ancien script)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                // On vérifie si c'est un lien interne (commence par #)
+                const targetId = this.getAttribute('href').split('#')[1];
+                if (targetId) {
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        e.preventDefault();
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
 </body>
 
 </html>
+
 
 
 
