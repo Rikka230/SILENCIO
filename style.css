@@ -199,3 +199,28 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     nav ul { gap: 1.5rem; font-size: 0.8rem; }
 }
 
+/* --- 8. VIDÉO D'ARRIÈRE-PLAN --- */
+.hero-video-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1; /* Derrière le titre */
+    overflow: hidden;
+}
+
+.hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* La vidéo remplit tout l'écran sans se déformer */
+    opacity: 0.5; /* On règle l'opacité pour bien voir le texte par dessus */
+}
+
+/* Filtre supplémentaire (Dégradé Cinéma) */
+.video-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    /* Un dégradé subtil pour assombrir le bas de la vidéo */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
+    pointer-events: none;
+}
