@@ -78,8 +78,92 @@
         <p style="font-size: 0.8rem; color: #666;">© 2026 Silencio Pictures</p>
     </footer>
 
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // --- A. GESTION DU CURSEUR (Seulement sur PC) ---
+            const cursor = document.querySelector('.custom-cursor');
+            
+            if (window.innerWidth > 1024) {
+                // 1. Le curseur suit la souris
+                document.addEventListener('mousemove', (e) => {
+                    cursor.style.left = e.clientX + 'px';
+                    cursor.style.top = e.clientY + 'px';
+                });
+
+                // 2. Le curseur grossit sur les liens
+                const links = document.querySelectorAll('a, .menu-toggle, .bento-item');
+                links.forEach(link => {
+                    link.addEventListener('mouseenter', () => {
+                        cursor.classList.add('hovered');
+                    });
+                    link.addEventListener('mouseleave', () => {
+                        cursor.classList.remove('hovered');
+                    });
+                });
+            }
+
+            // --- B. TRANSITION DE PAGE (FADE OUT) ---
+            // On intercepte tous les clics sur les liens
+            const transitionLinks = document.querySelectorAll('a');
+            const transitionOverlay = document.querySelector('.page-transition');
+
+            transitionLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const target = this.getAttribute('href');
+
+                    // Si c'est un lien vers une autre page (pas une ancre # ou un mailto)
+                    if (target && !target.startsWith('#') && !target.startsWith('mailto')) {
+                        e.preventDefault(); // On bloque le chargement immédiat
+                        
+                        // 1. On fait apparaître le rideau noir
+                        transitionOverlay.style.visibility = 'visible';
+                        transitionOverlay.style.opacity = '1';
+                        
+                        // 2. On attend 600ms (le temps du fondu) puis on change de page
+                        setTimeout(() => {
+                            window.location.href = target;
+                        }, 600);
+                    }
+                });
+            });
+
+            // --- C. VOTRE CODE EXISTANT (MENU MOBILE & SCROLL) ---
+            const menuToggle = document.querySelector('#mobile-menu');
+            const navMenu = document.querySelector('.nav-menu');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            if(menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    menuToggle.classList.toggle('is-active');
+                    navMenu.classList.toggle('active');
+                });
+
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        menuToggle.classList.remove('is-active');
+                        navMenu.classList.remove('active');
+                    });
+                });
+            }
+
+            // Scroll Bento (Mobile)
+            if (window.innerWidth <= 768) {
+                const bentoItems = document.querySelectorAll('.bento-item');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+                    });
+                }, { threshold: 0.2 });
+
+                bentoItems.forEach(item => observer.observe(item));
+            }
+        });
+    </script>
+
 </body>
 </html>
+
 
 
 
