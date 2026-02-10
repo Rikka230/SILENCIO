@@ -109,7 +109,7 @@ a.logo {
 }
 
 .logo img {
-    height: 120px; /* Taille optimale Desktop */
+    height: 200px; /* Taille optimale Desktop */
     width: auto;
     display: block;
     transition: opacity 0.3s;
@@ -395,7 +395,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     }
     
     .logo img {
-        height: 80px !important; /* Taille Mobile Forcée (sécurité anti-chevauchement) */
+        height: 100px !important; /* Taille Mobile Forcée (sécurité anti-chevauchement) */
         width: auto !important;
         margin: 0;
         object-fit: contain;
@@ -460,3 +460,4 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
