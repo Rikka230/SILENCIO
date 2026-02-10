@@ -149,24 +149,15 @@
    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
+            // --- 0. GESTION DU LOADER (GARDIEN) ---
+            // (Assurez-vous d'avoir gardé le petit script gardien en haut aussi)
             
-            // On vérifie si la mémoire contient la preuve qu'on a déjà vu l'intro
-            if (sessionStorage.getItem('silencioIntroPlayed')) {
-                // Si oui, on cache le loader IMMÉDIATEMENT
-                if(loader) loader.style.display = 'none';
-            } else {
-                // Si non, on enregistre l'info pour la prochaine page
-                sessionStorage.setItem('silencioIntroPlayed', 'true');
-            }
-
-
-            // --- 1. VARIABLES GLOBALES ---
+            // --- 1. VARIABLES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
             const transitionOverlay = document.querySelector('.page-transition');
             
-            // --- 2. FONCTIONS UTILES ---
-            
+            // --- 2. FONCTIONS ---
             function closeMenu() {
                 if(menuToggle) menuToggle.classList.remove('is-active');
                 if(navMenu) navMenu.classList.remove('active');
@@ -181,7 +172,17 @@
                 }
             }
 
-            // --- 3. MENU MOBILE ---
+            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" (Anti-Écran Noir) ---
+            // C'est cette partie qui sauve la mise quand on fait "Retour"
+            window.addEventListener('pageshow', function(event) {
+                // Si la page est chargée depuis le cache (bouton retour)
+                if (event.persisted && transitionOverlay) {
+                    transitionOverlay.classList.remove('active');
+                    transitionOverlay.style.opacity = '0';
+                }
+            });
+
+            // --- 4. MENU MOBILE ---
             if(menuToggle) {
                 menuToggle.addEventListener('click', function() {
                     menuToggle.classList.toggle('is-active');
@@ -189,42 +190,46 @@
                 });
             }
 
-            // --- 4. GESTION DES CLICS (TRANSITIONS) ---
+            // --- 5. GESTION DES CLICS (INTELLIGENTE) ---
             const allLinks = document.querySelectorAll('a');
 
             allLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
+                    const target = this.getAttribute('target');
 
-                    // On ignore les liens vides ou mailto
+                    // A. On ignore les liens vides, mailto, ou les liens nouvel onglet (Instagram)
                     if (!href || href.startsWith('mailto:') || href === '#') return;
+                    
+                    // SI C'EST UN LIEN "_blank" (Instagram), ON NE FAIT RIEN (pas de noir)
+                    if (target === '_blank') return; 
 
+                    // B. Pour le reste, on lance la transition
                     e.preventDefault();
                     closeMenu();
 
-                    // CAS 1 : ANCRE INTERNE (#contact, etc.)
+                    // C. Navigation
                     if (href.includes('#')) {
+                        // Ancre interne
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
 
                         if (targetElement) {
                             fadeToBlack(() => {
                                 targetElement.scrollIntoView({ behavior: 'auto' });
-                                transitionOverlay.classList.remove('active'); // On relève le rideau
+                                transitionOverlay.classList.remove('active');
                             });
                         } else {
-                            // Si l'ancre n'est pas sur cette page, on charge la page
                             fadeToBlack(() => { window.location.href = href; });
                         }
-                    } 
-                    // CAS 2 : LIEN EXTERNE (Page Projet)
-                    else {
+                    } else {
+                        // Lien externe (Projet)
                         fadeToBlack(() => { window.location.href = href; });
                     }
                 });
             });
 
-            // --- 5. ANIMATION BENTO (MOBILE) ---
+            // --- 6. ANIMATION BENTO (MOBILE) ---
             if (window.innerWidth <= 768) {
                 const bentoItems = document.querySelectorAll('.bento-item');
                 const observer = new IntersectionObserver((entries) => {
@@ -239,6 +244,7 @@
     
 </body>
 </html>
+
 
 
 
