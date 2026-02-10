@@ -531,9 +531,10 @@ footer {
     /* G. CORRECTION VIDÉO MOBILE (C'est ici que ça se règle) */
     .full-width-video {
         margin-top: 0 !important; /* Annule le décalage PC */
-        padding-top: -5rem; /* Espace propre */
+        padding-top: -10rem; /* Espace propre */
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
