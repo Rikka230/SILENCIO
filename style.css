@@ -263,8 +263,18 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     opacity: 0.8; 
 
     /* EFFET FONDU (VIGNETTE) */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+    /* 1. Pour Chrome/Safari/Mobile */
+    -webkit-mask-image: 
+        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%), /* Fade Vertical */
+        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%); /* Fade Horizontal */
+    /* IMPORTANT : On dit au navigateur de croiser les deux masques */
+    -webkit-mask-composite: source-in;
+
+    /* 2. Pour Firefox et Standard */
+    mask-image: 
+        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%),
+        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%);
+    mask-composite: intersect;
     
     transition: all 0.5s ease;
 }
@@ -460,6 +470,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
