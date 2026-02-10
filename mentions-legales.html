@@ -79,94 +79,102 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- A. TRANSITION DE PAGE (FADE TO BLACK) ---
-            const transitionOverlay = document.querySelector('.page-transition');
-            // On cible tous les liens sauf les ancres (#) et les mails (mailto)
-            const links = document.querySelectorAll('a:not([href^="#"]):not([href^="mailto:"])');
-
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const target = this.getAttribute('href');
-                    
-                    // Si le lien est valide
-                    if (target) {
-                        e.preventDefault(); // On bloque le changement brutal
-                        
-                        // 1. On baisse le rideau noir
-                        if (transitionOverlay) {
-                            transitionOverlay.style.visibility = 'visible';
-                            transitionOverlay.style.opacity = '1';
-                        }
-                        
-                        // 2. On attend 600ms et on change de page
-                        setTimeout(() => {
-                            window.location.href = target;
-                        }, 600);
-                    }
-                });
-            });
-
-            // --- B. GESTION DU MENU MOBILE ---
+            // --- 0. GESTION DU LOADER (GARDIEN) ---
+            // (Assurez-vous d'avoir gardé le petit script gardien en haut aussi)
+            
+            // --- 1. VARIABLES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
-            const navLinks = document.querySelectorAll('.nav-link');
+            const transitionOverlay = document.querySelector('.page-transition');
+            
+            // --- 2. FONCTIONS ---
+            function closeMenu() {
+                if(menuToggle) menuToggle.classList.remove('is-active');
+                if(navMenu) navMenu.classList.remove('active');
+            }
 
+            function fadeToBlack(callback) {
+                if(transitionOverlay) {
+                    transitionOverlay.classList.add('active'); 
+                    setTimeout(callback, 500); 
+                } else {
+                    callback();
+                }
+            }
+
+            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" (Anti-Écran Noir) ---
+            // C'est cette partie qui sauve la mise quand on fait "Retour"
+            window.addEventListener('pageshow', function(event) {
+                // Si la page est chargée depuis le cache (bouton retour)
+                if (event.persisted && transitionOverlay) {
+                    transitionOverlay.classList.remove('active');
+                    transitionOverlay.style.opacity = '0';
+                }
+            });
+
+            // --- 4. MENU MOBILE ---
             if(menuToggle) {
                 menuToggle.addEventListener('click', function() {
                     menuToggle.classList.toggle('is-active');
                     navMenu.classList.toggle('active');
                 });
-
-                navLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        menuToggle.classList.remove('is-active');
-                        navMenu.classList.remove('active');
-                    });
-                });
             }
 
-            // --- C. SCROLL FLUIDE (ANCRES) ---
-            document.querySelectorAll('a[href^="#"], a[href^="index.html#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    const targetId = href.includes('#') ? href.split('#')[1] : null;
+            // --- 5. GESTION DES CLICS (INTELLIGENTE) ---
+            const allLinks = document.querySelectorAll('a');
 
-                    if (targetId) {
+            allLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    const target = this.getAttribute('target');
+
+                    // A. On ignore les liens vides, mailto, ou les liens nouvel onglet (Instagram)
+                    if (!href || href.startsWith('mailto:') || href === '#') return;
+                    
+                    // SI C'EST UN LIEN "_blank" (Instagram), ON NE FAIT RIEN (pas de noir)
+                    if (target === '_blank') return; 
+
+                    // B. Pour le reste, on lance la transition
+                    e.preventDefault();
+                    closeMenu();
+
+                    // C. Navigation
+                    if (href.includes('#')) {
+                        // Ancre interne
+                        const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
+
                         if (targetElement) {
-                            e.preventDefault();
-                            targetElement.scrollIntoView({ behavior: 'smooth' });
-                            // Ferme le menu mobile si ouvert
-                            if(menuToggle) {
-                                menuToggle.classList.remove('is-active');
-                                navMenu.classList.remove('active');
-                            }
+                            fadeToBlack(() => {
+                                targetElement.scrollIntoView({ behavior: 'auto' });
+                                transitionOverlay.classList.remove('active');
+                            });
+                        } else {
+                            fadeToBlack(() => { window.location.href = href; });
                         }
+                    } else {
+                        // Lien externe (Projet)
+                        fadeToBlack(() => { window.location.href = href; });
                     }
                 });
             });
 
-            // --- D. APPARITION AU SCROLL (MOBILE BENTO) ---
+            // --- 6. ANIMATION BENTO (MOBILE) ---
             if (window.innerWidth <= 768) {
                 const bentoItems = document.querySelectorAll('.bento-item');
-                
-                const observerOptions = { threshold: 0.2 };
-
                 const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                        }
+                    entries.forEach(e => {
+                        if (e.isIntersecting) e.target.classList.add('is-visible');
                     });
-                }, observerOptions);
-
-                bentoItems.forEach(item => observer.observe(item));
+                }, { threshold: 0.2 });
+                bentoItems.forEach(i => observer.observe(i));
             }
         });
     </script>
 
 </body>
 </html>
+
 
 
 
