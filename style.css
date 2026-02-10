@@ -341,3 +341,99 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
         grid-row: span 2;    /* Hauteur double */
     }
 }
+
+/* --- 10. PAGE DÉTAIL PROJET (FICHE FILM) --- */
+.project-hero {
+    height: 70vh; /* L'image prend 70% de la hauteur */
+    position: relative;
+    overflow: hidden;
+}
+
+.project-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+}
+
+.project-header-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 4rem 2rem;
+    background: linear-gradient(to top, var(--color-bg), transparent);
+}
+
+.project-title {
+    font-size: clamp(3rem, 6vw, 5rem);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(215, 39, 37, 0.6);
+}
+
+/* Le bouton "Retour" */
+.back-btn {
+    position: fixed; /* Il vous suit quand vous scrollez */
+    top: 2rem;
+    left: 2rem;
+    z-index: 100;
+    color: #fff;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    mix-blend-mode: exclusion;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.back-btn::before {
+    content: '←';
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+
+.back-btn:hover::before {
+    transform: translateX(-5px); /* Petite flèche qui bouge */
+}
+
+/* Contenu (Synopsis + Infos) */
+.project-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2/3 pour l'histoire, 1/3 pour les infos */
+    gap: 4rem;
+}
+
+.synopsis {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #ddd;
+}
+
+.tech-specs h4 {
+    color: var(--color-accent);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-top: 1.5rem;
+}
+
+.tech-specs h4:first-child { margin-top: 0; }
+
+.tech-specs p {
+    color: #888;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+    .project-content { grid-template-columns: 1fr; gap: 2rem; }
+    .project-hero { height: 50vh; }
+}
