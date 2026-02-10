@@ -484,6 +484,26 @@ footer {
     100% { opacity: 0; visibility: hidden; }
 }
 
+/* --- BOUTON INSTAGRAM --- */
+.insta-link {
+    display: inline-block;
+    color: #fff; /* Blanc par défaut */
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    opacity: 0.7;
+}
+
+.insta-link svg {
+    width: 40px; /* Taille de l'icône */
+    height: 40px;
+}
+
+.insta-link:hover {
+    color: var(--color-accent); /* Devient ROUGE au survol */
+    opacity: 1;
+    transform: scale(1.1); /* Petit zoom dynamique */
+}
+
 /* =========================================================
    12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
    C'est ici que tout se règle pour les écrans < 768px
@@ -603,6 +623,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
