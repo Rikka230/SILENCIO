@@ -519,6 +519,35 @@ footer {
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
 
+/* --- MOBILE SCROLL REVEAL (BENTO GRID) --- */
+@media (max-width: 768px) {
+    
+    /* 1. On s'assure que par défaut c'est caché */
+    .bento-overlay {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s ease-out; /* Transition douce "cinéma" */
+    }
+
+    /* 2. La classe "Active" qui sera ajoutée quand on scroll dessus */
+    .bento-item.is-visible .bento-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* 3. On illumine aussi l'image automatiquement */
+    .bento-item.is-visible img {
+        opacity: 1;
+        transform: scale(1.05); /* Léger zoom automatique */
+        filter: brightness(1.1);
+    }
+    
+    /* 4. On ajoute la bordure rouge pour le style */
+    .bento-item.is-visible {
+        border-color: var(--color-accent);
+    }
+}
+
 
 
 
