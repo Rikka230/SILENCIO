@@ -310,11 +310,15 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 
 /* Contenu Principal */
 .project-content {
-    max-width: 1000px; margin: 0 auto;
-    padding: 4rem 2rem 1rem 2rem;
-    display: grid; grid-template-columns: 2fr 1fr; gap: 4rem;
-    position: relative; 
-    z-index: 5; /* Assure que le texte passe devant le fond */
+    max-width: 1000px;
+    margin: 0 auto;
+    /* On met le padding du bas à 0 pour coller à la suite */
+    padding: 4rem 2rem 0 2rem; 
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    position: relative;
+    z-index: 5;
 }
 .synopsis { font-size: 1.2rem; line-height: 1.8; color: #ddd; }
 .tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
@@ -323,9 +327,13 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
 
 /* Trailer Block */
 .full-width-video {
-    width: 100%; background: #000;
-    padding: 2rem 0 4rem 0;
-    text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
+    width: 100%;
+    background: #000;
+    /* On réduit drastiquement le padding du haut (passé de 4rem à 2rem) */
+    padding: 2rem 0 4rem 0; 
+    text-align: center;
+    /* On enlève la ligne de séparation si vous voulez que ça fasse un seul bloc uni */
+    border-top: none; 
 }
 .video-label { color: var(--color-text); text-transform: uppercase; letter-spacing: 4px; font-size: 1rem; margin-bottom: 2rem; opacity: 0.7; }
 .video-wrapper {
@@ -470,6 +478,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
