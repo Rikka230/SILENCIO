@@ -349,11 +349,8 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     opacity: 0.7;
     display: inline-block;
     
-    /* Petit fond noir flou pour que le titre reste lisible si ça chevauche */
-    background: rgba(0,0,0,0.5);
-    padding: 5px 10px;
-    border-radius: 4px;
-    backdrop-filter: blur(5px);
+    background: transparent; 
+    padding: 0;
 }
 
 .video-wrapper {
@@ -515,6 +512,7 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     .full-width-video { padding: 2rem 0; }
     .video-wrapper { aspect-ratio: 1 / 1; } 
 }
+
 
 
 
