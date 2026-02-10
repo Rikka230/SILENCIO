@@ -7,6 +7,7 @@
     <meta name="description" content="Informations légales, éditeur et hébergeur du site Silencio Pictures.">
     
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
 
@@ -14,13 +15,26 @@
     <div class="corner-glow"></div>
 
     <header>
+<body>
+
+    <div class="ambient-light"></div>
+    <div class="corner-glow"></div>
+
+    <header>
         <a href="index.html#home" class="logo">SILENCIO PICTURES</a>
-        <nav>
-            <ul>
-                <li><a href="index.html#home">Accueil</a></li>
-                <li><a href="index.html#projects">En production</a></li>
-                <li><a href="index.html#about">À propos</a></li>
-                <li><a href="index.html#contact">Contact</a></li>
+        
+        <div class="menu-toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+
+        <nav class="nav-container">
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Accueil</a></li>
+                <li><a href="index.html#projects" class="nav-link">En production</a></li>
+                <li><a href="index.html#about" class="nav-link">À propos</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
             </ul>
         </nav>
     </header>
@@ -66,7 +80,27 @@
         <p style="font-size: 0.8rem; color: #666; text-align: center; margin-top: 4rem;">© 2026 Silencio Pictures. All rights reserved.</p>
     </footer>
 
+    <script>
+        // GESTION DU MENU MOBILE
+        const menuToggle = document.querySelector('#mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        menuToggle.addEventListener('click', function() {
+            menuToggle.classList.toggle('is-active');
+            navMenu.classList.toggle('active');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('is-active');
+                navMenu.classList.remove('active');
+            });
+        });
+    </script>
+
 </body>
 </html>
+
 
 
