@@ -259,10 +259,35 @@ footer {
 
 /* --- 9. PAGE DÉTAIL PROJET (RÉPARÉ + FONDU) --- */
 .project-hero {
-    height: 70vh; 
-    position: relative; /* CRUCIAL : C'est ça qui manquait pour tenir le texte */
+    /* On force la hauteur minimale tout de suite */
+    height: 70vh;
+    min-height: 70vh; 
+    
+    position: relative;
     overflow: hidden;
     display: block;
+    
+    /* On met un fond noir par défaut : si l'image met 0.5s à charger,
+       l'utilisateur verra un bloc noir propre au lieu du blanc ou du vide */
+    background-color: #000;
+}
+
+/* On s'assure que l'image ne dépasse jamais */
+.project-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0; /* On la cache au tout début */
+    animation: fadeInImage 0.5s ease forwards; /* Elle apparaît en fondu */
+
+    /* Vos masques existants (ne les touchez pas) */
+    -webkit-mask-image: ...
+    /* ... */
+}
+
+/* Animation douce pour l'apparition de l'image */
+@keyframes fadeInImage {
+    to { opacity: 0.8; } /* On vise votre opacité finale de 0.8 */
 }
 
 .project-hero img {
@@ -578,6 +603,7 @@ footer {
         border-color: var(--color-accent);
     }
 }
+
 
 
 
