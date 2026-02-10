@@ -224,3 +224,120 @@ footer { margin-top: 4rem; font-size: 0.8rem; opacity: 0.5; }
     background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
     pointer-events: none;
 }
+
+/* --- 9. BENTO GRID (GRILLE PROJETS) --- */
+#projects {
+    padding: 6rem 2rem;
+    min-height: auto; /* La hauteur s'adapte au contenu */
+}
+
+.section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+    border-left: 4px solid var(--color-accent); /* Petite barre rouge à gauche */
+    padding-left: 1rem;
+}
+
+.bento-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.bento-grid {
+    display: grid;
+    /* Création automatique des colonnes (minimum 300px de large) */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* Espace entre les cases */
+    gap: 20px;
+    grid-auto-flow: dense; /* Optimise le remplissage des trous */
+}
+
+/* --- STYLE DES ITEMS (CARTES) --- */
+.bento-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden; /* Pour que l'image ne dépasse pas au zoom */
+    background: #111;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Transition fluide */
+    cursor: pointer;
+    min-height: 300px;
+    display: block; /* Important pour le lien <a> */
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.bento-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+    opacity: 0.7; /* Image un peu sombre par défaut */
+}
+
+/* --- LE TEXTE PAR DESSUS (OVERLAY) --- */
+.bento-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    transform: translateY(20px); /* Légèrement caché vers le bas */
+    opacity: 0; /* Invisible par défaut */
+    transition: all 0.4s ease;
+}
+
+.bento-overlay h3 {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.bento-overlay p {
+    color: var(--color-accent); /* Rouge Silencio */
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* --- ANIMATIONS AU SURVOL (HOVER) --- */
+.bento-item:hover {
+    transform: scale(1.02); /* Léger grossissement de la boîte */
+    z-index: 2; /* Passe par dessus les autres */
+    border-color: var(--color-accent); /* Bordure rouge */
+    /* Le fameux Halo de lumière  */
+    box-shadow: 0 10px 40px rgba(215, 39, 37, 0.4); 
+}
+
+.bento-item:hover img {
+    transform: scale(1.1); /* Zoom dans l'image */
+    opacity: 1; /* L'image devient nette et lumineuse */
+}
+
+.bento-item:hover .bento-overlay {
+    transform: translateY(0);
+    opacity: 1; /* Le texte apparaît */
+}
+
+/* --- ANIMATION AU CLIC (ACTIVE) --- */
+.bento-item:active {
+    transform: scale(0.98); /* Petit effet d'enfoncement quand on clique */
+    transition: transform 0.1s;
+}
+
+/* --- VARIATIONS DE TAILLE (BENTO LOGIC) --- */
+/* Pour écrans larges seulement (Desktop) */
+@media (min-width: 768px) {
+    .bento-large {
+        grid-column: span 2; /* Prend 2 colonnes de large */
+        grid-row: span 2;    /* Prend 2 lignes de haut */
+    }
+    .bento-wide {
+        grid-column: span 2; /* Largeur double */
+    }
+    .bento-tall {
+        grid-row: span 2;    /* Hauteur double */
+    }
+}
