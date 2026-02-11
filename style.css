@@ -201,7 +201,7 @@ footer {
 }
 
 
-/* --- 8. BENTO GRID (VERSION CORRIGÉE & SÉCURISÉE) --- */
+/* --- 8. BENTO GRID (LAYOUT "TETRIS 4x4" COMPACT) --- */
 #projects { 
     padding: 0 2rem; 
     min-height: 100vh; 
@@ -209,90 +209,63 @@ footer {
 }
 
 .bento-container { 
-    max-width: 1200px; 
+    max-width: 1400px; /* Largeur idéale pour 4 colonnes */
     margin: 0 auto; 
     width: 100%; 
 }
 
 .bento-grid {
     display: grid;
-    /* ON FORCE 3 COLONNES AVEC !important POUR ÉCRASER TOUT CONFLIT */
-    grid-template-columns: repeat(3, 1fr) !important; 
+    /* RETOUR À 4 COLONNES : C'est le secret pour que les images soient moins énormes */
+    grid-template-columns: repeat(4, 1fr) !important; 
     
     grid-auto-rows: auto; 
     gap: 20px;
     grid-auto-flow: dense; 
 }
 
-/* --- FORMES GÉOMÉTRIQUES (CARRÉS PARFAITS) --- */
+/* --- FORMES --- */
 .bento-item {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
     background: #111;
     border: 1px solid rgba(255,255,255,0.1);
-    
     width: 100%;
-    /* Carré par défaut */
+    
+    /* On force le CARRÉ pour les petits éléments */
     aspect-ratio: 1 / 1 !important; 
     
-    /* Place par défaut */
     grid-column: span 1;
     grid-row: span 1;
 }
 
-/* --- LES EXCEPTIONS (FORMES SPÉCIALES) --- */
-
-/* 1. LE GROS CUBE (Doit être 2x plus large et 2x plus haut) */
+/* LE GROS (2x2) */
 .bento-big { 
     grid-column: span 2 !important; 
     grid-row: span 2 !important; 
-    aspect-ratio: 1 / 1 !important; /* Reste un carré, mais géant */
+    aspect-ratio: 1 / 1 !important; 
 }
 
-/* 2. LE PANORAMIQUE (Large) */
-.bento-wide { 
-    grid-column: span 2 !important; 
-    aspect-ratio: 2 / 1 !important; /* Rectangle horizontal */
-}
-
-/* 3. L'AFFICHE (Haut) */
+/* LE VERTICAL (1x2) */
 .bento-tall { 
-    grid-row: span 2 !important; 
-    aspect-ratio: 1 / 2 !important; /* Rectangle vertical */
+    grid-column: span 1 !important; /* Prend 1 seule colonne */
+    grid-row: span 2 !important;    /* Mais 2 étages */
+    aspect-ratio: 1 / 2 !important; /* Forme haute */
 }
 
-
-/* --- IMAGES & EFFETS --- */
-.bento-item img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.6s ease; opacity: 0.7;
-}
-.bento-overlay {
-    position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    transform: translateY(20px); opacity: 0; transition: all 0.4s ease;
-}
-.bento-overlay h3 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 0.5rem; color: #fff; }
-.bento-overlay p { color: var(--color-accent); font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; }
-
-.bento-item:hover { transform: scale(1.02); z-index: 2; border-color: var(--color-accent); }
-.bento-item:hover img { transform: scale(1.1); opacity: 1; }
-.bento-item:hover .bento-overlay { transform: translateY(0); opacity: 1; }
+/* LE STANDARD (1x1) */
+/* Pas besoin de classe spéciale, c'est le défaut */
 
 
-/* --- MOBILE (RETOUR À 1 COLONNE) --- */
+/* --- MOBILE --- */
 @media (max-width: 1024px) {
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
-    
-    /* Sur mobile, on remet tout en format 16/9 classique */
-    .bento-wide, .bento-tall, .bento-big, .bento-item { 
+    .bento-grid { grid-template-columns: 1fr !important; }
+    .bento-item, .bento-big, .bento-tall { 
         grid-column: span 1 !important; 
         grid-row: span 1 !important; 
         aspect-ratio: 16/9 !important; 
     }
-    /* Sauf l'affiche verticale qui reste verticale */
-    .bento-tall { aspect-ratio: 2/3 !important; } 
 }
 
 
@@ -586,3 +559,4 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
