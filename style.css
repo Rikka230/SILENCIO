@@ -774,8 +774,8 @@ body.scroll-down .menu-toggle {
 
     /* 4. On ajuste le Hero (l'image du haut) pour qu'elle soit moins haute */
     .project-hero {
-        height: 50vh !important;
-        min-height: 350px !important;
+        height: 40vh !important;
+        min-height: 280px !important;
     }
 
     /* On réduit le titre du projet pour qu'il ne s'écrase pas */
@@ -791,6 +791,7 @@ body.scroll-down .menu-toggle {
         padding-bottom: 3rem !important;
     }
 }
+
 
 
 
