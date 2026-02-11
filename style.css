@@ -463,30 +463,10 @@ footer {
     position: relative;
     z-index: 5;
 }
-* --- FINESSE DU TEXTE SUR LES PAGES PROJET --- */
-.synopsis, .tech-specs p {
-    /* On utilise Montserrat pour garantir la finesse sur PC Windows */
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 200 !important; /* Très fin et élégant */
-    opacity: 0.9;
-}
-
-.synopsis {
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
-
-.tech-specs p {
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
-}
-
-/* On affine aussi les titres des specs techniques (Réalisation, Casting...) */
-.tech-specs h4 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400; /* Un peu plus gras que le texte pour la hiérarchie */
-    letter-spacing: 2px;
-}
+.synopsis { font-size: 1.2rem; line-height: 1.8; color: #ddd; }
+.tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
+.tech-specs h4:first-child { margin-top: 0; }
+.tech-specs p { color: #888; margin-bottom: 0.5rem; }
 
 /* --- 9.5. TRAILER --- */
 .full-width-video {
@@ -807,6 +787,7 @@ body.scroll-down .menu-toggle {
         padding-bottom: 2.5rem !important;
     }
 }
+
 
 
 
