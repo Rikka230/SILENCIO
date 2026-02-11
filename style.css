@@ -862,30 +862,39 @@ body.scroll-down .menu-toggle {
 }
 
 /* =========================================================
-   CORRECTIF ESTHÉTIQUE MAIL (MOBILE)
+   STYLE MAIL LUXE (PC & MOBILE UNIFIÉS)
    ========================================================= */
-@media (max-width: 768px) {
+
+/* On cible le lien mailto partout */
+.contact-info a[href^="mailto:"] {
     
-    /* On cible spécifiquement le lien qui contient "mailto:" */
-    .contact-info a[href^="mailto:"] {
-        
-        /* 1. TAILLE & OPTIMISATION ESPACE */
-        font-size: 1rem !important;       /* Beaucoup plus petit (env 16px) pour tenir sur une ligne */
-        white-space: nowrap !important;   /* Interdit la coupure en deux lignes */
-        
-        /* 2. STYLE ÉLÉGANT */
-        font-family: 'Montserrat', sans-serif !important; 
-        font-weight: 200 !important;      /* Très fin (Light) */
-        letter-spacing: 1px !important;   /* Un peu d'air entre les lettres */
-        color: #cccccc !important;        /* Gris très clair (moins agressif que le blanc pur) */
-        
-        /* 3. FINITION */
-        text-decoration: none !important; /* On enlève le soulignement par défaut */
-        border-bottom: 1px solid rgba(215, 39, 37, 0.5); /* On remplace par une ligne rouge très fine */
-        padding-bottom: 5px;              /* Espace entre le texte et la ligne */
-        display: inline-block;
-        margin-top: 0.5rem;
-    }
+    /* 1. TYPOGRAPHIE FINE & ÉLÉGANTE */
+    font-family: 'Montserrat', sans-serif !important; 
+    font-weight: 200 !important;       /* Ultra fin (Light) */
+    letter-spacing: 2px !important;    /* Lettres espacées (Cinéma) */
+    color: #cccccc !important;         /* Gris argenté doux */
+    
+    /* 2. TAILLE INTELLIGENTE */
+    /* Sur mobile ça sera ~16px, sur PC ça montera doucement vers ~22px */
+    font-size: clamp(1rem, 1.5vw, 1.4rem) !important; 
+    
+    /* 3. FINITION */
+    white-space: nowrap !important;    /* Jamais coupé en deux */
+    text-decoration: none !important;  /* On retire le trait moche par défaut */
+    
+    /* 4. LE SOULIGNEMENT ROUGE DISCRET */
+    border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
+    padding-bottom: 8px;               /* Espace entre texte et ligne */
+    
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+/* EFFET AU SURVOL (Uniquement sur PC) */
+.contact-info a[href^="mailto:"]:hover {
+    color: #ffffff !important;         /* Devient blanc pur */
+    border-bottom-color: #D72725;      /* La ligne devient rouge vif */
+    transform: translateY(-2px);       /* Remonte très légèrement */
 }
 
 
