@@ -538,50 +538,48 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER : COLONNE (LOGO HAUT / BURGER BAS) */
+    /* A. HEADER : COLONNE + CORRECTIF COULEUR */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
         padding: 1.5rem 1rem;
         
-        /* Disposition verticale : Logo au-dessus, Burger en dessous */
         display: flex; 
         flex-direction: column; 
-        align-items: center;      /* Tout est centré horizontalement */
+        align-items: center;      
         justify-content: flex-start;
-        gap: 15px; /* Espace entre le logo et les 3 traits */
+        gap: 15px;
 
-        background-color: transparent !important; /* Transparent par défaut */
+        background-color: transparent !important;
         border: none !important;            
         box-shadow: none !important;
         
-        /* Z-index très haut pour rester AU-DESSUS du fond noir du menu */
-        z-index: 1200; 
+        /* C'EST CETTE LIGNE QUI MANQUAIT POUR LE FOND NOIR : */
+        mix-blend-mode: normal !important; 
         
-        pointer-events: none; /* Permet de cliquer sur le site autour du logo */
+        z-index: 1200; 
+        pointer-events: none; 
     }
 
     /* B. LOGO & BURGER */
-    .logo { pointer-events: auto; } /* On réactive le clic */
+    .logo { pointer-events: auto; }
     .logo img { height: 50px !important; width: auto !important; }
     
     .menu-toggle {
         display: block !important; 
         cursor: pointer; 
         width: 35px; height: 30px;
-        pointer-events: auto; /* On réactive le clic */
+        pointer-events: auto;
         
-        /* POSITION RELATIVE pour rester dans le flux, sous le logo */
         position: relative !important; 
-        margin: 0 auto; /* Sécurité centrage */
+        margin: 0 auto; 
     }
     
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto; 
         background-color: #fff; display: block; transition: 0.3s;
         border-radius: 2px;
-        /* Petite ombre pour qu'on voie bien le burger sur les vidéos claires */
-        box-shadow: 0 1px 2px rgba(0,0,0,0.5); 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.8); /* Ombre plus forte pour visibilité */
     }
 
     /* ANIMATION CROIX */
@@ -593,23 +591,27 @@ body.scroll-down .menu-toggle {
     .nav-menu {
         position: fixed; 
         left: 0; top: 0; 
-        width: 100%; height: 100vh;
+        width: 100%; height: 100vh; /* Prend tout l'écran */
         
-        /* ICI : LE FOND NOIR OPAQUE QUE VOUS VOULEZ */
+        /* FOND NOIR ABSOLU */
         background-color: #000000 !important; 
+        background: #000000 !important;
         
         display: flex !important; 
         flex-direction: column; 
-        align-items: center;      /* Centre horizontalement */
-        justify-content: center;  /* Centre verticalement */
+        align-items: center;      
+        justify-content: center;  
         gap: 2rem;
         
         visibility: hidden; 
         opacity: 0; 
         transition: opacity 0.3s ease-in-out;
         
-        /* Z-index : Derrière le logo/burger (1200) mais devant le site */
+        /* Doit être juste derrière le burger */
         z-index: 1100; 
+        
+        /* Sécurité supplémentaire pour le fond */
+        mix-blend-mode: normal !important;
     }
     
     .nav-menu.active { 
@@ -621,7 +623,7 @@ body.scroll-down .menu-toggle {
     .nav-menu li { 
         display: block !important; 
         width: 100%; 
-        text-align: center; /* Texte bien centré */
+        text-align: center; 
     }
     
     .nav-link { 
@@ -630,15 +632,15 @@ body.scroll-down .menu-toggle {
         text-transform: uppercase; 
         letter-spacing: 4px; 
         display: inline-block !important; 
+        text-shadow: none !important; /* Pas d'ombre sur fond noir */
     }
 
-    /* D. GRILLE & RESTE (Inchangé) */
+    /* D. RESTE DU MOBILE */
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
     .bento-item, .bento-big, .bento-tall { 
         grid-column: span 1 !important; grid-row: span 1 !important; 
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
-    /* On pousse le contenu plus bas car le header prend de la place en hauteur */
     section { padding-top: 160px !important; } 
     #production { padding-top: 0 !important; }
 }
