@@ -1,5 +1,5 @@
 /* =========================================
-   SILENCIO PICTURES - STYLE MASTER (FINAL CLEAN V2)
+   SILENCIO PICTURES - STYLE MASTER (FINAL V3)
    ========================================= */
 
 /* --- 1. VARIABLES & RESET --- */
@@ -37,7 +37,7 @@ a:hover { opacity: 0.7; }
     pointer-events: none;
 }
 
-ambient-light::before {
+.ambient-light::before {
     content: ''; position: absolute;
     width: 150vw; height: 150vw;
     top: -50%; left: -50%;
@@ -105,7 +105,6 @@ header {
     mix-blend-mode: exclusion;
 }
 
-/* Logo Image */
 a.logo {
     display: flex; align-items: center;
     height: auto; width: auto;
@@ -114,7 +113,7 @@ a.logo {
 }
 
 .logo img {
-    height: 200px; /* Taille Desktop préservée */
+    height: 200px; 
     width: auto;
     display: block;
     transition: opacity 0.3s;
@@ -122,15 +121,12 @@ a.logo {
 
 .logo:hover img { opacity: 0.8; }
 
-/* Menu Desktop */
 nav ul { display: flex; gap: 2rem; list-style: none; }
 nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
 
-/* Bouton Burger (Caché sur Desktop) */
 .menu-toggle { display: none; }
 
-
-/* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
+/* --- 6. SECTIONS GÉNÉRALES --- */
 section {
     min-height: 100vh !important; 
     display: flex; 
@@ -154,18 +150,42 @@ h1 {
     font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;
 }
 
+/* --- STYLE TITRES DE SECTION --- */
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 3rem auto;
+    font-family: 'Montserrat', sans-serif; 
+    font-weight: 200; 
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #ffffff;
+    text-align: center;
+}
+
+.section-title::before,
+.section-title::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background-color: var(--color-accent);
+    flex-grow: 1;
+    max-width: 150px;
+    margin: 0 30px;
+    opacity: 0.8;
+}
+
 /* Page Accueil */
 #production { align-items: center; text-align: center; }
 
 /* Page À Propos */
 .about-text {
-    /* Utilisation de Montserrat pour permettre le rendu extra-fin sur PC */
     font-family: 'Montserrat', sans-serif;
-    
-    /* On règle sur 200 pour une finesse élégante, ou 300 pour un peu plus de lisibilité */
     font-weight: 200; 
-    
-    font-size: clamp(1.1rem, 2vw, 1.5rem); /* Taille ajustée pour la finesse */
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
     line-height: 1.6;
     opacity: 0.9;
     max-width: 800px;
@@ -173,10 +193,7 @@ h1 {
     text-align: center;
 }
 
-/* Optionnel : On peut aussi affiner les paragraphes à l'intérieur */
-.about-text p {
-    font-weight: 200;
-}
+.about-text p { font-weight: 200; }
 
 /* Page Contact */
 #contact { text-align: center; border-top: none; }
@@ -186,7 +203,6 @@ footer {
     padding-bottom: 2rem; 
     font-size: 0.8rem; 
     opacity: 0.5; 
-    border: none !important;
     text-align: center; 
     width: 100%;
 }
@@ -205,12 +221,6 @@ footer {
 @keyframes fadeInLogo {
     to { opacity: 1; transform: translateY(0); }
     from { opacity: 0; transform: translateY(20px); }
-}
-
-#production .subtitle {
-    position: relative;
-    z-index: 2;
-    margin-top: 0;
 }
 
 /* --- 7. VIDÉO D'ARRIÈRE-PLAN (HOME) --- */
@@ -235,84 +245,13 @@ footer {
     pointer-events: none;
 }
 
-/* --- NOUVEAU STYLE TITRES (CORRIGÉ POUR PC) --- */
-.section-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto 3rem auto;
-    
-    /* C'EST ICI LE SECRET : On utilise Montserrat au lieu de Helvetica/Arial */
-    font-family: 'Montserrat', sans-serif; 
-    font-weight: 200;  /* 100=Invisible, 200=Ultra Fin (Luxe), 300=Fin, 400=Normal */
-    
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    color: #ffffff;
-    text-align: center;
-}
-
-/* LES LIGNES ROUGES (Inchangé) */
-.section-title::before,
-.section-title::after {
-    content: '';
-    display: block;
-    height: 1px;
-    background-color: var(--color-accent);
-    flex-grow: 1;
-    max-width: 150px;
-    margin: 0 30px;
-    opacity: 0.8;
-}
-
-/* Ajustement Mobile pour les titres */
-@media (max-width: 768px) {
-    .section-title {
-        /* On réduit légèrement la taille pour que les longs mots rentrent */
-        font-size: 1.1rem; 
-        
-        /* On réduit l'espacement des lettres (tout en gardant l'effet luxe) */
-        letter-spacing: 2px; 
-        
-        /* On empêche le titre de se casser sur deux lignes */
-        white-space: nowrap; 
-    }
-
-    .section-title::before,
-    .section-title::after {
-        /* On raccourcit les lignes rouges pour laisser plus de place au texte */
-        max-width: 40px;       
-        
-        /* IMPORTANT : On force une taille minimale pour qu'elles ne disparaissent jamais */
-        min-width: 20px;       
-        
-        /* On réduit l'espace entre le texte et la ligne */
-        margin: 0 10px;
-    }
-}
-
-
 /* --- 8. BENTO GRID --- */
-#projects { 
-    padding: 0 2rem; 
-    min-height: 100vh; 
-    display: flex; flex-direction: column; justify-content: center;
-}
-
-.bento-container { 
-    max-width: 1100px; 
-    margin: 0 auto; 
-    width: 100%; 
-}
-
+#projects { padding: 0 2rem; }
+.bento-container { max-width: 1100px; margin: 0 auto; width: 100%; }
 .bento-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr) !important; 
-    grid-auto-rows: auto; 
     gap: 20px;
-    grid-auto-flow: dense; 
 }
 
 .bento-item {
@@ -323,112 +262,46 @@ footer {
     overflow: hidden; 
     background: #000;
     transition: all 0.4s ease;
-    cursor: pointer;
-    width: 100%;
     aspect-ratio: 1 / 1 !important; 
-    grid-column: span 1;
-    grid-row: span 1;
 }
 
-.bento-big { 
-    grid-column: span 2 !important; 
-    grid-row: span 2 !important; 
-    aspect-ratio: 1 / 1 !important; 
-}
-.bento-tall { 
-    grid-column: span 1 !important; 
-    grid-row: span 2 !important; 
-    aspect-ratio: 1 / 2 !important; 
-}
+.bento-big { grid-column: span 2 !important; grid-row: span 2 !important; }
+.bento-tall { grid-column: span 1 !important; grid-row: span 2 !important; aspect-ratio: 1 / 2 !important; }
 
 .bento-item img {
     width: 100%; height: 100%; 
     object-fit: cover; 
-    object-position: center center;
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     opacity: 0.8;
 }
 
-.bento-tall img { object-position: top center !important; }
-
 .bento-overlay {
-    position: absolute; 
-    bottom: 0; left: 0; width: 100%; 
+    position: absolute; bottom: 0; left: 0; width: 100%; 
     padding: 2rem;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    opacity: 0; 
-    transform: translateY(20px);
+    opacity: 0; transform: translateY(20px);
     transition: all 0.4s ease;
-    z-index: 10;
 }
 
-.bento-overlay h3 { 
-    font-size: 1.4rem; 
-    text-transform: uppercase; 
-    margin-bottom: 0.3rem; 
-    color: #fff; 
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-.bento-overlay p { 
-    color: var(--color-accent); 
-    font-size: 0.8rem; 
-    font-weight: bold; 
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-}
-
-.bento-item:hover { 
-    border-color: var(--color-accent); 
-    box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2);
-}
-.bento-item:hover img { transform: scale(1.1); opacity: 1; }
 .bento-item:hover .bento-overlay { opacity: 1; transform: translateY(0); }
-
-@media (max-width: 1024px) {
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
-    
-    .bento-item, .bento-big, .bento-tall { 
-        grid-column: span 1 !important; 
-        grid-row: span 1 !important; 
-        aspect-ratio: 16/9 !important; 
-    }
-    .bento-overlay { opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
-}
+.bento-item:hover img { transform: scale(1.1); opacity: 1; }
 
 /* --- 9. PAGE DÉTAIL PROJET --- */
 .project-hero {
     height: 70vh;
-    min-height: 70vh; 
     position: relative;
     overflow: hidden;
-    display: block;
     background-color: #000;
 }
 
 .project-hero img {
     width: 100%; height: 100%;
     object-fit: cover;
-    opacity: 0; 
-    animation: fadeInImage 0.5s ease forwards;
-    -webkit-mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%), 
-        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%); 
-    -webkit-mask-composite: source-in;
-    mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%),
-        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%);
-    mask-composite: intersect;
-    transition: all 0.5s ease;
-}
-
-@keyframes fadeInImage {
-    to { opacity: 0.8; }
+    opacity: 0.8;
 }
 
 .project-header-content {
-    position: absolute; 
-    bottom: 0; left: 0; width: 100%;
+    position: absolute; bottom: 0; left: 0; width: 100%;
     padding: 4rem 2rem;
     z-index: 2;
     background: linear-gradient(to top, var(--color-bg), transparent);
@@ -444,369 +317,135 @@ footer {
 .back-btn {
     position: fixed; top: 2rem; left: 2rem;
     z-index: 1001;
-    color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+    color: #fff; text-transform: uppercase; letter-spacing: 2px;
     mix-blend-mode: exclusion;
-    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
     padding: 10px 15px; border-radius: 30px;
     background: rgba(0,0,0,0.2); backdrop-filter: blur(5px);
 }
-.back-btn:hover::before { transform: translateX(-5px); }
-.back-btn::before { content: '←'; font-size: 1.2rem; transition: transform 0.3s; }
 
 .project-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 4rem 2rem 2rem 2rem; 
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    max-width: 1000px; margin: 0 auto;
+    padding: 4rem 2rem; 
+    display: grid; grid-template-columns: 2fr 1fr;
     gap: 4rem;
-    position: relative;
-    z-index: 5;
 }
+
 .synopsis { 
     font-family: 'Montserrat', sans-serif !important;
-    font-weight: 200 !important; /* Force la finesse sur tous les supports */
+    font-weight: 200 !important; 
     font-size: 1.2rem; 
-    line-height: 1.8; 
-    color: #ddd; 
+    line-height: 1.8; color: #ddd; 
 }
+
 .tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
-.tech-specs h4:first-child { margin-top: 0; }
 .tech-specs p { color: #888; margin-bottom: 0.5rem; }
 
 /* --- 9.5. TRAILER --- */
-.full-width-video {
-    width: 100%;
-    background: transparent;
-    margin-top: 0rem; 
-    padding: 0; 
-    text-align: center;
-    border: none !important;
-    position: relative;
-    z-index: 10;
-}
+.full-width-video { width: 100%; text-align: center; padding-bottom: 4rem; }
+.video-wrapper { aspect-ratio: 16 / 9; width: 100%; }
+.video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
-.video-label {
-    color: var(--color-text);
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    opacity: 0.7;
-    display: inline-block;
-    background: transparent; 
-    padding: 0;
-}
-
-.video-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: none;
-    aspect-ratio: 16 / 9;
-    margin: 0;
-    -webkit-mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
-        linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
-        linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
-    mask-composite: intersect;
-}
-
-.video-wrapper iframe {
-    position: absolute; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%;
-    border: none;
-    display: block;
-}
-
-/* --- 10. MENTIONS LÉGALES --- */
-.legal-section {
-    padding: 8rem 2rem 4rem; max-width: 800px; margin: 0 auto; color: #ccc;
-}
-.legal-section h1 {
-    color: #fff; text-transform: uppercase; text-align: center; margin-bottom: 4rem;
-    font-size: clamp(2rem, 4vw, 3rem); text-shadow: 0 0 20px rgba(215, 39, 37, 0.4);
-}
-.legal-block { margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; }
-.legal-block:last-child { border-bottom: none; }
-.legal-block h2 { color: var(--color-accent); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
-.legal-block p { line-height: 1.8; margin-bottom: 1rem; font-weight: 300; }
-.legal-block strong { color: #fff; font-weight: 500; }
-.legal-block a { text-decoration: underline; text-decoration-color: var(--color-accent); }
-.legal-block a:hover { color: var(--color-accent); }
-
-/* --- 11. ANIMATIONS KEYFRAMES --- */
-@keyframes drift1 {
-    0% { transform: translate(10%, 10%) scale(1); }
-    50% { transform: translate(40%, 20%) scale(1.1); }
-    100% { transform: translate(20%, 50%) scale(0.9); }
-}
-@keyframes drift2 {
-    0% { transform: translate(-10%, -10%) scale(0.9); }
-    50% { transform: translate(-30%, -40%) scale(1.2); }
-    100% { transform: translate(-10%, -60%) scale(1); }
-}
-@keyframes blurPulse {
-    0% { filter: blur(15px); opacity: 0.4; }
-    50% { filter: blur(0px); opacity: 1; }
-    100% { filter: blur(8px); opacity: 0.7; }
-}
-@keyframes fadeOut {
-    to { opacity: 0; visibility: hidden; }
-}
-
-/* --- TRANSITIONS --- */
-.page-transition {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: #000;
-    z-index: 99999;
-    pointer-events: none; 
-    opacity: 0; 
-    transition: opacity 0.5s ease-in-out;
-}
-.page-transition.active { opacity: 1; pointer-events: all; }
-
-/* --- BOUTON INSTAGRAM --- */
-.insta-link {
-    display: inline-block;
-    color: #fff;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-    opacity: 0.7;
-}
-.insta-link svg { width: 40px; height: 40px; }
-.insta-link:hover {
-    color: var(--color-accent); opacity: 1; transform: scale(1.1);
-}
-
-.auto-height-section {
-    min-height: auto !important; 
-    justify-content: flex-start !important; 
-    padding-bottom: 4 !important; 
-    padding-top: 4rem; 
-}
-
-/* --- SMART NAVIGATION (SCROLL) --- */
-nav, .menu-toggle {
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    opacity: 1;
-    transform: translateY(0);
-}
-
-body.scroll-down nav,
-body.scroll-down .menu-toggle {
-    opacity: 0; 
-    transform: translateY(-20px); 
-    pointer-events: none; 
-}
-
-.logo {
-    transition: opacity 0.3s;
-    z-index: 1002; 
-}
-
-
-/* =========================================================
-   12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px)
-   ========================================================= */
+/* --- 12. RESPONSIVE MOBILE & TABLETTE --- */
 @media (max-width: 1024px) {
 
-    /* 1. RESET SÉCURISÉ
-       On applique ces corrections UNIQUEMENT au header principal et au menu 
-       On exclut explicitement la classe .project-hero pour ne pas casser les pages films */
-    
-    header:not(.project-hero), 
-    nav, 
-    .nav-container {
-        position: static !important;
-        transform: none !important;
-        mix-blend-mode: normal !important;
-        filter: none !important;
-        perspective: none !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: auto !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* 2. LE HEADER PRINCIPAL (LOGO + BURGER) */
-    /* On utilise :not(.project-hero) pour être sûr de ne pas toucher à l'image du film */
+    /* HEADER FIXE MOBILE */
     header:not(.project-hero) {
-        position: fixed !important;
-        top: 0; left: 0;
-        z-index: 1200;
-        padding: 1.5rem 1rem !important;
-        pointer-events: none; /* Laisse cliquer le site derrière */
-        
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 20px !important;
+        position: fixed !important; top: 0; left: 0; width: 100%;
+        z-index: 1200; padding: 1.5rem 1rem !important;
+        display: flex !important; flex-direction: column !important;
+        align-items: center !important; gap: 20px !important;
+        background: transparent !important; pointer-events: none;
     }
 
-    /* 3. LOGO & BURGER */
-    .logo {
-        pointer-events: auto;
-        position: relative;
-        z-index: 1300;
-        display: block !important;
-    }
+    .logo { pointer-events: auto; }
     .logo img { height: 100px !important; width: auto !important; }
 
     .menu-toggle {
-        display: block !important;
-        pointer-events: auto;
-        cursor: pointer;
-        width: 35px; height: 30px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 1300;
+        display: block !important; pointer-events: auto;
+        cursor: pointer; width: 35px; height: 30px; margin: 0 auto;
+        position: relative; z-index: 1300;
     }
     
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto;
-        background-color: #ffffff !important;
-        display: block; transition: 0.3s;
-        border-radius: 2px;
+        background-color: #ffffff !important; display: block;
         box-shadow: 0 1px 4px rgba(0,0,0,0.8);
     }
-    
-    .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
-    .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-
-    /* 4. LE MENU NOIR (PLEIN ÉCRAN) */
+    /* MENU PLEIN ÉCRAN */
     .nav-menu {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        
+        position: fixed !important; inset: 0 !important;
+        width: 100vw !important; height: 100vh !important;
         background-color: #000000 !important;
-        background: #000000 !important;
-        isolation: isolate !important;
-        
-        display: flex !important;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 2rem;
-        
-        padding: 0 !important;
-        margin: 0 !important;
-        list-style: none !important;
-        
-        visibility: hidden !important;
-        opacity: 0 !important;
-        transition: opacity 0.3s ease-in-out;
-        
-        z-index: 1250 !important;
+        display: flex !important; flex-direction: column;
+        justify-content: center; align-items: center; gap: 2rem;
+        visibility: hidden; opacity: 0; transition: 0.3s; z-index: 1250;
     }
 
-    .nav-menu.active {
-        visibility: visible !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
+    .nav-menu.active { visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
+    .nav-link { font-size: 2rem !important; text-transform: uppercase; letter-spacing: 4px; }
 
-    .nav-menu li {
-        display: block !important;
-        width: 100%;
-        text-align: center;
-        padding: 0; margin: 0;
-    }
-
-    .nav-link {
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        text-decoration: none !important;
-        display: block;
-        text-shadow: none !important;
-    }
-
-    /* 5. GESTION DES ESPACES (Padding Sections) */
-    /* On applique le padding de sécurité UNIQUEMENT aux sections principales */
-    /* Et surtout PAS à la section Hero du projet (.project-hero) */
-    section:not(.project-hero) { 
-        padding-top: 160px !important; 
-    }
-    
-    /* Le #production sur la home n'en a pas besoin car il a la vidéo full screen */
-    #production { padding-top: 0 !important; }
-    
-    /* GRILLES ET IMAGES */
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
-    .bento-item, .bento-big, .bento-tall { 
-        grid-column: span 1 !important; grid-row: span 1 !important; 
-        width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
-    }
-}
-
-/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE (OPTIMISÉ VIDES) --- */
-@media (max-width: 1024px) {
-
-    section:not(.project-hero) { 
-        padding-top: 40px !important; /* Rapproche le contenu de l'image du haut */
-    }
+    /* --- PAGE PROJET MOBILE : RÉAGENCEMENT ET VIDES --- */
+    section:not(.project-hero) { padding-top: 10px !important; }
 
     .project-content {
         display: block !important;
-        width: 100% !important;
-        padding: 1rem 1.5rem !important; /* Réduit le vide interne */
+        padding: 0 1.5rem !important;
     }
 
     .synopsis {
-        width: 100% !important;
-        margin-bottom: 1.5rem !important; /* Rapproche des specs techniques */
+        margin-bottom: 2rem !important;
         font-size: 1.1rem !important;
     }
 
+    /* Alignement Titre / Nom Face à Face */
     .tech-specs {
+        display: block !important;
         width: 100% !important;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 1.5rem 1rem !important;
         border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 1.5rem;
+        padding-top: 1.5rem !important;
     }
 
-    .project-hero {
-        height: 45vh !important;
-        min-height: 280px !important;
+    .spec-group {
+        display: flex;
+        justify-content: space-between; 
+        align-items: baseline;
+        margin-bottom: 1rem;
+        gap: 10px;
     }
+
+    .tech-specs h4 { margin: 0 !important; font-size: 0.8rem !important; min-width: fit-content; }
+    .tech-specs p { margin: 0 !important; text-align: right; font-size: 0.9rem !important; }
+
+    .project-hero { height: 45vh !important; min-height: 280px !important; }
 
     .full-width-video {
-        margin-top: 0rem !important;
-        padding-top: 1rem !important;
-        padding-bottom: 2.5rem !important;
+        margin-top: -1rem !important; 
+        padding-top: 0 !important;
+        padding-bottom: 2rem !important;
     }
+
+    /* BENTO MOBILE */
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
+    .bento-item, .bento-big, .bento-tall { aspect-ratio: 16 / 9 !important; grid-column: span 1 !important; }
 }
 
+/* --- TITRES MOBILE --- */
+@media (max-width: 768px) {
+    .section-title { font-size: 1.1rem; letter-spacing: 2px; white-space: nowrap; }
+    .section-title::before, .section-title::after { max-width: 40px; min-width: 20px; margin: 0 10px; }
+}
 
+/* --- ANIMATIONS & TRANSITIONS --- */
+.page-transition {
+    position: fixed; inset: 0; background: #000;
+    z-index: 99999; pointer-events: none; opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.page-transition.active { opacity: 1; pointer-events: all; }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@keyframes blurPulse {
+    0% { filter: blur(15px); opacity: 0.4; }
+    100% { filter: blur(8px); opacity: 0.7; }
+}
