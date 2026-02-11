@@ -324,7 +324,8 @@ footer {
 .project-content {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 4rem 2rem 0 2rem; 
+    /* On met padding-bottom à 0 ou très petit (2rem) pour coller au suivant */
+    padding: 4rem 2rem 2rem 2rem; 
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 4rem;
@@ -340,7 +341,10 @@ footer {
 .full-width-video {
     width: 100%;
     background: transparent;
-    margin-top: -20rem; /* Réglage PC */
+    
+    /* LA CORRECTION EST ICI : */
+    margin-top: -4rem; /* Un petit chevauchement léger et sans risque */
+    
     padding: 0; 
     text-align: center;
     border: none !important;
@@ -535,6 +539,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
