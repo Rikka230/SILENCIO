@@ -538,7 +538,7 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER : LOGO ET BURGER */
+    /* A. HEADER : LE CONTENEUR LOGO + BURGER */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
@@ -547,23 +547,26 @@ body.scroll-down .menu-toggle {
         display: flex; 
         flex-direction: column; 
         align-items: center;      
-        gap: 20px;
+        gap: 20px; /* Espace entre Logo et Burger */
 
         background: transparent !important;
         border: none !important;            
         box-shadow: none !important;
+        
+        /* Désactive les effets de mélange pour que le noir soit bien NOIR */
         mix-blend-mode: normal !important; 
         
-        /* On casse tout lien de parenté avec le menu noir */
+        /* Empêche le header de limiter la taille du menu */
         transform: none !important; 
-        perspective: none !important;
         
         z-index: 1200; 
-        pointer-events: none; 
+        pointer-events: none; /* Permet de cliquer à travers les zones vides */
     }
 
-    /* B. LOGO & BURGER (CLIQUABLES) */
-    .logo { pointer-events: auto; }
+    /* B. LOGO & BURGER (DOIVENT RESTER CLIQUABLES) */
+    .logo { 
+        pointer-events: auto; 
+    }
     .logo img { height: 50px !important; width: auto !important; }
     
     .menu-toggle {
@@ -571,8 +574,10 @@ body.scroll-down .menu-toggle {
         cursor: pointer; 
         width: 35px; height: 30px;
         pointer-events: auto;
+        
         position: relative !important; 
-        z-index: 1300; 
+        margin: 0 auto; 
+        z-index: 1300; /* Le burger reste au-dessus du fond noir */
     }
     
     .menu-toggle .bar {
@@ -585,31 +590,25 @@ body.scroll-down .menu-toggle {
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* C. NETTOYAGE DU CONTENEUR INTERMÉDIAIRE (C'est souvent lui le coupable) */
+    /* C. NEUTRALISATION DU CONTENEUR INTERMÉDIAIRE */
     .nav-container {
         position: static !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: auto !important;
-        height: auto !important;
         display: block !important;
+        width: 0 !important; height: 0 !important;
+        padding: 0 !important; margin: 0 !important;
     }
 
-    /* D. LE MENU NOIR (POSITION ABSOLUE PAR RAPPORT A L'ECRAN) */
+    /* D. LE MENU NOIR (PLEIN ÉCRAN ABSOLU) */
     .nav-menu {
-        /* On utilise FIXED pour coller à l'écran, pas au parent */
         position: fixed !important; 
         
-        /* INSET 0 colle aux 4 bords (Haut/Bas/Gauche/Droite) */
+        /* COLLE AUX 4 BORDS DE L'ÉCRAN */
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
+        width: 100vw !important; /* Largeur écran totale */
+        height: 100vh !important; /* Hauteur écran totale */
         
-        width: 100vw !important;
-        height: 100vh !important;
-        
-        background-color: #000000 !important; 
+        background-color: #000000 !important; /* Fond Noir Opaque */
         
         display: flex !important; 
         flex-direction: column; 
@@ -617,18 +616,16 @@ body.scroll-down .menu-toggle {
         justify-content: center;  
         gap: 2rem;
         
-        /* SUPPRESSION RADICALE DES MARGES PAR DÉFAUT */
+        /* CORRECTION "HORS CADRE" : On supprime les marges par défaut des listes */
         padding: 0 !important; 
         margin: 0 !important;
-        padding-inline-start: 0 !important; /* Cible spécifiquement le décalage des listes */
         list-style: none !important;
         
         visibility: hidden; 
         opacity: 0; 
         transition: opacity 0.3s ease-in-out;
         
-        z-index: 1100; 
-        transform: translate3d(0,0,0); /* Force l'accélération matérielle */
+        z-index: 1100; /* Juste sous le logo/burger */
     }
     
     .nav-menu.active { 
