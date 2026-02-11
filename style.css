@@ -538,12 +538,16 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
 
-    /* 1. RESET TOTAL DU HEADER ET DE LA NAV
-       On retire toutes les animations et filtres PC qui cassent le mobile */
-    header, nav, .nav-container {
+    /* 1. RESET SÉCURISÉ
+       On applique ces corrections UNIQUEMENT au header principal et au menu 
+       On exclut explicitement la classe .project-hero pour ne pas casser les pages films */
+    
+    header:not(.project-hero), 
+    nav, 
+    .nav-container {
         position: static !important;
-        transform: none !important;        /* Empêche le menu d'être coincé en haut */
-        mix-blend-mode: normal !important; /* Empêche le noir de devenir transparent */
+        transform: none !important;
+        mix-blend-mode: normal !important;
         filter: none !important;
         perspective: none !important;
         width: 100% !important;
@@ -555,14 +559,14 @@ body.scroll-down .menu-toggle {
         box-shadow: none !important;
     }
 
-    /* 2. ON RECRÉE LE HEADER FIXE JUSTE POUR LE LOGO ET LE BURGER */
-    /* On utilise un pseudo-élément pour garder le header cliquable mais invisible */
-    header {
+    /* 2. LE HEADER PRINCIPAL (LOGO + BURGER) */
+    /* On utilise :not(.project-hero) pour être sûr de ne pas toucher à l'image du film */
+    header:not(.project-hero) {
         position: fixed !important;
         top: 0; left: 0;
         z-index: 1200;
-        padding: 1.5rem 1rem !important; /* Remet l'espacement visuel */
-        pointer-events: none; /* Laisse passer les clics autour */
+        padding: 1.5rem 1rem !important;
+        pointer-events: none; /* Laisse cliquer le site derrière */
         
         display: flex !important;
         flex-direction: column !important;
@@ -570,7 +574,7 @@ body.scroll-down .menu-toggle {
         gap: 20px !important;
     }
 
-    /* 3. LOGO & BURGER (DOIVENT ÊTRE AU-DESSUS DE TOUT) */
+    /* 3. LOGO & BURGER */
     .logo {
         pointer-events: auto;
         position: relative;
@@ -591,10 +595,10 @@ body.scroll-down .menu-toggle {
     
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto;
-        background-color: #ffffff !important; /* Blanc forcé */
+        background-color: #ffffff !important;
         display: block; transition: 0.3s;
         border-radius: 2px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.8); /* Ombre pour contraste */
+        box-shadow: 0 1px 4px rgba(0,0,0,0.8);
     }
     
     .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
@@ -602,19 +606,17 @@ body.scroll-down .menu-toggle {
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
 
-    /* 4. LE MENU NOIR (PLEIN ÉCRAN ABSOLU) */
+    /* 4. LE MENU NOIR (PLEIN ÉCRAN) */
     .nav-menu {
-        /* On sort le menu du flux normal */
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
         
-        /* COULEUR DE FOND + ISOLATION POUR ÉVITER LA TRANSPARENCE */
         background-color: #000000 !important;
         background: #000000 !important;
-        isolation: isolate !important; /* Force le noir à rester noir */
+        isolation: isolate !important;
         
         display: flex !important;
         flex-direction: column;
@@ -622,7 +624,6 @@ body.scroll-down .menu-toggle {
         align-items: center;
         gap: 2rem;
         
-        /* RESET MARGES */
         padding: 0 !important;
         margin: 0 !important;
         list-style: none !important;
@@ -631,7 +632,7 @@ body.scroll-down .menu-toggle {
         opacity: 0 !important;
         transition: opacity 0.3s ease-in-out;
         
-        z-index: 1250 !important; /* Entre le site et le burger */
+        z-index: 1250 !important;
     }
 
     .nav-menu.active {
@@ -657,15 +658,24 @@ body.scroll-down .menu-toggle {
         text-shadow: none !important;
     }
 
-    /* 5. RESTE DU SITE */
+    /* 5. GESTION DES ESPACES (Padding Sections) */
+    /* On applique le padding de sécurité UNIQUEMENT aux sections principales */
+    /* Et surtout PAS à la section Hero du projet (.project-hero) */
+    section:not(.project-hero) { 
+        padding-top: 160px !important; 
+    }
+    
+    /* Le #production sur la home n'en a pas besoin car il a la vidéo full screen */
+    #production { padding-top: 0 !important; }
+    
+    /* GRILLES ET IMAGES */
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
     .bento-item, .bento-big, .bento-tall { 
         grid-column: span 1 !important; grid-row: span 1 !important; 
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
-    section { padding-top: 160px !important; }
-    #production { padding-top: 0 !important; }
 }
+
 
 
 
