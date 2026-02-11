@@ -158,10 +158,24 @@ h1 {
 #production { align-items: center; text-align: center; }
 
 /* Page À Propos */
-#about { max-width: 900px; margin: 0 auto; text-align: center; }
 .about-text {
-    font-size: clamp(1.2rem, 2vw, 1.8rem);
-    font-weight: 300; line-height: 1.4; opacity: 0.9;
+    /* Utilisation de Montserrat pour permettre le rendu extra-fin sur PC */
+    font-family: 'Montserrat', sans-serif;
+    
+    /* On règle sur 200 pour une finesse élégante, ou 300 pour un peu plus de lisibilité */
+    font-weight: 200; 
+    
+    font-size: clamp(1.1rem, 2vw, 1.5rem); /* Taille ajustée pour la finesse */
+    line-height: 1.6;
+    opacity: 0.9;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Optionnel : On peut aussi affiner les paragraphes à l'intérieur */
+.about-text p {
+    font-weight: 200;
 }
 
 /* Page Contact */
@@ -773,6 +787,7 @@ body.scroll-down .menu-toggle {
         padding-bottom: 2.5rem !important;
     }
 }
+
 
 
 
