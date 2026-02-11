@@ -343,7 +343,7 @@ footer {
     background: transparent;
     
     /* LA CORRECTION EST ICI : */
-    margin-top: -4rem; /* Un petit chevauchement léger et sans risque */
+    margin-top: 0rem; /* Un petit chevauchement léger et sans risque */
     
     padding: 0; 
     text-align: center;
@@ -463,7 +463,7 @@ footer {
 .auto-height-section {
     min-height: auto !important; /* On arrête de forcer la hauteur de l'écran */
     justify-content: flex-start !important; /* On colle le contenu en haut */
-    padding-bottom: 0 !important; /* On supprime l'espace du bas */
+    padding-bottom: 4 !important; /* On supprime l'espace du bas */
     
     /* Optionnel : On peut réduire le padding du haut si ça fait trop vide */
     padding-top: 4rem; 
@@ -549,6 +549,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
