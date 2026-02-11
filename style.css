@@ -561,6 +561,29 @@ footer {
     padding-top: 4rem; 
 }
 
+/* --- SMART NAVIGATION (SCROLL) --- */
+
+/* 1. On prépare les éléments à être animés */
+nav, .menu-toggle {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 2. La classe que le JS va ajouter quand on descend */
+body.scroll-down nav,
+body.scroll-down .menu-toggle {
+    opacity: 0; /* Devient invisible */
+    transform: translateY(-20px); /* Remonte légèrement */
+    pointer-events: none; /* On ne peut plus cliquer dessus */
+}
+
+/* 3. Le Logo, lui, reste INTOUCHABLE et FIXE */
+.logo {
+    transition: opacity 0.3s;
+    z-index: 1002; /* Toujours au-dessus de tout */
+}
+
 
 /* =========================================================
    12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
@@ -642,6 +665,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
