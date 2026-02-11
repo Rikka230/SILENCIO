@@ -149,117 +149,131 @@
     </footer>
 
    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // --- 1. SMART SCROLL (MENU DISPARAÎT SUR PC UNIQUEMENT) ---
+        let lastScrollTop = 0;
+        const delta = 5; 
+
+        window.addEventListener('scroll', function() {
             
-            // --- 1. SMART SCROLL (MENU DISPARAÎT / LOGO RESTE) ---
-            let lastScrollTop = 0;
-            const delta = 5; // Sensibilité du scroll
+            // *** MODIFICATION MAJEURE ICI ***
+            // Si on est sur Mobile ou Tablette (<= 1024px), ON ARRÊTE TOUT.
+            // On empêche le script de cacher le menu.
+            if (window.innerWidth <= 1024) {
+                document.body.classList.remove('scroll-down');
+                return; 
+            }
 
-            window.addEventListener('scroll', function() {
-                const currentScroll = window.scrollY;
-                
-                // On empêche le déclenchement au rebond (haut de page)
-                if (currentScroll <= 0) {
-                    document.body.classList.remove('scroll-down');
-                    return;
-                }
-
-                // Si on a assez scrollé et qu'on descend
-                if (currentScroll > lastScrollTop && currentScroll > delta) {
-                    // On ajoute la classe qui cache le menu
-                    document.body.classList.add('scroll-down');
-                } else {
-                    // Si on remonte, on l'enlève
-                    document.body.classList.remove('scroll-down');
-                }
-                
-                lastScrollTop = currentScroll;
-            });
-
-
-            // --- 2. VARIABLES GLOBALES ---
-            const menuToggle = document.querySelector('#mobile-menu');
-            const navMenu = document.querySelector('.nav-menu');
-            const transitionOverlay = document.querySelector('.page-transition');
+            const currentScroll = window.scrollY;
             
-            // --- 3. FONCTIONS UTILES ---
-            function closeMenu() {
-                if(menuToggle) menuToggle.classList.remove('is-active');
-                if(navMenu) navMenu.classList.remove('active');
+            if (currentScroll <= 0) {
+                document.body.classList.remove('scroll-down');
+                return;
             }
 
-            function fadeToBlack(callback) {
-                if(transitionOverlay) {
-                    transitionOverlay.classList.add('active'); 
-                    setTimeout(callback, 500); 
-                } else {
-                    callback();
-                }
+            if (currentScroll > lastScrollTop && currentScroll > delta) {
+                document.body.classList.add('scroll-down');
+            } else {
+                document.body.classList.remove('scroll-down');
             }
+            
+            lastScrollTop = currentScroll;
+        });
 
-            // --- 4. SÉCURITÉ "BOUTON PRÉCÉDENT" ---
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted && transitionOverlay) {
-                    transitionOverlay.classList.remove('active');
-                    transitionOverlay.style.opacity = '0';
-                }
+
+        // --- 2. VARIABLES GLOBALES ---
+        // On cherche d'abord la classe .menu-toggle (plus fiable avec mon CSS)
+        const menuToggle = document.querySelector('.menu-toggle') || document.querySelector('#mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+        const transitionOverlay = document.querySelector('.page-transition');
+        
+        // --- 3. FONCTIONS UTILES ---
+        function closeMenu() {
+            if(menuToggle) menuToggle.classList.remove('is-active');
+            if(navMenu) navMenu.classList.remove('active');
+        }
+
+        function fadeToBlack(callback) {
+            if(transitionOverlay) {
+                transitionOverlay.classList.add('active'); 
+                setTimeout(callback, 500); 
+            } else {
+                callback();
+            }
+        }
+
+        // --- 4. SÉCURITÉ "BOUTON PRÉCÉDENT" ---
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted && transitionOverlay) {
+                transitionOverlay.classList.remove('active');
+                transitionOverlay.style.opacity = '0';
+            }
+        });
+
+        // --- 5. MENU BURGER (MOBILE) ---
+        if(menuToggle && navMenu) {
+            menuToggle.addEventListener('click', function(e) {
+                // Empêche le comportement par défaut (zoom ou saut)
+                e.preventDefault();
+                e.stopPropagation();
+                
+                menuToggle.classList.toggle('is-active');
+                navMenu.classList.toggle('active');
             });
+        } else {
+            console.log("Erreur : Menu burger introuvable dans le HTML");
+        }
 
-            // --- 5. MENU BURGER (MOBILE) ---
-            if(menuToggle) {
-                menuToggle.addEventListener('click', function() {
-                    menuToggle.classList.toggle('is-active');
-                    navMenu.classList.toggle('active');
-                });
-            }
+        // --- 6. GESTION DES CLICS (TRANSITIONS) ---
+        const allLinks = document.querySelectorAll('a');
 
-            // --- 6. GESTION DES CLICS (TRANSITIONS) ---
-            const allLinks = document.querySelectorAll('a');
+        allLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                const target = this.getAttribute('target');
 
-            allLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    const target = this.getAttribute('target');
+                if (!href || href.startsWith('mailto:') || href === '#') return;
+                if (target === '_blank') return; 
 
-                    if (!href || href.startsWith('mailto:') || href === '#') return;
-                    if (target === '_blank') return; 
+                e.preventDefault();
+                closeMenu(); // On ferme le menu mobile si on clique sur un lien
 
-                    e.preventDefault();
-                    closeMenu();
+                if (href.includes('#')) {
+                    const targetId = href.split('#')[1];
+                    const targetElement = document.getElementById(targetId);
 
-                    if (href.includes('#')) {
-                        const targetId = href.split('#')[1];
-                        const targetElement = document.getElementById(targetId);
-
-                        if (targetElement) {
-                            fadeToBlack(() => {
-                                targetElement.scrollIntoView({ behavior: 'auto' });
-                                transitionOverlay.classList.remove('active');
-                            });
-                        } else {
-                            fadeToBlack(() => { window.location.href = href; });
-                        }
+                    if (targetElement) {
+                        fadeToBlack(() => {
+                            targetElement.scrollIntoView({ behavior: 'auto' });
+                            transitionOverlay.classList.remove('active');
+                        });
                     } else {
                         fadeToBlack(() => { window.location.href = href; });
                     }
-                });
+                } else {
+                    fadeToBlack(() => { window.location.href = href; });
+                }
             });
-
-            // --- 7. ANIMATION BENTO (MOBILE) ---
-            if (window.innerWidth <= 768) {
-                const bentoItems = document.querySelectorAll('.bento-item');
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        if (e.isIntersecting) e.target.classList.add('is-visible');
-                    });
-                }, { threshold: 0.2 });
-                bentoItems.forEach(i => observer.observe(i));
-            }
         });
-    </script>
+
+        // --- 7. ANIMATION BENTO (MOBILE & TABLETTE) ---
+        // Modifié pour inclure les tablettes (1024px)
+        if (window.innerWidth <= 1024) {
+            const bentoItems = document.querySelectorAll('.bento-item');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) e.target.classList.add('is-visible');
+                });
+            }, { threshold: 0.1 }); // Seuil baissé à 0.1 pour réagir plus vite
+            bentoItems.forEach(i => observer.observe(i));
+        }
+    });
+</script>
     
 </body>
 </html>
+
 
 
 
