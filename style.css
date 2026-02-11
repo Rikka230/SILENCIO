@@ -628,85 +628,86 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) { 
     
-    /* A. HEADER MOBILE (FIXE & STABLE) */
-    /* On force le header à rester là, sans animation de disparition */
+    /* A. HEADER MOBILE (CENTRÉ & FIXE) */
     header {
         position: fixed; 
-        top: 0; left: 0;
-        width: 100%;
-        height: auto;
-        padding: 1.5rem;
-        background: transparent;
-        mix-blend-mode: normal; 
+        top: 0; left: 0; width: 100%;
+        padding: 1rem;
         
-        /* On annule l'effet "Smart Scroll" ici */
+        /* On remet le mode COLONNE pour centrer Logo et Burger l'un sous l'autre */
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        
+        background: transparent;
+        
+        /* On annule l'effet "Smart Scroll" (le menu reste toujours là) */
         opacity: 1 !important; 
         transform: none !important;
         pointer-events: auto !important;
-        justify-content: space-between;
+        z-index: 1100; /* Très haut pour passer au-dessus de tout */
     }
 
-    /* B. ON CACHE LE MENU PC (LIENS TEXTE) */
-    .nav-container ul,
-    .nav-menu.desktop-only { /* Sécurité */
-        display: none !important; 
-    }
-
-    /* C. LE LOGO MOBILE */
+    /* B. LOGO MOBILE */
     a.logo {
-        position: relative; z-index: 1005; margin: 0;
+        position: relative; z-index: 1101; margin: 0;
     }
     .logo img {
-        height: 80px !important; /* Taille adaptée mobile */
-        width: auto !important; margin: 0; 
+        height: 70px !important; /* Un peu plus petit pour gagner de la place */
+        width: auto !important; 
     }
 
-    /* D. LE BURGER (VISIBLE) */
+    /* C. LE BURGER (CENTRÉ SOUS LE LOGO) */
     .menu-toggle {
         display: block; 
         cursor: pointer; 
-        z-index: 1005; /* Au-dessus de tout */
+        z-index: 1101; 
         margin: 0;
         opacity: 1 !important;
         transform: none !important;
     }
-
     .menu-toggle .bar {
-        display: block; width: 30px; height: 2px; margin: 6px auto;
-        background-color: #fff; transition: all 0.3s ease-in-out;
+        background-color: #fff; 
+        width: 30px; height: 2px; margin: 6px auto;
+        transition: all 0.3s;
     }
 
-    /* E. LE MENU OUVERT (OVERLAY) */
+    /* D. LE MENU OUVERT (OVERLAY NOIR) */
     .nav-menu {
         position: fixed; 
         left: 0; top: 0; 
         width: 100%; height: 100vh;
         background-color: #000000;
         
-        /* Flex pour centrer les liens verticalement */
-        display: flex; 
-        flex-direction: column;
-        align-items: center; 
-        justify-content: center;
+        /* Flex pour centrer les liens */
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
         gap: 2rem;
         
-        /* Caché par défaut */
+        /* CACHÉ PAR DÉFAUT */
         visibility: hidden;
         opacity: 0;
+        pointer-events: none;
         transition: all 0.4s ease;
         z-index: 1000;
     }
     
-    /* Quand on clique sur le burger */
+    /* QUAND ON OUVRE LE MENU */
     .nav-menu.active { 
         visibility: visible;
         opacity: 1;
+        pointer-events: auto;
     }
     
-    /* On réaffiche les liens dans le burger */
+    /* On force l'affichage des liens et on cache le menu PC */
     .nav-menu li { display: block; }
+    .nav-container ul { display: flex; flex-direction: column; } 
+    /* Important : si vous avez une classe .nav-menu desktop-only, assurez-vous qu'elle ne gêne pas ici */
+
     .nav-link {
-        font-size: 2rem; font-weight: 300; color: #fff;
+        font-size: 1.5rem; font-weight: 300; color: #fff;
         text-transform: uppercase; letter-spacing: 3px; display: block;
     }
 
@@ -715,42 +716,58 @@ body.scroll-down .menu-toggle {
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
     
-    /* F. PAGE PROJET & BENTO (1 COLONNE) */
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
     
-    /* On remet tout en 16/9 sur mobile */
+    /* E. BENTO GRID (CORRECTION DÉFORMATION) */
+    .bento-grid { 
+        /* 1 seule colonne */
+        grid-template-columns: 1fr !important; 
+        gap: 20px; 
+    }
+    
+    /* On force TOUS les blocs à être en 16/9 (Format vidéo standard) */
+    /* Fini les déformations bizarres */
     .bento-item, .bento-big, .bento-tall, .bento-wide { 
         grid-column: span 1 !important; 
         grid-row: span 1 !important; 
         aspect-ratio: 16/9 !important; 
+        height: auto !important; /* Laisse le ratio décider */
     }
-    /* Exception pour l'affiche verticale */
+    
+    /* Exception : L'affiche verticale reste verticale */
     .bento-tall { aspect-ratio: 2/3 !important; }
 
-    /* G. AJUSTEMENTS DIVERS MOBILE */
-    .project-hero { height: 50vh; }
-    .video-wrapper { aspect-ratio: 1 / 1; }
-    .back-btn { top: 1.5rem; left: 1.5rem; }
-    
-    /* Correction du padding pour que le texte ne passe pas sous le logo */
-    section { 
-        padding-top: 150px !important; 
-        justify-content: flex-start !important;
-    }
-    #production { padding-top: 0 !important; justify-content: center !important; }
-
-    /* Forcer l'affichage des infos en overlay Bento (pas de hover sur mobile) */
+    /* On affiche le texte tout le temps sur l'image */
     .bento-overlay { 
         opacity: 1; 
         transform: translateY(0); 
-        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
+        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); 
+    }
+
+
+    /* F. AJUSTEMENTS ESPACES (POUR NE PAS CACHER LE TEXTE SOUS LE LOGO) */
+    
+    /* Comme le menu est centré (empilé), il est haut (~150px) */
+    /* On pousse le contenu des pages pour qu'il commence plus bas */
+    section { 
+        padding-top: 180px !important; 
+        justify-content: flex-start !important;
+        min-height: auto !important; /* Évite les grands vides */
+        padding-bottom: 4rem;
     }
     
-    /* Vidéo trailer fix */
+    /* Exception Accueil : on centre, mais on pousse un peu */
+    #production { 
+        padding-top: 0 !important; 
+        justify-content: center !important; 
+    }
+    
+    /* Ajustements visuels divers */
+    .project-hero { height: 50vh; }
+    .video-wrapper { aspect-ratio: 1 / 1; }
     .full-width-video { margin-top: 0 !important; padding-top: 2rem; }
+    .back-btn { top: 1.5rem; left: 1.5rem; }
 
-} /* <-- FIN DU FICHIER */
-
+} /* <-- FIN DU FICHIER CSS */
 
 
 
