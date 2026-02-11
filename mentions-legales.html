@@ -48,7 +48,7 @@
             
             <p><strong>Contact :</strong><br>
             Email : <a href="mailto:viard.antony83@gmail.com">viard.antony83@gmail.com</a><br>
-            Site web : <a href="https://nocxweb.netlify.app" class="nav-link">https://nocxweb.netlify.app</a>
+            Site web : <a href="https://nocxweb.netlify.app">https://nocxweb.netlify.app</a>
         </div>
 
         <div class="legal-block">
@@ -56,7 +56,7 @@
             <p>Le site est hébergé par :</p>
             <p><strong>Netlify, Inc.</strong><br>
             2325 3rd Street, Suite 215, San Francisco, California 94107, USA.<br>
-            Site web : <a href="https://www.netlify.com" class="nav-link">https://www.netlify.com</a></p>
+            Site web : <a href="https://www.netlify.com">https://www.netlify.com</a></p>
         </div>
 
         <div class="legal-block">
@@ -79,9 +79,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- 0. GESTION DU LOADER (GARDIEN) ---
-            // (Assurez-vous d'avoir gardé le petit script gardien en haut aussi)
-            
             // --- 1. VARIABLES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
@@ -102,10 +99,8 @@
                 }
             }
 
-            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" (Anti-Écran Noir) ---
-            // C'est cette partie qui sauve la mise quand on fait "Retour"
+            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" ---
             window.addEventListener('pageshow', function(event) {
-                // Si la page est chargée depuis le cache (bouton retour)
                 if (event.persisted && transitionOverlay) {
                     transitionOverlay.classList.remove('active');
                     transitionOverlay.style.opacity = '0';
@@ -120,7 +115,7 @@
                 });
             }
 
-            // --- 5. GESTION DES CLICS (INTELLIGENTE) ---
+            // --- 5. GESTION DES CLICS ---
             const allLinks = document.querySelectorAll('a');
 
             allLinks.forEach(link => {
@@ -128,19 +123,13 @@
                     const href = this.getAttribute('href');
                     const target = this.getAttribute('target');
 
-                    // A. On ignore les liens vides, mailto, ou les liens nouvel onglet (Instagram)
                     if (!href || href.startsWith('mailto:') || href === '#') return;
-                    
-                    // SI C'EST UN LIEN "_blank" (Instagram), ON NE FAIT RIEN (pas de noir)
                     if (target === '_blank') return; 
 
-                    // B. Pour le reste, on lance la transition
                     e.preventDefault();
                     closeMenu();
 
-                    // C. Navigation
                     if (href.includes('#')) {
-                        // Ancre interne
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
 
@@ -153,7 +142,6 @@
                             fadeToBlack(() => { window.location.href = href; });
                         }
                     } else {
-                        // Lien externe (Projet)
                         fadeToBlack(() => { window.location.href = href; });
                     }
                 });
@@ -174,13 +162,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
