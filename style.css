@@ -538,95 +538,90 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER : FOND NOIR TOTAL */
+    /* A. HEADER : COLONNE (LOGO HAUT / BURGER BAS) */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
         padding: 1.5rem 1rem;
+        
+        /* Disposition verticale : Logo au-dessus, Burger en dessous */
         display: flex; 
         flex-direction: column; 
-        justify-content: center; 
-        align-items: center;
-        gap: 15px;
+        align-items: center;      /* Tout est centré horizontalement */
+        justify-content: flex-start;
+        gap: 15px; /* Espace entre le logo et les 3 traits */
 
-        background-color: #000000 !important; 
+        background-color: transparent !important; /* Transparent par défaut */
         border: none !important;            
         box-shadow: none !important;
-        /* Header en dessous du menu ouvert mais au dessus du contenu */
-        z-index: 1100;
         
-        opacity: 1 !important; 
-        transform: none !important; 
-        pointer-events: auto !important;
+        /* Z-index très haut pour rester AU-DESSUS du fond noir du menu */
+        z-index: 1200; 
+        
+        pointer-events: none; /* Permet de cliquer sur le site autour du logo */
     }
 
     /* B. LOGO & BURGER */
+    .logo { pointer-events: auto; } /* On réactive le clic */
     .logo img { height: 50px !important; width: auto !important; }
     
     .menu-toggle {
         display: block !important; 
         cursor: pointer; 
-        /* Burger au dessus de tout */
-        z-index: 1200; 
         width: 35px; height: 30px;
-        position: fixed; /* Fixé pour rester au même endroit */
-        top: 1.5rem;
-        right: 1rem;
-        opacity: 1 !important;
-        transform: none !important;
-        pointer-events: auto !important;
+        pointer-events: auto; /* On réactive le clic */
+        
+        /* POSITION RELATIVE pour rester dans le flux, sous le logo */
+        position: relative !important; 
+        margin: 0 auto; /* Sécurité centrage */
     }
     
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto; 
         background-color: #fff; display: block; transition: 0.3s;
         border-radius: 2px;
+        /* Petite ombre pour qu'on voie bien le burger sur les vidéos claires */
+        box-shadow: 0 1px 2px rgba(0,0,0,0.5); 
     }
 
-    /* ANIMATION BURGER VERS CROIX */
+    /* ANIMATION CROIX */
     .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* C. LE MENU (OVERLAY PLEIN ÉCRAN) */
+    /* C. LE MENU (OVERLAY AVEC FOND NOIR) */
     .nav-menu {
         position: fixed; 
         left: 0; top: 0; 
         width: 100%; height: 100vh;
-        /* Fond noir solide garanti */
+        
+        /* ICI : LE FOND NOIR OPAQUE QUE VOUS VOULEZ */
         background-color: #000000 !important; 
         
-        /* Centrage Flexbox */
         display: flex !important; 
         flex-direction: column; 
-        align-items: center;      /* Centrage horizontal */
-        justify-content: center;  /* Centrage vertical */
-        gap: 2.5rem;
+        align-items: center;      /* Centre horizontalement */
+        justify-content: center;  /* Centre verticalement */
+        gap: 2rem;
         
         visibility: hidden; 
         opacity: 0; 
-        transform: translateY(-20px);
-        transition: all 0.4s ease-in-out;
+        transition: opacity 0.3s ease-in-out;
         
-        /* Z-index entre le header (1100) et le burger (1200) */
-        z-index: 1150;
-        
-        list-style: none; 
-        padding: 0;
-        margin: 0;
+        /* Z-index : Derrière le logo/burger (1200) mais devant le site */
+        z-index: 1100; 
     }
     
     .nav-menu.active { 
         visibility: visible !important; 
         opacity: 1 !important; 
-        transform: translateY(0);
         pointer-events: auto !important; 
     }
     
     .nav-menu li { 
         display: block !important; 
         width: 100%; 
-        text-align: center; /* Assure le centrage du texte */
+        text-align: center; /* Texte bien centré */
     }
     
     .nav-link { 
@@ -637,18 +632,14 @@ body.scroll-down .menu-toggle {
         display: inline-block !important; 
     }
 
-    /* D. BENTO GRID */
+    /* D. GRILLE & RESTE (Inchangé) */
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
-    
-    .bento-item, .bento-big, .bento-tall, .bento-wide { 
-        grid-column: span 1 !important; 
-        grid-row: span 1 !important; 
-        width: 100% !important; 
-        height: auto !important;
-        aspect-ratio: 16 / 9 !important; 
+    .bento-item, .bento-big, .bento-tall { 
+        grid-column: span 1 !important; grid-row: span 1 !important; 
+        width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
-
-    /* E. ESPACEMENTS */
-    section { padding-top: 160px !important; }
+    /* On pousse le contenu plus bas car le header prend de la place en hauteur */
+    section { padding-top: 160px !important; } 
     #production { padding-top: 0 !important; }
 }
+
