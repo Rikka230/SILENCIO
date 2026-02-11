@@ -221,47 +221,48 @@ footer {
     pointer-events: none;
 }
 
-/* --- NOUVEAU STYLE TITRES (STYLE "PICTURES" DU LOGO) --- */
+/* --- NOUVEAU STYLE TITRES (CORRIGÉ POUR PC) --- */
 .section-title {
-    display: flex;             /* Active l'alignement lignes/texte */
-    align-items: center;       /* Centre verticalement */
-    justify-content: center;   /* Centre horizontalement */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    margin: 0 auto 3rem auto;  /* Marge en bas pour respirer */
+    margin: 0 auto 3rem auto;
     
-    /* TYPOGRAPHIE */
-    font-family: var(--font-main);
-    font-weight: 300;          /* Regular, comme 'PICTURES' sur le logo */
-    font-size: clamp(1.8rem, 4vw, 2.5rem); /* Plus grand et responsive */
+    /* C'EST ICI LE SECRET : On utilise Montserrat au lieu de Helvetica/Arial */
+    font-family: 'Montserrat', sans-serif; 
+    font-weight: 200;  /* 100=Invisible, 200=Ultra Fin (Luxe), 300=Fin, 400=Normal */
+    
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
     text-transform: uppercase;
-    letter-spacing: 0.3em;     /* Ecartement large des lettres (Signature du logo) */
-    color: #ffffff;            /* Blanc pur */
+    letter-spacing: 0.3em;
+    color: #ffffff;
     text-align: center;
 }
 
-/* LES DEUX LIGNES ROUGES */
+/* LES LIGNES ROUGES (Inchangé) */
 .section-title::before,
 .section-title::after {
     content: '';
     display: block;
-    height: 1px;               /* Ligne très fine (élégance) */
-    background-color: var(--color-accent); /* Votre Rouge (#D72725) */
-    
-    flex-grow: 1;              /* La ligne s'étire pour remplir l'espace */
-    max-width: 150px;          /* Largeur maximale de la ligne (pour ne pas toucher les bords sur écran géant) */
-    margin: 0 30px;            /* Espace entre le texte et la ligne */
+    height: 1px;
+    background-color: var(--color-accent);
+    flex-grow: 1;
+    max-width: 150px;
+    margin: 0 30px;
     opacity: 0.8;
 }
 
-/* Ajustement Mobile : Lignes un peu plus courtes */
+/* Ajustement Mobile */
 @media (max-width: 768px) {
     .section-title::before,
     .section-title::after {
-        max-width: 60px;       /* Plus court sur mobile */
+        max-width: 60px;
         margin: 0 15px;
     }
     .section-title {
-        letter-spacing: 0.2em; /* Un peu moins écarté sur mobile pour éviter les retours à la ligne */
+        font-size: 1.5rem; 
+        letter-spacing: 0.2em;
     }
 }
 
@@ -719,6 +720,7 @@ body.scroll-down .menu-toggle {
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
 }
+
 
 
 
