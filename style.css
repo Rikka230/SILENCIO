@@ -469,6 +469,14 @@ footer {
     padding-top: 4rem; 
 }
 
+/* --- OPTIMISATION ÉCRANS GÉANTS (PC > 1600px) --- */
+@media (min-width: 1600px) {
+    /* On grossit tout sur les très grands écrans pour remplir le vide */
+    .about-text { font-size: 2.5rem; max-width: 1200px; }
+    .contact-info p { font-size: 2rem; }
+    h1 { font-size: 10rem; } /* Le titre Silencio énorme */
+}
+
 /* =========================================================
    12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
    C'est ici que tout se règle pour les écrans < 768px
@@ -549,6 +557,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
