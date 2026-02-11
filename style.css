@@ -41,10 +41,7 @@ ambient-light::before {
     content: ''; position: absolute;
     width: 150vw; height: 150vw;
     top: -50%; left: -50%;
-    
-    /* REGLAGE : On passe de 0.15 à 0.25 (Plus visible) */
     background: radial-gradient(circle, rgba(215, 39, 37, 0.25) 0%, rgba(0,0,0,0) 60%);
-    
     filter: blur(80px);
     animation: drift1 12s infinite alternate ease-in-out;
 }
@@ -53,10 +50,7 @@ ambient-light::before {
     content: ''; position: absolute;
     width: 120vw; height: 120vw;
     bottom: -20%; right: -20%;
-    
-    /* REGLAGE : On passe de 0.1 à 0.2 */
     background: radial-gradient(circle, rgba(180, 20, 20, 0.2) 0%, rgba(0,0,0,0) 60%);
-    
     filter: blur(60px);
     animation: drift2 15s infinite alternate-reverse ease-in-out;
 }
@@ -70,18 +64,13 @@ ambient-light::before {
     z-index: 10;
     mix-blend-mode: screen;
     background: 
-        /* REGLAGE : On passe de 0.3 à 0.5 */
         radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.5) 0%, transparent 40%),
         radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.5) 0%, transparent 40%);
     animation: breathe 5s infinite alternate ease-in-out;
 }
 
-/* On calme aussi l'animation de respiration */
 @keyframes breathe {
-    /* Avant c'était 0.3 -> Maintenant 0.5 (Ne descend jamais en dessous de 50%) */
     0% { opacity: 0.5; transform: scale(1); }
-    
-    /* Le maximum reste confortable */
     100% { opacity: 0.8; transform: scale(1.05); }
 }
 
@@ -143,17 +132,12 @@ nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-
 
 /* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
 section {
-    /* Hauteur forcée à 100% de la fenêtre visible */
     min-height: 100vh !important; 
-    
-    /* On centre tout, tout le temps */
     display: flex; 
     flex-direction: column; 
     justify-content: center;
     position: relative;
     z-index: 1;
-    
-    /* Sécurité pour ne pas que ça déborde */
     overflow: hidden; 
 }
 
@@ -196,18 +180,10 @@ footer {
 /* --- LE LOGO GÉANT (ACCUEIL) --- */
 .hero-logo-main {
     display: block;
-    margin: 0 auto 2rem auto; /* Centré + espace en bas vers le sous-titre */
-    
-    /* GESTION DE LA TAILLE (RESPONSIVE) */
-    /* Min: 300px (mobile) | Idéal: 60% de l'écran | Max: 900px (grand écran) */
+    margin: 0 auto 2rem auto;
     width: clamp(300px, 60vw, 900px);
-    
-    height: auto; /* Garde les proportions */
-    
-    /* L'ombre portée (Indispensable pour qu'il ressorte sur la vidéo) */
+    height: auto;
     filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
-    
-    /* Petite animation d'apparition douce */
     opacity: 0;
     animation: fadeInLogo 1.5s ease-out forwards 0.5s;
 }
@@ -217,7 +193,6 @@ footer {
     from { opacity: 0; transform: translateY(20px); }
 }
 
-/* On s'assure que le sous-titre est bien visible en dessous */
 #production .subtitle {
     position: relative;
     z-index: 2;
@@ -247,7 +222,7 @@ footer {
 }
 
 
-/* --- 8. BENTO GRID (STYLE FINAL : 4 COLONNES + EFFETS SILENCIO) --- */
+/* --- 8. BENTO GRID --- */
 #projects { 
     padding: 0 2rem; 
     min-height: 100vh; 
@@ -255,46 +230,34 @@ footer {
 }
 
 .bento-container { 
-    max-width: 1100px; /* Largeur idéale pour la netteté des images */
+    max-width: 1100px; 
     margin: 0 auto; 
     width: 100%; 
 }
 
 .bento-grid {
     display: grid;
-    /* 4 Colonnes pour l'agencement "Tetris" */
     grid-template-columns: repeat(4, 1fr) !important; 
     grid-auto-rows: auto; 
     gap: 20px;
     grid-auto-flow: dense; 
 }
 
-/* --- LE BLOC (FORME & STYLE) --- */
 .bento-item {
-    position: relative; /* Indispensable pour que le texte se place dessus */
+    position: relative;
     display: block;
-    
-    /* 1. LES ARRONDIS */
     border-radius: 12px; 
-    
-    /* 2. LE CADRE DISCRET */
     border: 1px solid rgba(255,255,255,0.1);
-    
-    /* 3. IMPORTANT : Empêche l'image de dépasser quand elle zoome */
     overflow: hidden; 
-    
     background: #000;
     transition: all 0.4s ease;
     cursor: pointer;
     width: 100%;
-    
-    /* Forme Carrée par défaut */
     aspect-ratio: 1 / 1 !important; 
     grid-column: span 1;
     grid-row: span 1;
 }
 
-/* --- FORMES SPÉCIALES --- */
 .bento-big { 
     grid-column: span 2 !important; 
     grid-row: span 2 !important; 
@@ -306,33 +269,23 @@ footer {
     aspect-ratio: 1 / 2 !important; 
 }
 
-
-/* --- L'IMAGE (ANIMATION ZOOM) --- */
 .bento-item img {
     width: 100%; height: 100%; 
     object-fit: cover; 
-    object-position: center center; /* Centre l'image proprement */
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Zoom fluide */
-    opacity: 0.8; /* Légèrement sombre par défaut pour faire ressortir le texte */
+    object-position: center center;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    opacity: 0.8;
 }
 
-/* Astuce pour l'image verticale : on s'aligne en haut */
 .bento-tall img { object-position: top center !important; }
 
-
-/* --- LE TEXTE (OVERLAY) --- */
 .bento-overlay {
     position: absolute; 
     bottom: 0; left: 0; width: 100%; 
     padding: 2rem;
-    
-    /* Fond dégradé pour lire le texte */
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    
-    /* 4. CACHÉ PAR DÉFAUT */
     opacity: 0; 
-    transform: translateY(20px); /* Décalé vers le bas */
-    
+    transform: translateY(20px);
     transition: all 0.4s ease;
     z-index: 10;
 }
@@ -353,29 +306,13 @@ footer {
     text-transform: uppercase;
 }
 
-
-/* --- LES ANIMATIONS AU SURVOL (HOVER) --- */
-
-/* A. Le bloc devient rouge */
 .bento-item:hover { 
     border-color: var(--color-accent); 
     box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2);
 }
+.bento-item:hover img { transform: scale(1.1); opacity: 1; }
+.bento-item:hover .bento-overlay { opacity: 1; transform: translateY(0); }
 
-/* B. L'image zoome et s'éclaire */
-.bento-item:hover img { 
-    transform: scale(1.1); 
-    opacity: 1; 
-}
-
-/* C. Le texte remonte et apparaît */
-.bento-item:hover .bento-overlay { 
-    opacity: 1; 
-    transform: translateY(0); 
-}
-
-
-/* --- MOBILE (RETOUR À 1 COLONNE) --- */
 @media (max-width: 1024px) {
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
     
@@ -384,12 +321,10 @@ footer {
         grid-row: span 1 !important; 
         aspect-ratio: 16/9 !important; 
     }
-    
-    /* Sur mobile, on affiche le texte tout le temps (pas de hover) */
     .bento-overlay { opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
 }
 
-/* --- 9. PAGE DÉTAIL PROJET (RÉPARÉ + FONDU) --- */
+/* --- 9. PAGE DÉTAIL PROJET --- */
 .project-hero {
     height: 70vh;
     min-height: 70vh; 
@@ -404,18 +339,14 @@ footer {
     object-fit: cover;
     opacity: 0; 
     animation: fadeInImage 0.5s ease forwards;
-
-    /* EFFET FONDU (VIGNETTE) */
     -webkit-mask-image: 
         linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%), 
         linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%); 
     -webkit-mask-composite: source-in;
-
     mask-image: 
         linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%),
         linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%);
     mask-composite: intersect;
-    
     transition: all 0.5s ease;
 }
 
@@ -423,7 +354,6 @@ footer {
     to { opacity: 0.8; }
 }
 
-/* Le conteneur du titre sur l'image */
 .project-header-content {
     position: absolute; 
     bottom: 0; left: 0; width: 100%;
@@ -439,7 +369,6 @@ footer {
     text-shadow: 0 0 30px rgba(215, 39, 37, 0.6);
 }
 
-/* Bouton Retour */
 .back-btn {
     position: fixed; top: 2rem; left: 2rem;
     z-index: 1001;
@@ -452,11 +381,9 @@ footer {
 .back-btn:hover::before { transform: translateX(-5px); }
 .back-btn::before { content: '←'; font-size: 1.2rem; transition: transform 0.3s; }
 
-/* Contenu Principal */
 .project-content {
     max-width: 1000px;
     margin: 0 auto;
-    /* On met padding-bottom à 0 ou très petit (2rem) pour coller au suivant */
     padding: 4rem 2rem 2rem 2rem; 
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -469,7 +396,7 @@ footer {
 .tech-specs h4:first-child { margin-top: 0; }
 .tech-specs p { color: #888; margin-bottom: 0.5rem; }
 
-/* --- 9.5. TRAILER (PC) --- */
+/* --- 9.5. TRAILER --- */
 .full-width-video {
     width: 100%;
     background: transparent;
@@ -499,13 +426,10 @@ footer {
     max-width: none;
     aspect-ratio: 16 / 9;
     margin: 0;
-    
-    /* LE MASQUE FLOU */
     -webkit-mask-image: 
         linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
         linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
     -webkit-mask-composite: source-in;
-
     mask-image: 
         linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
         linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
@@ -520,8 +444,7 @@ footer {
     display: block;
 }
 
-
-/* --- 10. PAGE MENTIONS LÉGALES --- */
+/* --- 10. MENTIONS LÉGALES --- */
 .legal-section {
     padding: 8rem 2rem 4rem; max-width: 800px; margin: 0 auto; color: #ccc;
 }
@@ -537,7 +460,6 @@ footer {
 .legal-block a { text-decoration: underline; text-decoration-color: var(--color-accent); }
 .legal-block a:hover { color: var(--color-accent); }
 
-
 /* --- 11. ANIMATIONS KEYFRAMES --- */
 @keyframes drift1 {
     0% { transform: translate(10%, 10%) scale(1); }
@@ -548,10 +470,6 @@ footer {
     0% { transform: translate(-10%, -10%) scale(0.9); }
     50% { transform: translate(-30%, -40%) scale(1.2); }
     100% { transform: translate(-10%, -60%) scale(1); }
-}
-@keyframes breathe {
-    0% { opacity: 0.4; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.05); }
 }
 @keyframes blurPulse {
     0% { filter: blur(15px); opacity: 0.4; }
@@ -588,37 +506,30 @@ footer {
     color: var(--color-accent); opacity: 1; transform: scale(1.1);
 }
 
-/* --- FIX ÉCRANS GÉANTS (SECTION LIBRE) --- */
 .auto-height-section {
-    min-height: auto !important; /* On arrête de forcer la hauteur de l'écran */
-    justify-content: flex-start !important; /* On colle le contenu en haut */
-    padding-bottom: 4 !important; /* On supprime l'espace du bas */
-    
-    /* Optionnel : On peut réduire le padding du haut si ça fait trop vide */
+    min-height: auto !important; 
+    justify-content: flex-start !important; 
+    padding-bottom: 4 !important; 
     padding-top: 4rem; 
 }
 
 /* --- SMART NAVIGATION (SCROLL) --- */
-
-/* 1. On prépare les éléments à être animés */
 nav, .menu-toggle {
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     opacity: 1;
     transform: translateY(0);
 }
 
-/* 2. La classe que le JS va ajouter quand on descend */
 body.scroll-down nav,
 body.scroll-down .menu-toggle {
-    opacity: 0; /* Devient invisible */
-    transform: translateY(-20px); /* Remonte légèrement */
-    pointer-events: none; /* On ne peut plus cliquer dessus */
+    opacity: 0; 
+    transform: translateY(-20px); 
+    pointer-events: none; 
 }
 
-/* 3. Le Logo, lui, reste INTOUCHABLE et FIXE */
 .logo {
     transition: opacity 0.3s;
-    z-index: 1002; /* Toujours au-dessus de tout */
+    z-index: 1002; 
 }
 
 
@@ -627,7 +538,7 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER : FOND NOIR TOTAL & SANS BORDURE */
+    /* A. HEADER : FOND NOIR TOTAL */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
@@ -638,12 +549,12 @@ body.scroll-down .menu-toggle {
         align-items: center;
         gap: 15px;
 
-        background-color: #000000 !important; /* Noir pur */
-        border: none !important;            /* Supprime la bordure */
+        background-color: #000000 !important; 
+        border: none !important;            
         box-shadow: none !important;
         z-index: 1100;
         
-        /* Désactive les effets de disparition du script scroll */
+        /* Force la visibilité contre le Smart Scroll */
         opacity: 1 !important; 
         transform: none !important; 
         pointer-events: auto !important;
@@ -657,36 +568,49 @@ body.scroll-down .menu-toggle {
         cursor: pointer; 
         z-index: 1200; 
         width: 35px; height: 30px;
+        position: relative;
+        /* Ajout crucial : Force le bouton à rester visible et cliquable */
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto !important;
     }
+    
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto; 
         background-color: #fff; display: block; transition: 0.3s;
+        border-radius: 2px;
     }
 
-    /* C. LE MENU (OVERLAY) - CORRIGÉ */
-    .nav-container ul { display: none !important; } /* Cache le menu texte horizontal */
+    /* ANIMATION BURGER VERS CROIX */
+    .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    /* C. LE MENU (OVERLAY) */
+    /* SUPPRESSION DE LA LIGNE CONFLICTUELLE .nav-container ul { display: none !important; } */
     
     .nav-menu {
         position: fixed; 
         left: 0; top: 0; 
         width: 100%; height: 100vh;
-        background-color: #000000 !important; /* Fond noir plein écran */
+        background-color: #000000 !important; 
         
-        display: flex !important; /* Force le flex pour voir les liens */
+        display: flex !important; 
         flex-direction: column; 
         align-items: center; 
         justify-content: center;
         gap: 2.5rem;
         
-        /* État caché */
         visibility: hidden; 
         opacity: 0; 
         transform: translateY(-20px);
         transition: all 0.4s ease-in-out;
         z-index: 1050;
+        list-style: none; /* Nettoyage */
+        padding: 0;
+        margin: 0;
     }
     
-    /* État affiché quand on clique */
     .nav-menu.active { 
         visibility: visible !important; 
         opacity: 1 !important; 
@@ -708,7 +632,7 @@ body.scroll-down .menu-toggle {
         display: inline-block !important; 
     }
 
-    /* D. BENTO GRID : UNIFORMISATION 16/9 */
+    /* D. BENTO GRID */
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
     
     .bento-item, .bento-big, .bento-tall, .bento-wide { 
@@ -716,20 +640,10 @@ body.scroll-down .menu-toggle {
         grid-row: span 1 !important; 
         width: 100% !important; 
         height: auto !important;
-        aspect-ratio: 16 / 9 !important; /* Tout le monde en format vidéo */
+        aspect-ratio: 16 / 9 !important; 
     }
 
-    /* E. ESPACEMENTS CONTENU */
+    /* E. ESPACEMENTS */
     section { padding-top: 160px !important; }
     #production { padding-top: 0 !important; }
-
 }
-
-
-
-
-
-
-
-
-
