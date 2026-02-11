@@ -561,7 +561,7 @@ body.scroll-down .menu-toggle {
         pointer-events: none; /* Laisse passer les clics autour */
     }
 
-    /* B. LOGO & BURGER (DOIVENT RESTER CLIQUABLES) */
+    /* B. LOGO & BURGER */
     .logo { 
         pointer-events: auto; 
     }
@@ -576,7 +576,7 @@ body.scroll-down .menu-toggle {
         /* Reste dans le flux sous le logo */
         position: relative !important; 
         margin: 0 auto; 
-        z-index: 1300; /* Toujours au-dessus du menu noir */
+        z-index: 1300; 
     }
     
     .menu-toggle .bar {
@@ -591,13 +591,21 @@ body.scroll-down .menu-toggle {
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* C. LE MENU (CORRECTION HORS CADRE) */
+    /* C. LE MENU (CORRECTION DU DÉCALAGE) */
+    .nav-container {
+        position: static !important; /* On annule tout positionnement du conteneur */
+        width: 100% !important;
+        height: 0 !important; /* Pour ne pas gêner */
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .nav-menu {
         position: fixed; 
         top: 0; 
-        left: 0; /* Force le collage à gauche */
-        width: 100vw; /* Largeur totale de l'écran */
-        height: 100vh; /* Hauteur totale de l'écran */
+        left: 0; 
+        width: 100vw; /* Force la largeur totale de l'écran */
+        height: 100vh; /* Force la hauteur totale */
         
         /* FOND NOIR OPAQUE */
         background-color: #000000 !important; 
@@ -607,17 +615,18 @@ body.scroll-down .menu-toggle {
         flex-direction: column; 
         align-items: center;      
         justify-content: center;  
-        gap: 1.5rem;
+        gap: 2rem;
         
-        /* CORRECTION DU DÉCALAGE (TRES IMPORTANT) */
+        /* C'EST ICI LA CORRECTION MAJEURE : */
         padding: 0 !important; 
         margin: 0 !important;
+        list-style: none !important;
         
         visibility: hidden; 
         opacity: 0; 
         transition: opacity 0.3s ease-in-out;
         
-        z-index: 1100; /* Juste en dessous du burger */
+        z-index: 1100; 
     }
     
     .nav-menu.active { 
@@ -635,11 +644,11 @@ body.scroll-down .menu-toggle {
     }
     
     .nav-link { 
-        font-size: 1.8rem !important; /* Taille ajustée pour ne pas couper */
+        font-size: 2rem !important; 
         line-height: 1.2;
         color: #ffffff !important;
         text-transform: uppercase; 
-        letter-spacing: 3px; 
+        letter-spacing: 4px; 
         display: inline-block !important; 
         text-shadow: none !important;
     }
