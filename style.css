@@ -125,13 +125,20 @@ nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-
 .menu-toggle { display: none; }
 
 
-/* --- 6. SECTIONS GÉNÉRALES --- */
+/* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
 section {
-    min-height: 100vh;
-    padding: 4rem 2rem;
-    display: flex; flex-direction: column; justify-content: center;
+    /* Hauteur forcée à 100% de la fenêtre visible */
+    min-height: 100vh; 
+    
+    /* On centre tout, tout le temps */
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
     position: relative;
     z-index: 1;
+    
+    /* Sécurité pour ne pas que ça déborde */
+    overflow: hidden; 
 }
 
 h1 {
@@ -469,12 +476,61 @@ footer {
     padding-top: 4rem; 
 }
 
-/* --- OPTIMISATION ÉCRANS GÉANTS (PC > 1600px) --- */
-@media (min-width: 1600px) {
-    /* On grossit tout sur les très grands écrans pour remplir le vide */
-    .about-text { font-size: 2.5rem; max-width: 1200px; }
-    .contact-info p { font-size: 2rem; }
-    h1 { font-size: 10rem; } /* Le titre Silencio énorme */
+/* =========================================================
+   MODE "CINEMATIC SCALE" (POUR ÉCRANS > 1400px)
+   Ce bloc fait grandir le site proportionnellement à l'écran
+   ========================================================= */
+@media (min-width: 1400px) {
+
+    /* 1. ON DÉBLOQUE LA LARGEUR (Bento Grid) */
+    .bento-container {
+        /* Au lieu de bloquer à 1200px, on prend 85% de l'écran, QUELLE QUE SOIT sa taille */
+        max-width: 85vw; 
+        width: 85vw;
+    }
+    
+    .bento-grid {
+        /* On écarte les cases proportionnellement */
+        gap: 2vw; 
+    }
+    
+    .bento-item {
+        /* Les cases grandissent en hauteur avec l'écran */
+        min-height: 35vh; 
+    }
+
+    /* 2. ON GROSSIT LES TEXTES (Typographie Fluide) */
+    /* On utilise 'vw' : si l'écran double, le texte double */
+    
+    .about-text {
+        max-width: 70vw; /* Le bloc de texte s'élargit */
+        font-size: 1.8vw; /* Le texte grossit */
+        line-height: 1.5;
+    }
+
+    .contact-info p {
+        font-size: 2vw; /* Gros texte de contact */
+    }
+
+    h1 {
+        font-size: 8vw; /* Titre Gigantesque */
+    }
+    
+    .section-title {
+        font-size: 3vw;
+        margin-bottom: 4vh;
+    }
+    
+    /* Le logo grossit aussi */
+    .logo img {
+        height: 12vh; /* 12% de la hauteur de l'écran */
+        width: auto;
+    }
+
+    /* Les liens du menu grossissent */
+    nav a {
+        font-size: 1.2vw;
+    }
 }
 
 /* =========================================================
@@ -557,6 +613,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
