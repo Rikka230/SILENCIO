@@ -459,6 +459,16 @@ footer {
     color: var(--color-accent); opacity: 1; transform: scale(1.1);
 }
 
+/* --- FIX ÉCRANS GÉANTS (SECTION LIBRE) --- */
+.auto-height-section {
+    min-height: auto !important; /* On arrête de forcer la hauteur de l'écran */
+    justify-content: flex-start !important; /* On colle le contenu en haut */
+    padding-bottom: 0 !important; /* On supprime l'espace du bas */
+    
+    /* Optionnel : On peut réduire le padding du haut si ça fait trop vide */
+    padding-top: 4rem; 
+}
+
 /* =========================================================
    12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
    C'est ici que tout se règle pour les écrans < 768px
@@ -539,6 +549,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
