@@ -151,15 +151,38 @@
    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- 0. GESTION DU LOADER (GARDIEN) ---
-            // (Assurez-vous d'avoir gardé le petit script gardien en haut aussi)
-            
-            // --- 1. VARIABLES ---
+            // --- 1. SMART SCROLL (MENU DISPARAÎT / LOGO RESTE) ---
+            let lastScrollTop = 0;
+            const delta = 5; // Sensibilité du scroll
+
+            window.addEventListener('scroll', function() {
+                const currentScroll = window.scrollY;
+                
+                // On empêche le déclenchement au rebond (haut de page)
+                if (currentScroll <= 0) {
+                    document.body.classList.remove('scroll-down');
+                    return;
+                }
+
+                // Si on a assez scrollé et qu'on descend
+                if (currentScroll > lastScrollTop && currentScroll > delta) {
+                    // On ajoute la classe qui cache le menu
+                    document.body.classList.add('scroll-down');
+                } else {
+                    // Si on remonte, on l'enlève
+                    document.body.classList.remove('scroll-down');
+                }
+                
+                lastScrollTop = currentScroll;
+            });
+
+
+            // --- 2. VARIABLES GLOBALES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
             const transitionOverlay = document.querySelector('.page-transition');
             
-            // --- 2. FONCTIONS ---
+            // --- 3. FONCTIONS UTILES ---
             function closeMenu() {
                 if(menuToggle) menuToggle.classList.remove('is-active');
                 if(navMenu) navMenu.classList.remove('active');
@@ -174,17 +197,15 @@
                 }
             }
 
-            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" (Anti-Écran Noir) ---
-            // C'est cette partie qui sauve la mise quand on fait "Retour"
+            // --- 4. SÉCURITÉ "BOUTON PRÉCÉDENT" ---
             window.addEventListener('pageshow', function(event) {
-                // Si la page est chargée depuis le cache (bouton retour)
                 if (event.persisted && transitionOverlay) {
                     transitionOverlay.classList.remove('active');
                     transitionOverlay.style.opacity = '0';
                 }
             });
 
-            // --- 4. MENU MOBILE ---
+            // --- 5. MENU BURGER (MOBILE) ---
             if(menuToggle) {
                 menuToggle.addEventListener('click', function() {
                     menuToggle.classList.toggle('is-active');
@@ -192,7 +213,7 @@
                 });
             }
 
-            // --- 5. GESTION DES CLICS (INTELLIGENTE) ---
+            // --- 6. GESTION DES CLICS (TRANSITIONS) ---
             const allLinks = document.querySelectorAll('a');
 
             allLinks.forEach(link => {
@@ -200,19 +221,13 @@
                     const href = this.getAttribute('href');
                     const target = this.getAttribute('target');
 
-                    // A. On ignore les liens vides, mailto, ou les liens nouvel onglet (Instagram)
                     if (!href || href.startsWith('mailto:') || href === '#') return;
-                    
-                    // SI C'EST UN LIEN "_blank" (Instagram), ON NE FAIT RIEN (pas de noir)
                     if (target === '_blank') return; 
 
-                    // B. Pour le reste, on lance la transition
                     e.preventDefault();
                     closeMenu();
 
-                    // C. Navigation
                     if (href.includes('#')) {
-                        // Ancre interne
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
 
@@ -225,13 +240,12 @@
                             fadeToBlack(() => { window.location.href = href; });
                         }
                     } else {
-                        // Lien externe (Projet)
                         fadeToBlack(() => { window.location.href = href; });
                     }
                 });
             });
 
-            // --- 6. ANIMATION BENTO (MOBILE) ---
+            // --- 7. ANIMATION BENTO (MOBILE) ---
             if (window.innerWidth <= 768) {
                 const bentoItems = document.querySelectorAll('.bento-item');
                 const observer = new IntersectionObserver((entries) => {
@@ -246,6 +260,7 @@
     
 </body>
 </html>
+
 
 
 
