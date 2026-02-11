@@ -22,27 +22,28 @@
     <meta name="twitter:image" content="https://www.silenciopictures.com/share.jpg">
 
     <link rel="icon" type="image/png" href="favicon.png">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body id="home"><div class="page-transition"></div>
+<body id="home">
+    
+    <div class="page-transition"></div>
 
     <div class="ambient-light"></div>
     <div class="corner-glow"></div>
 
     <div id="loader">
-    <div class="loader-logo">SILENCIO</div>
-</div>
-
-<script>
-    // Vérifie IMMÉDIATEMENT si on a déjà vu l'intro
-    if (sessionStorage.getItem('silencioSeen')) {
-        document.getElementById('loader').style.display = 'none';
-    } else {
-        // Sinon, on note qu'on l'a vue pour la prochaine fois
-        sessionStorage.setItem('silencioSeen', 'true');
-    }
-</script>
+        <div class="loader-logo">SILENCIO</div>
+    </div>
+    <script>
+        // Gestion du loader : ne s'affiche qu'une seule fois par session
+        if (sessionStorage.getItem('silencioSeen')) {
+            document.getElementById('loader').style.display = 'none';
+        } else {
+            sessionStorage.setItem('silencioSeen', 'true');
+        }
+    </script>
     
     <header>
         <a href="index.html#home" class="logo">
@@ -55,7 +56,7 @@
             <span class="bar"></span>
         </div>
 
-        <nav class="nav-container">
+        <nav>
             <ul class="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Accueil</a></li>
                 <li><a href="index.html#projects" class="nav-link">En production</a></li>
@@ -74,47 +75,47 @@
         </div>
         
         <img src="image/Brand.png" alt="Silencio Pictures" class="hero-logo-main">
+        
+        <p class="subtitle">Production de films &bull; Paris</p>
     </section>
 
     <section id="projects">
         <div class="bento-container">
-            <h2 class="section-title">En Production</h2>
-            
             <div class="bento-grid">
     
-    <a href="projet1.html" class="bento-item bento-big">
-        <img src="image/F1.jpg" alt="Tales of Taipei">
-        <div class="bento-overlay">
-            <h3>TALES OF TAIPEI</h3>
-            <p>Joseph Hsu</p>
-        </div>
-    </a>
+                <a href="projet1.html" class="bento-item bento-big">
+                    <img src="image/F1.jpg" alt="Tales of Taipei">
+                    <div class="bento-overlay">
+                        <h3>TALES OF TAIPEI</h3>
+                        <p>Joseph Hsu</p>
+                    </div>
+                </a>
 
-    <a href="projet-detail.html" class="bento-item bento-tall">
-        <img src="image/F2.jpg" alt="L'Ombre">
-        <div class="bento-overlay">
-            <h3>L'OMBRE</h3>
-            <p>Drame</p>
-        </div>
-    </a>
+                <a href="projet-detail.html" class="bento-item bento-tall">
+                    <img src="image/F2.jpg" alt="L'Ombre">
+                    <div class="bento-overlay">
+                        <h3>L'OMBRE</h3>
+                        <p>Drame</p>
+                    </div>
+                </a>
 
-    <a href="projet-detail.html" class="bento-item">
-        <img src="image/F3.jpg" alt="Neon Nights">
-        <div class="bento-overlay">
-            <h3>NEON NIGHTS</h3>
-            <p>Court-métrage</p>
-        </div>
-    </a>
+                <a href="projet-detail.html" class="bento-item">
+                    <img src="image/F3.jpg" alt="Neon Nights">
+                    <div class="bento-overlay">
+                        <h3>NEON NIGHTS</h3>
+                        <p>Court-métrage</p>
+                    </div>
+                </a>
 
-    <a href="projet-detail.html" class="bento-item">
-        <img src="image/F4.jpg" alt="Silencio">
-        <div class="bento-overlay">
-            <h3>SILENCIO</h3>
-            <p>Documentaire</p>
-        </div>
-    </a>
-    
-</div>
+                <a href="projet-detail.html" class="bento-item">
+                    <img src="image/F4.jpg" alt="Silencio">
+                    <div class="bento-overlay">
+                        <h3>SILENCIO</h3>
+                        <p>Documentaire</p>
+                    </div>
+                </a>
+                
+            </div>
         </div>
     </section>
     
@@ -129,17 +130,17 @@
 
     <section id="contact">
         <div class="contact-info">
-    <p style="color: var(--color-accent); font-weight: bold; margin-bottom: 0.5rem;">Luca MONGAI</p>
-    <p style="margin-bottom: 2rem;"><a href="mailto:luca.mongai@silencio-pictures.com">luca.mongai@silencio-pictures.com</a></p>
-    
-    <a href="https://www.instagram.com/silenciopictures/" target="_blank" class="insta-link" aria-label="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-        </svg>
-    </a>
-</div>
+            <p style="color: var(--color-accent); font-weight: bold; margin-bottom: 0.5rem;">Luca MONGAI</p>
+            <p style="margin-bottom: 2rem;"><a href="mailto:luca.mongai@silencio-pictures.com">luca.mongai@silencio-pictures.com</a></p>
+            
+            <a href="https://www.instagram.com/silenciopictures/" target="_blank" class="insta-link" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
     </section>
 
     <footer>
@@ -150,20 +151,38 @@
    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- 1. SMART SCROLL (UNIQUEMENT SUR PC) ---
+            // --- 1. GESTION MENU BURGER (MOBILE) ---
+            const menuToggle = document.querySelector('#mobile-menu');
+            const navMenu = document.querySelector('.nav-menu');
+            const transitionOverlay = document.querySelector('.page-transition');
+
+            // On vérifie que les éléments existent pour éviter les erreurs
+            if(menuToggle && navMenu) {
+                menuToggle.addEventListener('click', function() {
+                    menuToggle.classList.toggle('is-active');
+                    navMenu.classList.toggle('active');
+                });
+            }
+
+            // Fonction pour fermer le menu quand on clique sur un lien
+            function closeMenu() {
+                if(menuToggle) menuToggle.classList.remove('is-active');
+                if(navMenu) navMenu.classList.remove('active');
+            }
+
+
+            // --- 2. SMART SCROLL (UNIQUEMENT SUR PC) ---
             let lastScrollTop = 0;
             const delta = 5; 
 
             window.addEventListener('scroll', function() {
-                
-                // SÉCURITÉ MOBILE : Si l'écran est plus petit que 1024px, ON ARRÊTE TOUT ICI.
-                // Le menu restera toujours fixe.
+                // SÉCURITÉ MOBILE : Si l'écran est plus petit que 1024px, ON NE FAIT RIEN.
+                // Cela empêche le menu de disparaître ou de sauter sur téléphone.
                 if (window.innerWidth <= 1024) {
                     document.body.classList.remove('scroll-down');
                     return; 
                 }
 
-                // ... Le reste du code PC (inchangé) ...
                 const currentScroll = window.scrollY;
                 if (currentScroll <= 0) {
                     document.body.classList.remove('scroll-down');
@@ -178,27 +197,17 @@
             });
 
 
-            // --- 2. VARIABLES GLOBALES ---
-            const menuToggle = document.querySelector('#mobile-menu');
-            const navMenu = document.querySelector('.nav-menu');
-            const transitionOverlay = document.querySelector('.page-transition');
-            
-            // --- 3. FONCTIONS UTILES ---
-            function closeMenu() {
-                if(menuToggle) menuToggle.classList.remove('is-active');
-                if(navMenu) navMenu.classList.remove('active');
-            }
-
+            // --- 3. TRANSITIONS DE PAGE (FADE TO BLACK) ---
             function fadeToBlack(callback) {
                 if(transitionOverlay) {
                     transitionOverlay.classList.add('active'); 
-                    setTimeout(callback, 500); 
+                    setTimeout(callback, 500); // Attend la fin de l'anim
                 } else {
                     callback();
                 }
             }
 
-            // --- 4. SÉCURITÉ "BOUTON PRÉCÉDENT" ---
+            // Gère le retour arrière du navigateur (pour enlever le noir)
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted && transitionOverlay) {
                     transitionOverlay.classList.remove('active');
@@ -206,78 +215,59 @@
                 }
             });
 
-            // --- 5. MENU BURGER (MOBILE) ---
-            if(menuToggle) {
-                menuToggle.addEventListener('click', function() {
-                    menuToggle.classList.toggle('is-active');
-                    navMenu.classList.toggle('active');
-                });
-            }
-
-            // --- 6. GESTION DES CLICS (TRANSITIONS) ---
+            // Gère les clics sur les liens
             const allLinks = document.querySelectorAll('a');
-
             allLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
                     const target = this.getAttribute('target');
 
+                    // On ignore les liens mailto, ancres vides ou nouvel onglet
                     if (!href || href.startsWith('mailto:') || href === '#') return;
                     if (target === '_blank') return; 
 
                     e.preventDefault();
-                    closeMenu();
+                    closeMenu(); // Ferme le menu mobile si ouvert
 
+                    // Si c'est une ancre (#) sur la même page
                     if (href.includes('#')) {
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
 
                         if (targetElement) {
-                            fadeToBlack(() => {
-                                targetElement.scrollIntoView({ behavior: 'auto' });
-                                transitionOverlay.classList.remove('active');
-                            });
+                            // On scrolle doucement
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
                         } else {
+                            // Sinon on change de page avec transition
                             fadeToBlack(() => { window.location.href = href; });
                         }
                     } else {
+                        // Changement de page classique avec transition
                         fadeToBlack(() => { window.location.href = href; });
                     }
                 });
             });
 
-            // --- 7. ANIMATION BENTO (MOBILE) ---
-            if (window.innerWidth <= 768) {
+
+            // --- 4. ANIMATION BENTO (APPARITION AU SCROLL SUR MOBILE) ---
+            if (window.innerWidth <= 1024) {
                 const bentoItems = document.querySelectorAll('.bento-item');
+                
+                // Utilise IntersectionObserver pour détecter quand l'image est à l'écran
                 const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        if (e.isIntersecting) e.target.classList.add('is-visible');
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            // Optionnel : arrêter d'observer une fois apparu
+                            // observer.unobserve(entry.target); 
+                        }
                     });
-                }, { threshold: 0.2 });
-                bentoItems.forEach(i => observer.observe(i));
+                }, { threshold: 0.1 }); // Déclenche quand 10% de l'item est visible
+
+                bentoItems.forEach(item => observer.observe(item));
             }
         });
     </script>
     
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
