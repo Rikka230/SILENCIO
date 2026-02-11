@@ -204,27 +204,26 @@ footer {
 /* --- 8. BENTO GRID (EN PRODUCTION) --- */
 #projects { 
     padding: 0 2rem; 
-    /* On s'assure que la section projets prend aussi tout l'écran */
     min-height: 100vh; 
     display: flex; flex-direction: column; justify-content: center;
 }
 
 .bento-container { 
-    max-width: 1400px; 
+    max-width: 1200px; /* Un peu plus serré pour la netteté */
     margin: 0 auto; 
     width: 100%; 
 }
 
 .bento-grid {
     display: grid;
-    /* On crée une grille de 4 colonnes flexibles */
-    grid-template-columns: repeat(4, 1fr); 
-    /* On définit une hauteur de ligne de base (ex: 280px) */
-    grid-auto-rows: 280px; 
-    gap: 20px;
+    /* C'EST ICI LA CORRECTION MATHÉMATIQUE : 3 COLONNES */
+    grid-template-columns: repeat(3, 1fr); 
     
-    /* MAGIE : "dense" permet aux blocs de remonter pour combler les vides */
-    grid-auto-flow: dense; 
+    /* On augmente un peu la hauteur des lignes pour que ça remplisse l'écran */
+    grid-auto-rows: 350px; 
+    
+    gap: 20px;
+    grid-auto-flow: dense; /* Indispensable pour boucher les trous */
 }
 
 .bento-item {
@@ -241,16 +240,10 @@ footer {
     grid-row: span 1;
 }
 
-/* --- LES VARIATIONS DE FORMES (Pour casser le côté carré) --- */
-
-/* Rectangle Horizontal (Prend 2 colonnes) */
-.bento-wide { grid-column: span 2; }
-
-/* Rectangle Vertical (Prend 2 hauteurs) */
-.bento-tall { grid-row: span 2; }
-
-/* Gros Carré (Prend 2x2 - La star) */
-.bento-big { grid-column: span 2; grid-row: span 2; }
+/* --- FORMES TÉTRIS --- */
+.bento-wide { grid-column: span 2; }       /* Largeur 2 */
+.bento-tall { grid-row: span 2; }          /* Hauteur 2 */
+.bento-big  { grid-column: span 2; grid-row: span 2; } /* Le cube 2x2 */
 
 
 /* Styles Images & Overlay (Inchangés) */
@@ -269,6 +262,18 @@ footer {
 .bento-item:hover { transform: scale(1.02); z-index: 2; border-color: var(--color-accent); box-shadow: 0 10px 40px rgba(215, 39, 37, 0.4); }
 .bento-item:hover img { transform: scale(1.1); opacity: 1; }
 .bento-item:hover .bento-overlay { transform: translateY(0); opacity: 1; }
+
+
+/* --- SÉCURITÉ MOBILE (1 COLONNE) --- */
+@media (max-width: 1024px) {
+    .bento-grid { 
+        grid-template-columns: 1fr; /* 1 seule colonne sur tablette/mobile */
+        grid-auto-rows: 300px; 
+    }
+    /* On annule les formes complexes sur mobile pour éviter la casse */
+    .bento-wide, .bento-tall, .bento-big { grid-column: span 1; grid-row: span 1; }
+    .bento-tall { grid-row: span 2; } /* On garde juste la hauteur pour le style */
+}
 
 
 /* --- 6. SECTIONS GÉNÉRALES (CORRECTION ÉCRAN GÉANT) --- */
@@ -625,6 +630,7 @@ section {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
