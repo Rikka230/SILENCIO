@@ -26,7 +26,7 @@ body {
 a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
 a:hover { opacity: 0.7; }
 
-/* --- 2. AMBIENT LIGHT (FOND) --- */
+/* --- 2. AMBIENT LIGHT (VERSION DOUCE) --- */
 .ambient-light {
     position: fixed;
     top: 0; left: 0;
@@ -41,7 +41,8 @@ a:hover { opacity: 0.7; }
     content: ''; position: absolute;
     width: 150vw; height: 150vw;
     top: -50%; left: -50%;
-    background: radial-gradient(circle, rgba(215, 39, 37, 0.4) 0%, rgba(0,0,0,0) 60%);
+    /* On passe de 0.4 à 0.15 (beaucoup plus discret) */
+    background: radial-gradient(circle, rgba(215, 39, 37, 0.15) 0%, rgba(0,0,0,0) 60%);
     filter: blur(80px);
     animation: drift1 12s infinite alternate ease-in-out;
 }
@@ -50,12 +51,13 @@ a:hover { opacity: 0.7; }
     content: ''; position: absolute;
     width: 120vw; height: 120vw;
     bottom: -20%; right: -20%;
-    background: radial-gradient(circle, rgba(180, 20, 20, 0.3) 0%, rgba(0,0,0,0) 60%);
+    /* On passe de 0.3 à 0.1 */
+    background: radial-gradient(circle, rgba(180, 20, 20, 0.1) 0%, rgba(0,0,0,0) 60%);
     filter: blur(60px);
     animation: drift2 15s infinite alternate-reverse ease-in-out;
 }
 
-/* --- 3. CORNER GLOW (LUMIÈRES COINS) --- */
+/* --- 3. CORNER GLOW (LUMIÈRES COINS DOUCES) --- */
 .corner-glow {
     position: fixed;
     bottom: 0; left: 0;
@@ -64,9 +66,16 @@ a:hover { opacity: 0.7; }
     z-index: 10;
     mix-blend-mode: screen;
     background: 
-        radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.6) 0%, transparent 40%),
-        radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.6) 0%, transparent 40%);
+        /* On réduit drastiquement l'opacité ici aussi (0.6 -> 0.3) */
+        radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.3) 0%, transparent 40%);
     animation: breathe 5s infinite alternate ease-in-out;
+}
+
+/* On calme aussi l'animation de respiration */
+@keyframes breathe {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.6; transform: scale(1.05); } /* Max 0.6 au lieu de 1 */
 }
 
 /* --- 4. LOADER / INTRO --- */
@@ -128,7 +137,7 @@ nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-
 /* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
 section {
     /* Hauteur forcée à 100% de la fenêtre visible */
-    min-height: 100vh; 
+    min-height: 100vh !important; 
     
     /* On centre tout, tout le temps */
     display: flex; 
@@ -201,7 +210,7 @@ footer {
 }
 
 
-/* --- 8. BENTO GRID (CORRECTION : CARRÉS PARFAITS & 3 COLONNES) --- */
+/* --- 8. BENTO GRID (STYLE FINAL : 4 COLONNES + EFFETS SILENCIO) --- */
 #projects { 
     padding: 0 2rem; 
     min-height: 100vh; 
@@ -209,113 +218,138 @@ footer {
 }
 
 .bento-container { 
-    max-width: 1200px; 
+    max-width: 1100px; /* Largeur idéale pour la netteté des images */
     margin: 0 auto; 
     width: 100%; 
 }
 
 .bento-grid {
     display: grid;
-    /* 1. ON FORCE 3 COLONNES (Mathématique : 3x3 = 9 blocs) */
-    grid-template-columns: repeat(3, 1fr); 
-    
-    /* 2. ON SUPPRIME LA HAUTEUR FIXE (C'est ça qui créait les rectangles) */
-    /* On laisse le contenu décider de la hauteur */
+    /* 4 Colonnes pour l'agencement "Tetris" */
+    grid-template-columns: repeat(4, 1fr) !important; 
     grid-auto-rows: auto; 
-    
     gap: 20px;
     grid-auto-flow: dense; 
 }
 
-/* --- LE SECRET DES FORMES GÉOMÉTRIQUES --- */
-/* On utilise 'aspect-ratio' pour forcer la forme, quelle que soit la taille de l'écran */
-
+/* --- LE BLOC (FORME & STYLE) --- */
 .bento-item {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #111;
-    transition: all 0.4s ease;
-    cursor: pointer;
+    position: relative; /* Indispensable pour que le texte se place dessus */
+    display: block;
+    
+    /* 1. LES ARRONDIS */
+    border-radius: 12px; 
+    
+    /* 2. LE CADRE DISCRET */
     border: 1px solid rgba(255,255,255,0.1);
     
-    width: 100%;
-    /* PAR DÉFAUT : C'est un CARRÉ (1 sur 1) */
-    aspect-ratio: 1 / 1; 
+    /* 3. IMPORTANT : Empêche l'image de dépasser quand elle zoome */
+    overflow: hidden; 
     
+    background: #000;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    width: 100%;
+    
+    /* Forme Carrée par défaut */
+    aspect-ratio: 1 / 1 !important; 
     grid-column: span 1;
     grid-row: span 1;
 }
 
-/* LE GROS CARRÉ (2x2) */
+/* --- FORMES SPÉCIALES --- */
 .bento-big { 
-    grid-column: span 2; 
-    grid-row: span 2; 
-    aspect-ratio: 1 / 1; /* Reste un carré parfait */
+    grid-column: span 2 !important; 
+    grid-row: span 2 !important; 
+    aspect-ratio: 1 / 1 !important; 
 }
-
-/* LE PANORAMIQUE (Large) */
-.bento-wide { 
-    grid-column: span 2; 
-    aspect-ratio: 2 / 1; /* Rectangle horizontal (2x plus large que haut) */
-}
-
-/* LE PORTRAIT (Haut) */
 .bento-tall { 
-    grid-row: span 2; 
-    aspect-ratio: 1 / 2; /* Rectangle vertical (2x plus haut que large) */
+    grid-column: span 1 !important; 
+    grid-row: span 2 !important; 
+    aspect-ratio: 1 / 2 !important; 
 }
 
 
-/* --- IMAGES & EFFETS --- */
+/* --- L'IMAGE (ANIMATION ZOOM) --- */
 .bento-item img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.6s ease; opacity: 0.7;
+    width: 100%; height: 100%; 
+    object-fit: cover; 
+    object-position: center center; /* Centre l'image proprement */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Zoom fluide */
+    opacity: 0.8; /* Légèrement sombre par défaut pour faire ressortir le texte */
 }
-.bento-overlay {
-    position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    transform: translateY(20px); opacity: 0; transition: all 0.4s ease;
-}
-.bento-overlay h3 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 0.5rem; color: #fff; }
-.bento-overlay p { color: var(--color-accent); font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; }
 
-.bento-item:hover { transform: scale(1.02); z-index: 2; border-color: var(--color-accent); box-shadow: 0 10px 40px rgba(215, 39, 37, 0.4); }
-.bento-item:hover img { transform: scale(1.1); opacity: 1; }
-.bento-item:hover .bento-overlay { transform: translateY(0); opacity: 1; }
+/* Astuce pour l'image verticale : on s'aligne en haut */
+.bento-tall img { object-position: top center !important; }
+
+
+/* --- LE TEXTE (OVERLAY) --- */
+.bento-overlay {
+    position: absolute; 
+    bottom: 0; left: 0; width: 100%; 
+    padding: 2rem;
+    
+    /* Fond dégradé pour lire le texte */
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    
+    /* 4. CACHÉ PAR DÉFAUT */
+    opacity: 0; 
+    transform: translateY(20px); /* Décalé vers le bas */
+    
+    transition: all 0.4s ease;
+    z-index: 10;
+}
+
+.bento-overlay h3 { 
+    font-size: 1.4rem; 
+    text-transform: uppercase; 
+    margin-bottom: 0.3rem; 
+    color: #fff; 
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.bento-overlay p { 
+    color: var(--color-accent); 
+    font-size: 0.8rem; 
+    font-weight: bold; 
+    letter-spacing: 2px; 
+    text-transform: uppercase;
+}
+
+
+/* --- LES ANIMATIONS AU SURVOL (HOVER) --- */
+
+/* A. Le bloc devient rouge */
+.bento-item:hover { 
+    border-color: var(--color-accent); 
+    box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2);
+}
+
+/* B. L'image zoome et s'éclaire */
+.bento-item:hover img { 
+    transform: scale(1.1); 
+    opacity: 1; 
+}
+
+/* C. Le texte remonte et apparaît */
+.bento-item:hover .bento-overlay { 
+    opacity: 1; 
+    transform: translateY(0); 
+}
 
 
 /* --- MOBILE (RETOUR À 1 COLONNE) --- */
 @media (max-width: 1024px) {
-    .bento-grid { grid-template-columns: 1fr; gap: 15px; }
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
     
-    /* Sur mobile, on garde les ratios ou on repasse tout en carré ? 
-       Garder les ratios est plus joli : */
-    .bento-wide, .bento-tall, .bento-big { 
-        grid-column: span 1; 
-        grid-row: span 1; 
-        aspect-ratio: 16/9; /* Tout devient format vidéo sur mobile */
+    .bento-item, .bento-big, .bento-tall { 
+        grid-column: span 1 !important; 
+        grid-row: span 1 !important; 
+        aspect-ratio: 16/9 !important; 
     }
-    .bento-tall { aspect-ratio: 2/3; } /* Sauf l'affiche qui reste verticale */
-}
-
-/* --- 6. SECTIONS GÉNÉRALES (CORRECTION ÉCRAN GÉANT) --- */
-/* Ceci corrige le problème de chevauchement production/à propos */
-section {
-    min-height: 100vh !important; /* Force ABSOLUE 100% hauteur écran */
-    height: auto;
-    padding: 6rem 2rem; /* Espace en haut et en bas */
-    display: flex; flex-direction: column; justify-content: center;
-    position: relative;
-    z-index: 1;
-    overflow: hidden; /* Empêche tout débordement */
-}
-
-/* Sur Mobile, on remet le Bento en 1 seule colonne */
-@media (max-width: 768px) {
-    .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 300px; }
-    .bento-wide, .bento-tall, .bento-big { grid-column: span 1; grid-row: span 1; }
-    .bento-tall { grid-row: span 2; } /* On garde juste les verticaux hauts sur mobile */
+    
+    /* Sur mobile, on affiche le texte tout le temps (pas de hover) */
+    .bento-overlay { opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
 }
 
 /* --- 9. PAGE DÉTAIL PROJET (RÉPARÉ + FONDU) --- */
@@ -402,10 +436,7 @@ section {
 .full-width-video {
     width: 100%;
     background: transparent;
-    
-    /* LA CORRECTION EST ICI : */
-    margin-top: 0rem; /* Un petit chevauchement léger et sans risque */
-    
+    margin-top: 0rem; 
     padding: 0; 
     text-align: center;
     border: none !important;
@@ -530,46 +561,27 @@ section {
     padding-top: 4rem; 
 }
 
-/* =========================================================
-   10.5 STABILISATION DESKTOP (LA MÊME EXPÉRIENCE PARTOUT)
-   ========================================================= */
+/* --- SMART NAVIGATION (SCROLL) --- */
 
-@media (min-width: 1024px) {
-    
-    /* A. ON VERROUILLE LE BENTO (Forme Inchangée) */
-    .bento-container {
-        max-width: 1400px; /* On empêche que ça devienne grotesque sur écran géant */
-        margin: 0 auto;    /* On centre parfaitement */
-        padding: 0 2rem;
-    }
+/* 1. On prépare les éléments à être animés */
+nav, .menu-toggle {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 1;
+    transform: translateY(0);
+}
 
-    .bento-grid {
-        /* LE SECRET EST ICI : On force 4 colonnes. 
-           Si l'écran grandit, les colonnes grandissent, mais ne changent pas de nombre. */
-        grid-template-columns: repeat(4, 1fr) !important; 
-        gap: 30px; /* Plus d'espace sur PC */
-    }
+/* 2. La classe que le JS va ajouter quand on descend */
+body.scroll-down nav,
+body.scroll-down .menu-toggle {
+    opacity: 0; /* Devient invisible */
+    transform: translateY(-20px); /* Remonte légèrement */
+    pointer-events: none; /* On ne peut plus cliquer dessus */
+}
 
-    /* Rappel de vos réglages Bento (Indispensable pour que le 4 colonnes marche) */
-    .bento-large { grid-column: span 2; grid-row: span 2; }
-    .bento-tall  { grid-column: span 1; grid-row: span 2; }
-    .bento-item  { grid-column: span 1; grid-row: span 1; }
-
-    /* B. ON VERROUILLE LE TEXTE (À Propos / Contact) */
-    /* On empêche le texte de s'étaler sur 3 mètres de large */
-    .about-text, .contact-info {
-        max-width: 800px !important; /* Largeur de lecture idéale */
-        margin-left: auto !important;
-        margin-right: auto !important;
-        
-        /* On augmente un peu la taille de police pour les grands écrans */
-        font-size: 1.5rem; 
-    }
-    
-    /* C. ON CENTRE LES SECTIONS */
-    section {
-        align-items: center; /* Centre horizontalement */
-    }
+/* 3. Le Logo, lui, reste INTOUCHABLE et FIXE */
+.logo {
+    transition: opacity 0.3s;
+    z-index: 1002; /* Toujours au-dessus de tout */
 }
 
 
@@ -648,20 +660,11 @@ section {
 
     /* G. CORRECTION VIDÉO MOBILE (C'est ici que ça se règle) */
     .full-width-video {
-        margin-top: 0 !important; /* Annule le décalage PC */
-        padding-top: -20rem; /* Espace propre */
+        margin-top: 0 !important; 
+        padding-top: 3rem; /* CORRECTION : Valeur positive */
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
-
-
-
-
-
-
-
-
-
 
 
 
