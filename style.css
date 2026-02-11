@@ -793,3 +793,40 @@ body.scroll-down .menu-toggle {
         padding-bottom: 2rem !important;
     }
 }
+
+/* =========================================================
+   CORRECTIF ESPACE VIDE MOBILE (PAGE PROJET)
+   ========================================================= */
+
+@media (max-width: 1024px) {
+    
+    /* 1. On retire la hauteur minimale forcée qui crée le vide */
+    .project-content {
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: 0 !important; /* Colle le bas du texte au bloc suivant */
+        min-height: auto !important;
+        gap: 2rem !important; /* Espace maîtrisé entre synopsis et infos */
+    }
+
+    /* 2. On remonte drastiquement la section vidéo */
+    .full-width-video {
+        margin-top: -2rem !important; /* On tire la vidéo vers le haut */
+        padding-top: 0 !important;
+        position: relative;
+        z-index: 10;
+    }
+
+    /* 3. On réduit l'espace sous les infos techniques (Réalisation, Casting...) */
+    .tech-specs {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    /* 4. On s'assure que le titre "BANDE ANNONCE" est proche de la vidéo */
+    .video-label {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
