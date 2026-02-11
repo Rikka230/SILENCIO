@@ -701,7 +701,21 @@ body.scroll-down .menu-toggle {
         padding-top: 3rem; /* CORRECTION : Valeur positive */
     }
 
+   /* --- FIX MOBILE : DÉSACTIVER SMART SCROLL --- */
+@media (max-width: 1024px) {
+    
+    /* Même si le Javascript dit de cacher (scroll-down), on force l'affichage */
+    body.scroll-down nav,
+    body.scroll-down .menu-toggle,
+    body.scroll-down header {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+    }
+}
+
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
