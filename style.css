@@ -26,7 +26,7 @@ body {
 a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
 a:hover { opacity: 0.7; }
 
-/* --- 2. AMBIENT LIGHT (FOND) --- */
+/* --- 2. AMBIENT LIGHT (VERSION DOUCE) --- */
 .ambient-light {
     position: fixed;
     top: 0; left: 0;
@@ -41,7 +41,8 @@ a:hover { opacity: 0.7; }
     content: ''; position: absolute;
     width: 150vw; height: 150vw;
     top: -50%; left: -50%;
-    background: radial-gradient(circle, rgba(215, 39, 37, 0.4) 0%, rgba(0,0,0,0) 60%);
+    /* On passe de 0.4 à 0.15 (beaucoup plus discret) */
+    background: radial-gradient(circle, rgba(215, 39, 37, 0.15) 0%, rgba(0,0,0,0) 60%);
     filter: blur(80px);
     animation: drift1 12s infinite alternate ease-in-out;
 }
@@ -50,12 +51,13 @@ a:hover { opacity: 0.7; }
     content: ''; position: absolute;
     width: 120vw; height: 120vw;
     bottom: -20%; right: -20%;
-    background: radial-gradient(circle, rgba(180, 20, 20, 0.3) 0%, rgba(0,0,0,0) 60%);
+    /* On passe de 0.3 à 0.1 */
+    background: radial-gradient(circle, rgba(180, 20, 20, 0.1) 0%, rgba(0,0,0,0) 60%);
     filter: blur(60px);
     animation: drift2 15s infinite alternate-reverse ease-in-out;
 }
 
-/* --- 3. CORNER GLOW (LUMIÈRES COINS) --- */
+/* --- 3. CORNER GLOW (LUMIÈRES COINS DOUCES) --- */
 .corner-glow {
     position: fixed;
     bottom: 0; left: 0;
@@ -64,9 +66,16 @@ a:hover { opacity: 0.7; }
     z-index: 10;
     mix-blend-mode: screen;
     background: 
-        radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.6) 0%, transparent 40%),
-        radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.6) 0%, transparent 40%);
+        /* On réduit drastiquement l'opacité ici aussi (0.6 -> 0.3) */
+        radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.3) 0%, transparent 40%);
     animation: breathe 5s infinite alternate ease-in-out;
+}
+
+/* On calme aussi l'animation de respiration */
+@keyframes breathe {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.6; transform: scale(1.05); } /* Max 0.6 au lieu de 1 */
 }
 
 /* --- 4. LOADER / INTRO --- */
@@ -633,6 +642,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
