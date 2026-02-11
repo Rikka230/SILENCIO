@@ -253,16 +253,29 @@ footer {
     opacity: 0.8;
 }
 
-/* Ajustement Mobile */
+/* Ajustement Mobile pour les titres */
 @media (max-width: 768px) {
+    .section-title {
+        /* On réduit légèrement la taille pour que les longs mots rentrent */
+        font-size: 1.1rem; 
+        
+        /* On réduit l'espacement des lettres (tout en gardant l'effet luxe) */
+        letter-spacing: 2px; 
+        
+        /* On empêche le titre de se casser sur deux lignes */
+        white-space: nowrap; 
+    }
+
     .section-title::before,
     .section-title::after {
-        max-width: 60px;
-        margin: 0 15px;
-    }
-    .section-title {
-        font-size: 1.5rem; 
-        letter-spacing: 0.2em;
+        /* On raccourcit les lignes rouges pour laisser plus de place au texte */
+        max-width: 40px;       
+        
+        /* IMPORTANT : On force une taille minimale pour qu'elles ne disparaissent jamais */
+        min-width: 20px;       
+        
+        /* On réduit l'espace entre le texte et la ligne */
+        margin: 0 10px;
     }
 }
 
@@ -720,6 +733,7 @@ body.scroll-down .menu-toggle {
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
 }
+
 
 
 
