@@ -1,5 +1,5 @@
 /* =========================================
-   SILENCIO PICTURES - STYLE MASTER (CLEAN)
+   SILENCIO PICTURES - STYLE MASTER (CORRECTIF FINAL)
    ========================================= */
 
 /* --- 1. VARIABLES & RESET --- */
@@ -26,12 +26,11 @@ body {
 a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
 a:hover { opacity: 0.7; }
 
-/* --- 2. AMBIANCE (LUMIÈRES & FOND) --- */
+/* --- 2. AMBIANCE --- */
 .ambient-light, .corner-glow {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: -2; overflow: hidden;
 }
-
 .ambient-light::before {
     content: ''; position: absolute; top: -50%; left: -50%; width: 150vw; height: 150vw;
     background: radial-gradient(circle, rgba(215, 39, 37, 0.25) 0%, rgba(0,0,0,0) 60%);
@@ -42,7 +41,6 @@ a:hover { opacity: 0.7; }
     background: radial-gradient(circle, rgba(180, 20, 20, 0.2) 0%, rgba(0,0,0,0) 60%);
     filter: blur(60px); animation: drift2 15s infinite alternate-reverse ease-in-out;
 }
-
 .corner-glow {
     z-index: 10; mix-blend-mode: screen;
     background: radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.5) 0%, transparent 40%),
@@ -50,41 +48,35 @@ a:hover { opacity: 0.7; }
     animation: breathe 5s infinite alternate ease-in-out;
 }
 
-/* --- 3. HEADER (VERSION PC PAR DÉFAUT) --- */
+/* --- 3. HEADER (PC) --- */
 header {
-    position: fixed; top: 0; left: 0; width: 100%;
-    padding: 2rem;
+    position: fixed; top: 0; left: 0; width: 100%; padding: 2rem;
     display: flex; justify-content: space-between; align-items: center;
-    z-index: 1100;
-    mix-blend-mode: exclusion;
+    z-index: 1100; mix-blend-mode: exclusion;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-
-/* Smart Scroll PC : Cache le menu si on descend */
 body.scroll-down header { opacity: 0; transform: translateY(-20px); pointer-events: none; }
-body.scroll-down .logo { opacity: 1; pointer-events: auto; }
 
-/* Logo & Menu */
+/* Logo */
 a.logo { z-index: 1102; display: block; }
 .logo img { height: 140px; width: auto; display: block; }
 
+/* Navigation PC */
 nav ul { display: flex; gap: 2rem; list-style: none; }
 nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
 .menu-toggle { display: none; } /* Caché sur PC */
 
 
-/* --- 4. SECTIONS (STRUCTURE) --- */
+/* --- 4. SECTIONS --- */
 section {
     min-height: 100vh !important; 
-    padding: 200px 2rem 4rem 2rem; /* Espace haut pour le menu PC */
+    padding: 200px 2rem 4rem 2rem; 
     display: flex; flex-direction: column; justify-content: flex-start;
     position: relative; z-index: 1; overflow: hidden;
 }
-
 /* Titres */
 h1 {
-    font-size: clamp(3rem, 10vw, 8rem); text-transform: uppercase;
-    line-height: 0.9; margin-bottom: 1rem;
+    font-size: clamp(3rem, 10vw, 8rem); text-transform: uppercase; line-height: 0.9; margin-bottom: 1rem;
     text-shadow: 0 0 30px rgba(215, 39, 37, 0.4);
 }
 .hero-logo-main {
@@ -93,30 +85,24 @@ h1 {
     filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
     animation: fadeInLogo 1.5s ease-out forwards 0.5s; opacity: 0;
 }
+/* Accueil */
 #production { justify-content: center; padding-top: 0; }
 .hero-video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 .hero-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
 
 
-/* --- 5. BENTO GRID (PC : 4 COLONNES) --- */
+/* --- 5. BENTO GRID (PC) --- */
 #projects { justify-content: center; }
 .bento-container { max-width: 1100px; margin: 0 auto; width: 100%; }
 
 .bento-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: auto; 
-    gap: 20px;
-    grid-auto-flow: dense;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; grid-auto-flow: dense;
 }
-
 .bento-item {
     position: relative; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
     overflow: hidden; background: #000; width: 100%; cursor: pointer;
-    aspect-ratio: 1 / 1; /* Carré par défaut */
-    transition: all 0.4s ease;
+    aspect-ratio: 1 / 1; transition: all 0.4s ease;
 }
-
 /* Formes PC */
 .bento-big { grid-column: span 2; grid-row: span 2; aspect-ratio: 1 / 1; }
 .bento-tall { grid-column: span 1; grid-row: span 2; aspect-ratio: 1 / 2; }
@@ -128,6 +114,7 @@ h1 {
 }
 .bento-tall img { object-position: top center; }
 
+/* Overlay */
 .bento-overlay {
     position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
@@ -136,8 +123,7 @@ h1 {
 .bento-overlay h3 { font-size: 1.4rem; color: #fff; margin-bottom: 0.3rem; text-transform: uppercase; }
 .bento-overlay p { color: var(--color-accent); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
 
-/* Hover PC */
-.bento-item:hover { border-color: var(--color-accent); box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2); }
+.bento-item:hover { border-color: var(--color-accent); }
 .bento-item:hover img { transform: scale(1.1); opacity: 1; }
 .bento-item:hover .bento-overlay { opacity: 1; transform: translateY(0); }
 
@@ -153,7 +139,18 @@ h1 {
 footer { padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; text-align: center; width: 100%; }
 .about-text, .contact-info { text-align: center; max-width: 800px; margin: 0 auto; }
 
-/* Animations */
+/* --- INSTAGRAM (CORRECTIF TAILLE) --- */
+.insta-link { display: inline-block; margin-top: 1rem; opacity: 0.7; transition: all 0.3s ease; }
+.insta-link svg { 
+    width: 40px !important; 
+    height: 40px !important; 
+    max-width: 40px; /* Sécurité anti-géant */
+    display: block; 
+}
+.insta-link:hover { color: var(--color-accent); opacity: 1; transform: scale(1.1); }
+
+
+/* --- ANIMATIONS --- */
 @keyframes drift1 { 0% { transform: translate(10%, 10%) scale(1); } 100% { transform: translate(20%, 50%) scale(0.9); } }
 @keyframes drift2 { 0% { transform: translate(-10%, -10%) scale(0.9); } 100% { transform: translate(-10%, -60%) scale(1); } }
 @keyframes breathe { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 0.8; transform: scale(1.05); } }
@@ -161,28 +158,25 @@ footer { padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; text-align: cent
 
 
 /* =========================================================
-   7. MOBILE & TABLETTE (MAX 1024px) - LE FIX DÉFINITIF
+   7. MOBILE & TABLETTE (MAX 1024px)
+   C'est ici que tout se règle pour le téléphone
    ========================================================= */
 @media (max-width: 1024px) { 
     
-    /* A. HEADER MOBILE : FIXE, CENTRÉ, AVEC FOND */
+    /* A. HEADER MOBILE (FIXE, CENTRÉ, NOIR) */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
-        padding: 1.5rem 1rem; /* Un peu d'air autour */
-        
+        padding: 1rem; 
         display: flex; flex-direction: column; 
         justify-content: center; align-items: center;
         gap: 15px;
-        
-        /* Fond dégradé léger pour détacher le logo du contenu qui passe dessous */
-        background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+        background: rgba(0,0,0,0.8); /* Fond sombre pour lisibilité */
+        backdrop-filter: blur(10px);
         z-index: 1100;
         
-        /* ON FORCE L'ACTIVATION (Annule le bug du burger bloqué) */
-        opacity: 1 !important; 
-        transform: none !important;
-        pointer-events: auto !important;
+        /* FORCE L'ACTIVATION (Contre le bug Smart Scroll) */
+        opacity: 1 !important; transform: none !important; pointer-events: auto !important;
     }
 
     /* B. LOGO & BURGER */
@@ -197,64 +191,53 @@ footer { padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; text-align: cent
         width: 30px; height: 2px; margin: 6px auto; background-color: #fff; display: block; transition: all 0.3s;
     }
 
-    /* C. MENU OVERLAY (QUAND OUVERT) */
-    .nav-container ul { display: none; } /* On cache les liens PC */
-    
+    /* C. MENU OVERLAY */
+    .nav-container ul { display: none; } /* Cache liens PC */
     .nav-menu {
         position: fixed; left: 0; top: 0; width: 100%; height: 100vh;
         background-color: #000;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: 2rem;
-        visibility: hidden; opacity: 0; transition: all 0.4s ease;
-        z-index: 1000;
+        visibility: hidden; opacity: 0; transition: all 0.4s ease; z-index: 1000;
     }
     .nav-menu.active { visibility: visible; opacity: 1; pointer-events: auto; }
     .nav-menu li { display: block; }
     .nav-link { font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; display: block; }
 
-    /* Animation Croix Burger */
+    /* Croix Burger */
     .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
 
-    /* D. BENTO GRID MOBILE (1 COLONNE UNIFORME) */
-    .bento-grid { 
-        grid-template-columns: 1fr !important; /* 1 colonne */
-        gap: 20px; 
-    }
+    /* D. BENTO GRID MOBILE (1 COLONNE PROPRE) */
+    .bento-grid { grid-template-columns: 1fr !important; gap: 20px; }
     
-    /* ON ÉCRASE TOUTES LES FORMES PC POUR AVOIR DU 16/9 PARTOUT */
+    /* TOUT LE MONDE EN 16/9 */
     .bento-item, .bento-big, .bento-tall, .bento-wide { 
         grid-column: span 1 !important; 
         grid-row: span 1 !important; 
-        width: 100% !important;
-        height: auto !important;
-        aspect-ratio: 16 / 9 !important; /* Format Vidéo Standard */
+        width: 100% !important; height: auto !important;
+        aspect-ratio: 16 / 9 !important; 
     }
-    
-    /* Exception : L'affiche reste verticale si vous voulez (sinon mettez 16/9 aussi) */
+    /* Affiche verticale */
     .bento-tall { aspect-ratio: 2 / 3 !important; }
 
-    /* Texte toujours visible */
     .bento-overlay { opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
 
 
-    /* E. MISE EN PAGE & ESPACEMENTS MOBILE */
-    /* On pousse le contenu vers le bas car le Header (Logo+Burger) prend de la place (~150px) */
+    /* E. MISE EN PAGE MOBILE */
+    /* On pousse le contenu vers le bas (header ~150px) */
     section { 
-        padding-top: 180px !important; 
+        padding-top: 160px !important; 
         justify-content: flex-start !important;
-        min-height: auto !important; /* Évite les grands vides */
-        padding-bottom: 4rem;
+        min-height: auto !important; padding-bottom: 4rem;
     }
-    
-    /* Page d'accueil : On enlève le padding pour que la vidéo soit plein écran */
+    /* Accueil : Plein écran */
     #production { padding-top: 0 !important; justify-content: center !important; }
     
-    /* Autres pages */
     .project-content { grid-template-columns: 1fr; gap: 2rem; padding-top: 2rem; }
     .project-hero { height: 50vh; }
     .back-btn { top: 1.5rem; left: 1.5rem; }
 
-} /* --- FIN DU CSS --- */
+} /* --- FIN DU FICHIER --- */
