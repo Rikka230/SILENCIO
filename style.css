@@ -221,6 +221,50 @@ footer {
     pointer-events: none;
 }
 
+/* --- NOUVEAU STYLE TITRES (STYLE "PICTURES" DU LOGO) --- */
+.section-title {
+    display: flex;             /* Active l'alignement lignes/texte */
+    align-items: center;       /* Centre verticalement */
+    justify-content: center;   /* Centre horizontalement */
+    width: 100%;
+    margin: 0 auto 3rem auto;  /* Marge en bas pour respirer */
+    
+    /* TYPOGRAPHIE */
+    font-family: var(--font-main);
+    font-weight: 400;          /* Regular, comme 'PICTURES' sur le logo */
+    font-size: clamp(1.8rem, 4vw, 2.5rem); /* Plus grand et responsive */
+    text-transform: uppercase;
+    letter-spacing: 0.3em;     /* Ecartement large des lettres (Signature du logo) */
+    color: #ffffff;            /* Blanc pur */
+    text-align: center;
+}
+
+/* LES DEUX LIGNES ROUGES */
+.section-title::before,
+.section-title::after {
+    content: '';
+    display: block;
+    height: 1px;               /* Ligne très fine (élégance) */
+    background-color: var(--color-accent); /* Votre Rouge (#D72725) */
+    
+    flex-grow: 1;              /* La ligne s'étire pour remplir l'espace */
+    max-width: 150px;          /* Largeur maximale de la ligne (pour ne pas toucher les bords sur écran géant) */
+    margin: 0 30px;            /* Espace entre le texte et la ligne */
+    opacity: 0.8;
+}
+
+/* Ajustement Mobile : Lignes un peu plus courtes */
+@media (max-width: 768px) {
+    .section-title::before,
+    .section-title::after {
+        max-width: 60px;       /* Plus court sur mobile */
+        margin: 0 15px;
+    }
+    .section-title {
+        letter-spacing: 0.2em; /* Un peu moins écarté sur mobile pour éviter les retours à la ligne */
+    }
+}
+
 
 /* --- 8. BENTO GRID --- */
 #projects { 
@@ -675,6 +719,7 @@ body.scroll-down .menu-toggle {
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
 }
+
 
 
 
