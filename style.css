@@ -623,139 +623,108 @@ body.scroll-down .menu-toggle {
 
 
 /* =========================================================
-   12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px) - CORRECTIF FINAL
+   12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px)
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER (FOND NOIR OBLIGATOIRE POUR LISIBILITÉ) */
+    /* A. HEADER : FOND NOIR TOTAL & SANS BORDURE */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
-        padding: 1rem;
-        
-        /* On empile : Logo au-dessus, Burger en dessous */
+        padding: 1.5rem 1rem;
         display: flex; 
         flex-direction: column; 
         justify-content: center; 
         align-items: center;
         gap: 15px;
 
-        /* IMPORTANT : Fond noir opaque pour cacher le contenu qui défile dessous */
-        background-color: #000000 !important; 
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        background-color: #000000 !important; /* Noir pur */
+        border: none !important;            /* Supprime la bordure */
+        box-shadow: none !important;
         z-index: 1100;
         
-        /* On force l'affichage (Annule le Smart Scroll sur mobile) */
+        /* Désactive les effets de disparition du script scroll */
         opacity: 1 !important; 
         transform: none !important; 
         pointer-events: auto !important;
     }
 
     /* B. LOGO & BURGER */
-    .logo img { 
-        height: 60px !important; 
-        width: auto !important; 
-        margin: 0; 
-    }
+    .logo img { height: 50px !important; width: auto !important; }
     
     .menu-toggle {
         display: block !important; 
         cursor: pointer; 
-        z-index: 1102; /* Au-dessus du header */
-        width: 40px; height: 40px; /* Zone de clic confortable */
-        margin: 0;
+        z-index: 1200; 
+        width: 35px; height: 30px;
     }
-    
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto; 
         background-color: #fff; display: block; transition: 0.3s;
     }
 
-    /* Animation de la Croix du Burger */
-    .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
-    .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-
-    /* C. MENU DÉROULANT (OVERLAY) */
-    .nav-container ul { display: none; } /* On cache le menu PC texte */
+    /* C. LE MENU (OVERLAY) - CORRIGÉ */
+    .nav-container ul { display: none !important; } /* Cache le menu texte horizontal */
     
     .nav-menu {
         position: fixed; 
         left: 0; top: 0; 
         width: 100%; height: 100vh;
-        background-color: #000; /* Fond noir total */
+        background-color: #000000 !important; /* Fond noir plein écran */
         
-        display: flex; flex-direction: column; 
-        align-items: center; justify-content: center;
-        gap: 2rem;
+        display: flex !important; /* Force le flex pour voir les liens */
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        gap: 2.5rem;
         
-        /* Caché par défaut */
+        /* État caché */
         visibility: hidden; 
         opacity: 0; 
-        transition: all 0.4s ease;
-        z-index: 1000;
+        transform: translateY(-20px);
+        transition: all 0.4s ease-in-out;
+        z-index: 1050;
     }
     
-    /* Quand le menu est ouvert via JS */
+    /* État affiché quand on clique */
     .nav-menu.active { 
-        visibility: visible; 
-        opacity: 1; 
-        pointer-events: auto; 
+        visibility: visible !important; 
+        opacity: 1 !important; 
+        transform: translateY(0);
+        pointer-events: auto !important; 
     }
     
-    .nav-menu li { display: block; }
+    .nav-menu li { 
+        display: block !important; 
+        width: 100%; 
+        text-align: center; 
+    }
+    
     .nav-link { 
-        font-size: 1.8rem; 
-        font-weight: 300; 
-        color: #fff;
+        font-size: 2rem !important; 
+        color: #ffffff !important;
         text-transform: uppercase; 
-        letter-spacing: 3px; 
-        display: block; 
+        letter-spacing: 4px; 
+        display: inline-block !important; 
     }
 
-
-    /* D. BENTO GRID (CORRECTION TAILLE DES IMAGES) */
-    .bento-grid { 
-        grid-template-columns: 1fr !important; 
-        gap: 20px; 
-    }
+    /* D. BENTO GRID : UNIFORMISATION 16/9 */
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
     
-    /* ICI : ON FORCE TOUTES LES CASES EN 16/9 (Format Vidéo) */
-    /* Cela empêche "L'Ombre" d'être immense verticalement */
     .bento-item, .bento-big, .bento-tall, .bento-wide { 
         grid-column: span 1 !important; 
         grid-row: span 1 !important; 
         width: 100% !important; 
         height: auto !important;
-        
-        /* La règle magique pour uniformiser : */
-        aspect-ratio: 16 / 9 !important; 
+        aspect-ratio: 16 / 9 !important; /* Tout le monde en format vidéo */
     }
 
-    /* Le texte sur l'image toujours visible sur mobile */
-    .bento-overlay { 
-        opacity: 1; 
-        transform: translateY(0); 
-        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); 
-    }
+    /* E. ESPACEMENTS CONTENU */
+    section { padding-top: 160px !important; }
+    #production { padding-top: 0 !important; }
 
-    /* E. ESPACEMENTS */
-    /* On pousse le contenu vers le bas pour qu'il ne soit pas caché sous le header */
-    section { 
-        padding-top: 180px !important; 
-        justify-content: flex-start !important; 
-    }
-    
-    /* Exception Accueil : centré */
-    #production { 
-        padding-top: 0 !important; 
-        justify-content: center !important; 
-    }
-    
-    .project-content { padding-top: 2rem; }
+}
 
-} /* --- FIN DU CSS --- */
 
 
 
