@@ -477,61 +477,47 @@ footer {
 }
 
 /* =========================================================
-   MODE "CINEMATIC SCALE" (POUR ÉCRANS > 1400px)
-   Ce bloc fait grandir le site proportionnellement à l'écran
+   10.5 STABILISATION DESKTOP (LA MÊME EXPÉRIENCE PARTOUT)
    ========================================================= */
-@media (min-width: 1400px) {
 
-    /* 1. ON DÉBLOQUE LA LARGEUR (Bento Grid) */
+@media (min-width: 1024px) {
+    
+    /* A. ON VERROUILLE LE BENTO (Forme Inchangée) */
     .bento-container {
-        /* Au lieu de bloquer à 1200px, on prend 85% de l'écran, QUELLE QUE SOIT sa taille */
-        max-width: 85vw; 
-        width: 85vw;
+        max-width: 1400px; /* On empêche que ça devienne grotesque sur écran géant */
+        margin: 0 auto;    /* On centre parfaitement */
+        padding: 0 2rem;
     }
-    
+
     .bento-grid {
-        /* On écarte les cases proportionnellement */
-        gap: 2vw; 
-    }
-    
-    .bento-item {
-        /* Les cases grandissent en hauteur avec l'écran */
-        min-height: 35vh; 
+        /* LE SECRET EST ICI : On force 4 colonnes. 
+           Si l'écran grandit, les colonnes grandissent, mais ne changent pas de nombre. */
+        grid-template-columns: repeat(4, 1fr) !important; 
+        gap: 30px; /* Plus d'espace sur PC */
     }
 
-    /* 2. ON GROSSIT LES TEXTES (Typographie Fluide) */
-    /* On utilise 'vw' : si l'écran double, le texte double */
-    
-    .about-text {
-        max-width: 70vw; /* Le bloc de texte s'élargit */
-        font-size: 1.8vw; /* Le texte grossit */
-        line-height: 1.5;
-    }
+    /* Rappel de vos réglages Bento (Indispensable pour que le 4 colonnes marche) */
+    .bento-large { grid-column: span 2; grid-row: span 2; }
+    .bento-tall  { grid-column: span 1; grid-row: span 2; }
+    .bento-item  { grid-column: span 1; grid-row: span 1; }
 
-    .contact-info p {
-        font-size: 2vw; /* Gros texte de contact */
-    }
-
-    h1 {
-        font-size: 8vw; /* Titre Gigantesque */
-    }
-    
-    .section-title {
-        font-size: 3vw;
-        margin-bottom: 4vh;
+    /* B. ON VERROUILLE LE TEXTE (À Propos / Contact) */
+    /* On empêche le texte de s'étaler sur 3 mètres de large */
+    .about-text, .contact-info {
+        max-width: 800px !important; /* Largeur de lecture idéale */
+        margin-left: auto !important;
+        margin-right: auto !important;
+        
+        /* On augmente un peu la taille de police pour les grands écrans */
+        font-size: 1.5rem; 
     }
     
-    /* Le logo grossit aussi */
-    .logo img {
-        height: 12vh; /* 12% de la hauteur de l'écran */
-        width: auto;
-    }
-
-    /* Les liens du menu grossissent */
-    nav a {
-        font-size: 1.2vw;
+    /* C. ON CENTRE LES SECTIONS */
+    section {
+        align-items: center; /* Centre horizontalement */
     }
 }
+
 
 /* =========================================================
    12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
@@ -613,6 +599,7 @@ footer {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
