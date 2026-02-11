@@ -149,17 +149,27 @@
             
             // --- 1. SMART SCROLL (PC UNIQUEMENT) ---
             let lastScrollTop = 0;
+            let isAutoScrolling = false; // Nouvelle sécurité
+
             window.addEventListener('scroll', function() {
+                // Sur mobile, on ne fait rien
                 if (window.innerWidth <= 1024) {
                     document.body.classList.remove('scroll-down');
                     return; 
                 }
 
+                // Si c'est un défilement automatique (clic), on ne cache PAS le menu
+                if (isAutoScrolling) return;
+
                 const currentScroll = window.scrollY;
+                
+                // Si on est tout en haut, on affiche
                 if (currentScroll <= 0) {
                     document.body.classList.remove('scroll-down');
                     return;
                 }
+
+                // Logique standard : on descend = on cache, on monte = on affiche
                 if (currentScroll > lastScrollTop && currentScroll > 5) {
                     document.body.classList.add('scroll-down');
                 } else {
@@ -176,7 +186,11 @@
             // --- 3. FONCTIONS ---
             function closeMenu() {
                 if(menuToggle) menuToggle.classList.remove('is-active');
-                if(navMenu) navMenu.classList.remove('active');
+                if(navMenu) navMenu.classList.remove('active'); // Corrige le sélecteur JS
+                // Note: votre JS précédent ciblait .nav-menu mais le CSS mobile utilisait .nav-container parfois.
+                // Ici on garde la logique propre.
+                const navContainer = document.querySelector('.nav-container'); 
+                if(navContainer && window.innerWidth <= 1024) navContainer.classList.remove('active');
             }
 
             function fadeToBlack(callback) {
@@ -194,10 +208,14 @@
                     e.stopPropagation();
                     this.classList.toggle('is-active');
                     navMenu.classList.toggle('active');
+                    
+                    // Petit fix pour le conteneur parent sur mobile si besoin
+                    const navContainer = document.querySelector('.nav-container');
+                    if(navContainer) navContainer.classList.toggle('active');
                 });
             }
 
-            // --- 5. TRANSITIONS & CLICS ---
+            // --- 5. TRANSITIONS & CLICS (CORRIGÉ POUR LE MENU FIXE) ---
             document.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
@@ -206,6 +224,9 @@
                     e.preventDefault();
                     closeMenu();
 
+                    // ON ACTIVE LA SÉCURITÉ : "C'est un clic, pas un scroll manuel"
+                    isAutoScrolling = true;
+
                     if (href.includes('#')) {
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
@@ -213,6 +234,15 @@
                             fadeToBlack(() => {
                                 targetElement.scrollIntoView({ behavior: 'auto' });
                                 transitionOverlay.classList.remove('active');
+                                
+                                // ICI : On force le menu à réapparaître immédiatement
+                                document.body.classList.remove('scroll-down');
+                                
+                                // On réinitialise la position connue pour éviter un bug au prochain scroll
+                                setTimeout(() => {
+                                    lastScrollTop = window.scrollY;
+                                    isAutoScrolling = false; // On libère la sécurité
+                                }, 100);
                             });
                         } else {
                             fadeToBlack(() => { window.location.href = href; });
@@ -234,3 +264,4 @@
     </script>
 </body>
 </html>
+
