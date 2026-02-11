@@ -830,3 +830,35 @@ body.scroll-down .menu-toggle {
     }
 }
 
+/* =========================================================
+   CORRECTIF ESPACE VIDE VIDÉO (MOBILE)
+   ========================================================= */
+@media (max-width: 1024px) {
+
+    /* 1. On annule le comportement "Plein Écran" de la section vidéo */
+    section.full-width-video {
+        min-height: auto !important;   /* Annule les 100vh */
+        height: auto !important;       /* Hauteur naturelle */
+        display: block !important;     /* Annule le centrage Flex vertical */
+        padding-top: 0 !important;     /* Enlève le padding du haut */
+        padding-bottom: 2rem !important;
+        margin-top: 0 !important;
+    }
+
+    /* 2. On gère l'espacement du titre "BANDE ANNONCE" */
+    .video-label {
+        display: block !important;
+        margin-top: 3rem !important;    /* Espace propre après le Casting */
+        margin-bottom: 1.5rem !important;
+        position: relative;
+        z-index: 20;
+    }
+
+    /* 3. On s'assure que le bloc texte du dessus ne pousse pas trop */
+    .project-content {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+
