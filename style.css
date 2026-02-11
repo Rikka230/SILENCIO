@@ -538,13 +538,12 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER : STRUCTURE */
+    /* A. HEADER : LE CADRE DU LOGO ET DU BURGER */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
         padding: 1.5rem 1rem;
         
-        /* Alignement Vertical : Logo puis Burger */
         display: flex; 
         flex-direction: column; 
         align-items: center;      
@@ -553,15 +552,19 @@ body.scroll-down .menu-toggle {
         background: transparent !important;
         border: none !important;            
         box-shadow: none !important;
-        
-        /* IMPORTANT : Empêche le header de rendre le noir transparent */
         mix-blend-mode: normal !important; 
         
+        /* --- CORRECTION CRUCIALE --- */
+        /* Empêche le header de "piéger" le menu noir à l'intérieur */
+        transform: none !important; 
+        transition: none !important;
+        /* --------------------------- */
+        
         z-index: 1200; 
-        pointer-events: none; /* Laisse passer les clics autour */
+        pointer-events: none; /* On clique à travers le vide */
     }
 
-    /* B. LOGO & BURGER */
+    /* B. LOGO & BURGER (DOIVENT RESTER CLIQUABLES) */
     .logo { 
         pointer-events: auto; 
     }
@@ -573,7 +576,6 @@ body.scroll-down .menu-toggle {
         width: 35px; height: 30px;
         pointer-events: auto;
         
-        /* Reste dans le flux sous le logo */
         position: relative !important; 
         margin: 0 auto; 
         z-index: 1300; 
@@ -591,33 +593,33 @@ body.scroll-down .menu-toggle {
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* C. LE MENU (CORRECTION DU DÉCALAGE) */
+    /* C. LE MENU (FOND NOIR PLEIN ECRAN) */
+    /* On neutralise le conteneur intermédiaire pour éviter les bugs */
     .nav-container {
-        position: static !important; /* On annule tout positionnement du conteneur */
-        width: 100% !important;
-        height: 0 !important; /* Pour ne pas gêner */
-        margin: 0 !important;
-        padding: 0 !important;
+        position: static !important;
+        width: 0 !important; height: 0 !important;
+        margin: 0 !important; padding: 0 !important;
     }
 
     .nav-menu {
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100vw; /* Force la largeur totale de l'écran */
-        height: 100vh; /* Force la hauteur totale */
+        position: fixed !important; /* Force absolue par rapport à l'écran */
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         
-        /* FOND NOIR OPAQUE */
+        width: 100vw !important;
+        height: 100vh !important;
+        
         background-color: #000000 !important; 
         
-        /* CENTRAGE DU TEXTE */
         display: flex !important; 
         flex-direction: column; 
         align-items: center;      
         justify-content: center;  
         gap: 2rem;
         
-        /* C'EST ICI LA CORRECTION MAJEURE : */
+        /* On rase toutes les marges parasites */
         padding: 0 !important; 
         margin: 0 !important;
         list-style: none !important;
@@ -626,7 +628,7 @@ body.scroll-down .menu-toggle {
         opacity: 0; 
         transition: opacity 0.3s ease-in-out;
         
-        z-index: 1100; 
+        z-index: 1100; /* Derrière le burger, devant le site */
     }
     
     .nav-menu.active { 
@@ -639,8 +641,7 @@ body.scroll-down .menu-toggle {
         display: block !important; 
         width: 100%; 
         text-align: center; 
-        margin: 0;
-        padding: 0;
+        margin: 0; padding: 0;
     }
     
     .nav-link { 
@@ -662,4 +663,5 @@ body.scroll-down .menu-toggle {
     section { padding-top: 160px !important; } 
     #production { padding-top: 0 !important; }
 }
+
 
