@@ -748,46 +748,43 @@ body.scroll-down .menu-toggle {
     }
 }
 
-/* --- RÉGLAGE CIBLÉ : HEADER ET SYNOPSIS MOBILE --- */
+/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE (OPTIMISÉ VIDES) --- */
 @media (max-width: 1024px) {
 
-    /* 1. On réduit l'espace blanc global sous l'image */
     section:not(.project-hero) { 
-        padding-top: 20px !important; 
+        padding-top: 40px !important; /* Rapproche le contenu de l'image du haut */
     }
 
-    /* 2. On remonte le bloc de contenu */
     .project-content {
-        display: flex !important;
-        flex-direction: column !important;
-        padding: 0 1.5rem !important;
-        margin-top: -20px !important; /* Force la remontée vers l'image */
+        display: block !important;
+        width: 100% !important;
+        padding: 1rem 1.5rem !important; /* Réduit le vide interne */
     }
 
-    /* 3. SYNOPSIS : On élargit et on utilise Montserrat fin */
     .synopsis {
         width: 100% !important;
-        font-family: 'Montserrat', sans-serif !important;
-        font-weight: 200 !important;
+        margin-bottom: 1.5rem !important; /* Rapproche des specs techniques */
         font-size: 1.1rem !important;
-        line-height: 1.6 !important;
-        margin-bottom: 2rem !important; /* Espace raisonnable avant la suite */
     }
 
-    /* 4. HEADER IMAGE : Plus compacte */
+    .tech-specs {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1.5rem 1rem !important;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1.5rem;
+    }
+
     .project-hero {
-        height: 40vh !important;
-        min-height: 300px !important;
+        height: 45vh !important;
+        min-height: 280px !important;
     }
 
-    .project-header-content {
-        padding: 2rem 1.5rem !important; /* Remonte le titre dans l'image */
-    }
-
-    /* 5. VIDEO : Suppression du vide inutile au-dessus */
     .full-width-video {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
+        margin-top: 0rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 2.5rem !important;
     }
 }
 
