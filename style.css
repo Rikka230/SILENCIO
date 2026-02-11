@@ -463,7 +463,13 @@ footer {
     position: relative;
     z-index: 5;
 }
-.synopsis { font-size: 1.2rem; line-height: 1.8; color: #ddd; }
+.synopsis { 
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 200 !important; /* Force la finesse sur tous les supports */
+    font-size: 1.2rem; 
+    line-height: 1.8; 
+    color: #ddd; 
+}
 .tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
 .tech-specs h4:first-child { margin-top: 0; }
 .tech-specs p { color: #888; margin-bottom: 0.5rem; }
@@ -787,6 +793,7 @@ body.scroll-down .menu-toggle {
         padding-bottom: 2.5rem !important;
     }
 }
+
 
 
 
