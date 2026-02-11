@@ -201,7 +201,7 @@ footer {
 }
 
 
-/* --- 8. BENTO GRID (EN PRODUCTION) --- */
+/* --- 8. BENTO GRID (CORRECTION : CARRÉS PARFAITS & 3 COLONNES) --- */
 #projects { 
     padding: 0 2rem; 
     min-height: 100vh; 
@@ -209,44 +209,65 @@ footer {
 }
 
 .bento-container { 
-    max-width: 1200px; /* Un peu plus serré pour la netteté */
+    max-width: 1200px; 
     margin: 0 auto; 
     width: 100%; 
 }
 
 .bento-grid {
     display: grid;
-    /* C'EST ICI LA CORRECTION MATHÉMATIQUE : 3 COLONNES */
+    /* 1. ON FORCE 3 COLONNES (Mathématique : 3x3 = 9 blocs) */
     grid-template-columns: repeat(3, 1fr); 
     
-    /* On augmente un peu la hauteur des lignes pour que ça remplisse l'écran */
-    grid-auto-rows: 350px; 
+    /* 2. ON SUPPRIME LA HAUTEUR FIXE (C'est ça qui créait les rectangles) */
+    /* On laisse le contenu décider de la hauteur */
+    grid-auto-rows: auto; 
     
     gap: 20px;
-    grid-auto-flow: dense; /* Indispensable pour boucher les trous */
+    grid-auto-flow: dense; 
 }
+
+/* --- LE SECRET DES FORMES GÉOMÉTRIQUES --- */
+/* On utilise 'aspect-ratio' pour forcer la forme, quelle que soit la taille de l'écran */
 
 .bento-item {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
     background: #111;
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.4s ease;
     cursor: pointer;
     border: 1px solid rgba(255,255,255,0.1);
     
-    /* Par défaut : Petit Carré (1x1) */
+    width: 100%;
+    /* PAR DÉFAUT : C'est un CARRÉ (1 sur 1) */
+    aspect-ratio: 1 / 1; 
+    
     grid-column: span 1;
     grid-row: span 1;
 }
 
-/* --- FORMES TÉTRIS --- */
-.bento-wide { grid-column: span 2; }       /* Largeur 2 */
-.bento-tall { grid-row: span 2; }          /* Hauteur 2 */
-.bento-big  { grid-column: span 2; grid-row: span 2; } /* Le cube 2x2 */
+/* LE GROS CARRÉ (2x2) */
+.bento-big { 
+    grid-column: span 2; 
+    grid-row: span 2; 
+    aspect-ratio: 1 / 1; /* Reste un carré parfait */
+}
+
+/* LE PANORAMIQUE (Large) */
+.bento-wide { 
+    grid-column: span 2; 
+    aspect-ratio: 2 / 1; /* Rectangle horizontal (2x plus large que haut) */
+}
+
+/* LE PORTRAIT (Haut) */
+.bento-tall { 
+    grid-row: span 2; 
+    aspect-ratio: 1 / 2; /* Rectangle vertical (2x plus haut que large) */
+}
 
 
-/* Styles Images & Overlay (Inchangés) */
+/* --- IMAGES & EFFETS --- */
 .bento-item img {
     width: 100%; height: 100%; object-fit: cover;
     transition: transform 0.6s ease; opacity: 0.7;
@@ -264,17 +285,19 @@ footer {
 .bento-item:hover .bento-overlay { transform: translateY(0); opacity: 1; }
 
 
-/* --- SÉCURITÉ MOBILE (1 COLONNE) --- */
+/* --- MOBILE (RETOUR À 1 COLONNE) --- */
 @media (max-width: 1024px) {
-    .bento-grid { 
-        grid-template-columns: 1fr; /* 1 seule colonne sur tablette/mobile */
-        grid-auto-rows: 300px; 
+    .bento-grid { grid-template-columns: 1fr; gap: 15px; }
+    
+    /* Sur mobile, on garde les ratios ou on repasse tout en carré ? 
+       Garder les ratios est plus joli : */
+    .bento-wide, .bento-tall, .bento-big { 
+        grid-column: span 1; 
+        grid-row: span 1; 
+        aspect-ratio: 16/9; /* Tout devient format vidéo sur mobile */
     }
-    /* On annule les formes complexes sur mobile pour éviter la casse */
-    .bento-wide, .bento-tall, .bento-big { grid-column: span 1; grid-row: span 1; }
-    .bento-tall { grid-row: span 2; } /* On garde juste la hauteur pour le style */
+    .bento-tall { aspect-ratio: 2/3; } /* Sauf l'affiche qui reste verticale */
 }
-
 
 /* --- 6. SECTIONS GÉNÉRALES (CORRECTION ÉCRAN GÉANT) --- */
 /* Ceci corrige le problème de chevauchement production/à propos */
@@ -630,6 +653,7 @@ section {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
