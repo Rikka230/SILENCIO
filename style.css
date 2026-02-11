@@ -537,127 +537,149 @@ body.scroll-down .menu-toggle {
    12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px)
    ========================================================= */
 @media (max-width: 1024px) {
-    
-    /* A. HEADER : LE CONTENEUR LOGO + BURGER */
+
+    /* 1. HEADER : On le nettoie de tout effet bizarre */
     header {
-        position: fixed; 
+        position: fixed;
         top: 0; left: 0; width: 100%;
         padding: 1.5rem 1rem;
         
-        display: flex; 
-        flex-direction: column; 
-        align-items: center;      
-        gap: 20px; /* Espace entre Logo et Burger */
+        /* On garde le logo et le burger centrés */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
 
         background: transparent !important;
-        border: none !important;            
-        box-shadow: none !important;
+        mix-blend-mode: normal !important; /* Force les couleurs normales */
+        transform: none !important;        /* Empêche les bugs de position */
         
-        /* Désactive les effets de mélange pour que le noir soit bien NOIR */
-        mix-blend-mode: normal !important; 
-        
-        /* Empêche le header de limiter la taille du menu */
-        transform: none !important; 
-        
-        z-index: 1200; 
-        pointer-events: none; /* Permet de cliquer à travers les zones vides */
+        z-index: 1200;
+        pointer-events: none; /* Laisse cliquer sur le site derrière */
     }
 
-    /* B. LOGO & BURGER (DOIVENT RESTER CLIQUABLES) */
-    .logo { 
-        pointer-events: auto; 
-    }
+    /* 2. LOGO & BURGER : Toujours actifs */
+    .logo { pointer-events: auto; }
     .logo img { height: 50px !important; width: auto !important; }
-    
+
     .menu-toggle {
-        display: block !important; 
-        cursor: pointer; 
+        display: block !important;
+        cursor: pointer;
         width: 35px; height: 30px;
         pointer-events: auto;
-        
-        position: relative !important; 
-        margin: 0 auto; 
-        z-index: 1300; /* Le burger reste au-dessus du fond noir */
+        position: relative !important;
+        margin: 0 auto;
+        z-index: 1300; /* Le burger reste au-dessus du noir */
     }
     
     .menu-toggle .bar {
-        width: 30px; height: 2px; margin: 6px auto; 
+        width: 30px; height: 2px; margin: 6px auto;
         background-color: #fff; display: block; transition: 0.3s;
         border-radius: 2px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.5); 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
+    /* Animation Croix */
     .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* C. NEUTRALISATION DU CONTENEUR INTERMÉDIAIRE */
-    .nav-container {
-        position: static !important;
-        display: block !important;
-        width: 0 !important; height: 0 !important;
-        padding: 0 !important; margin: 0 !important;
-    }
 
-    /* D. LE MENU NOIR (PLEIN ÉCRAN ABSOLU) */
-    .nav-menu {
-        position: fixed !important; 
-        
-        /* COLLE AUX 4 BORDS DE L'ÉCRAN */
+    /* 3. C'EST ICI QUE TOUT CHANGE : ON CIBLE LE CONTENEUR PARENT */
+    /* Le .nav-container devient l'écran noir */
+    .nav-container {
+        position: fixed !important; /* Sort du header et colle à l'écran */
         top: 0 !important;
         left: 0 !important;
-        width: 100vw !important; /* Largeur écran totale */
-        height: 100vh !important; /* Hauteur écran totale */
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
         
-        background-color: #000000 !important; /* Fond Noir Opaque */
+        background-color: #000000 !important; /* Le fond noir est ICI */
         
-        display: flex !important; 
-        flex-direction: column; 
-        align-items: center;      
-        justify-content: center;  
-        gap: 2rem;
+        /* On utilise Flexbox pour centrer le contenu (la liste) */
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
         
-        /* CORRECTION "HORS CADRE" : On supprime les marges par défaut des listes */
-        padding: 0 !important; 
-        margin: 0 !important;
-        list-style: none !important;
-        
-        visibility: hidden; 
-        opacity: 0; 
+        visibility: hidden;
+        opacity: 0;
         transition: opacity 0.3s ease-in-out;
+        z-index: 1100; /* Derrière le burger */
         
-        z-index: 1100; /* Juste sous le logo/burger */
-    }
-    
-    .nav-menu.active { 
-        visibility: visible !important; 
-        opacity: 1 !important; 
-        pointer-events: auto !important; 
-    }
-    
-    .nav-menu li { 
-        display: block !important; 
-        width: 100%; 
-        text-align: center; 
-        padding: 0; margin: 0;
-    }
-    
-    .nav-link { 
-        font-size: 2rem !important; 
-        line-height: 1.5;
-        color: #ffffff !important;
-        text-transform: uppercase; 
-        letter-spacing: 4px; 
-        display: inline-block !important; 
-        text-shadow: none !important;
+        /* On annule toute marge parasite */
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    /* E. RESTE DU MOBILE */
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
-    .bento-item, .bento-big, .bento-tall { 
-        grid-column: span 1 !important; grid-row: span 1 !important; 
-        width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
+    /* Quand on ouvre le menu, le conteneur apparaît */
+    .nav-menu.active {
+        /* ATTENTION : Le JS ajoute .active sur .nav-menu, pas .nav-container */
+        /* Astuce CSS : On ne peut pas remonter au parent en CSS pur facilement */
+        /* MAIS, votre JS cible .nav-menu. Nous allons tricher visuellement */
+        /* SI VOTRE JS AJOUTE 'active' sur UL, on doit adapter le code ci-dessous */
     }
-    section { padding-top: 160px !important; } 
+    
+    /* CORRECTION JS-COMPATIBLE : */
+    /* Votre JS met .active sur le UL (.nav-menu). */
+    /* Donc on doit appliquer le style fixe sur le UL comme avant, mais en forçant le reset du parent */
+
+    .nav-container {
+        position: static !important; /* Le parent ne doit pas gêner */
+        width: 0 !important; height: 0 !important;
+    }
+
+    /* LE MENU (UL) REPREND LE POUVOIR */
+    .nav-menu {
+        position: fixed !important;
+        inset: 0 !important; /* Raccourci pour top:0, left:0, right:0, bottom:0 */
+        width: 100vw !important;
+        height: 100vh !important;
+        background-color: #000000 !important;
+        
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        
+        /* CRUCIAL : Supprime le décalage à droite */
+        padding: 0 !important;
+        margin: 0 !important;
+        padding-inline-start: 0 !important; /* Force la suppression de l'espace liste */
+        
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 1100;
+        
+        transform: none !important; /* Annule les effets de scroll JS */
+    }
+
+    .nav-menu.active {
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .nav-menu li {
+        display: block !important;
+        width: 100%;
+        text-align: center;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .nav-link {
+        font-size: 2rem !important;
+        color: #fff !important;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        display: block !important;
+    }
+
+    /* RESTE DU SITE */
+    section { padding-top: 160px !important; }
     #production { padding-top: 0 !important; }
 }
 
