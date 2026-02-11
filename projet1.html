@@ -16,8 +16,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preload" as="image" href="image/F1.jpg">
 </head>
-<body><div class="page-transition"></div>
-
+<body>
+    
+    <div class="page-transition"></div>
     <div class="ambient-light"></div>
     <div class="corner-glow"></div>
 
@@ -32,7 +33,7 @@
         </div>
     </header>
 
-    <section class="project-content">
+    <section class="project-content auto-height-section">
         
         <div class="synopsis">
             <h3 style="margin-bottom: 1rem; color: #fff;">Synopsis</h3>
@@ -58,8 +59,7 @@
         </aside>
 
     </section>
-</section> 
-<!--  <p>Fermer la Section suivante si pas de video </p> -->
+
     <section class="full-width-video">
         <h3 class="video-label">Bande Annonce</h3>
         
@@ -74,16 +74,12 @@
         </div>
     </section>
 
-    <footer>
     <footer style="text-align: center; padding: 2rem; border-top: 1px solid #222;">
         <p style="font-size: 0.8rem; color: #666;">© 2026 Silencio Pictures</p>
     </footer>
 
-       <script>
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
-            
-            // --- 0. GESTION DU LOADER (GARDIEN) ---
-            // (Assurez-vous d'avoir gardé le petit script gardien en haut aussi)
             
             // --- 1. VARIABLES ---
             const menuToggle = document.querySelector('#mobile-menu');
@@ -105,25 +101,15 @@
                 }
             }
 
-            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" (Anti-Écran Noir) ---
-            // C'est cette partie qui sauve la mise quand on fait "Retour"
+            // --- 3. SÉCURITÉ "BOUTON PRÉCÉDENT" ---
             window.addEventListener('pageshow', function(event) {
-                // Si la page est chargée depuis le cache (bouton retour)
                 if (event.persisted && transitionOverlay) {
                     transitionOverlay.classList.remove('active');
                     transitionOverlay.style.opacity = '0';
                 }
             });
 
-            // --- 4. MENU MOBILE ---
-            if(menuToggle) {
-                menuToggle.addEventListener('click', function() {
-                    menuToggle.classList.toggle('is-active');
-                    navMenu.classList.toggle('active');
-                });
-            }
-
-            // --- 5. GESTION DES CLICS (INTELLIGENTE) ---
+            // --- 4. GESTION DES CLICS ---
             const allLinks = document.querySelectorAll('a');
 
             allLinks.forEach(link => {
@@ -131,19 +117,13 @@
                     const href = this.getAttribute('href');
                     const target = this.getAttribute('target');
 
-                    // A. On ignore les liens vides, mailto, ou les liens nouvel onglet (Instagram)
                     if (!href || href.startsWith('mailto:') || href === '#') return;
-                    
-                    // SI C'EST UN LIEN "_blank" (Instagram), ON NE FAIT RIEN (pas de noir)
                     if (target === '_blank') return; 
 
-                    // B. Pour le reste, on lance la transition
                     e.preventDefault();
                     closeMenu();
 
-                    // C. Navigation
                     if (href.includes('#')) {
-                        // Ancre interne
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
 
@@ -156,33 +136,11 @@
                             fadeToBlack(() => { window.location.href = href; });
                         }
                     } else {
-                        // Lien externe (Projet)
                         fadeToBlack(() => { window.location.href = href; });
                     }
                 });
             });
-
-            // --- 6. ANIMATION BENTO (MOBILE) ---
-            if (window.innerWidth <= 768) {
-                const bentoItems = document.querySelectorAll('.bento-item');
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        if (e.isIntersecting) e.target.classList.add('is-visible');
-                    });
-                }, { threshold: 0.2 });
-                bentoItems.forEach(i => observer.observe(i));
-            }
         });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
