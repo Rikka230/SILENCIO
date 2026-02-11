@@ -169,7 +169,16 @@
 
    <script>
         document.addEventListener("DOMContentLoaded", function() {
-            
+            // --- SÉCURITÉ ANTI-ÉCRAN NOIR (BOUTON RETOUR NAVIGATEUR) ---
+window.addEventListener('pageshow', function(event) {
+    const transitionOverlay = document.querySelector('.page-transition');
+    // event.persisted est vrai si la page est chargée depuis le cache du navigateur (Bouton retour)
+    if (event.persisted && transitionOverlay) {
+        transitionOverlay.classList.remove('active');
+        transitionOverlay.style.opacity = '0';
+        transitionOverlay.style.visibility = 'hidden';
+    }
+});
             // --- 1. SMART SCROLL (PC UNIQUEMENT) ---
             let lastScrollTop = 0;
             let isAutoScrolling = false; // Nouvelle sécurité
@@ -287,6 +296,7 @@
     </script>
 </body>
 </html>
+
 
 
 
