@@ -538,31 +538,33 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
     
-    /* A. HEADER : ON FORCE L'AFFICHAGE NORMAL (TRES IMPORTANT) */
+    /* A. HEADER : STRUCTURE */
     header {
         position: fixed; 
         top: 0; left: 0; width: 100%;
         padding: 1.5rem 1rem;
         
+        /* Alignement Vertical : Logo puis Burger */
         display: flex; 
         flex-direction: column; 
         align-items: center;      
-        justify-content: flex-start;
-        gap: 15px;
+        gap: 20px;
 
-        background-color: transparent !important;
+        background: transparent !important;
         border: none !important;            
         box-shadow: none !important;
         
-        /* C'EST LA CORRECTION CLEF : On désactive l'effet d'inversion des couleurs */
+        /* IMPORTANT : Empêche le header de rendre le noir transparent */
         mix-blend-mode: normal !important; 
         
-        z-index: 9999; /* Au-dessus de tout */
-        pointer-events: none; /* Laisse passer les clics quand le menu est fermé */
+        z-index: 1200; 
+        pointer-events: none; /* Laisse passer les clics autour */
     }
 
-    /* B. LOGO & BURGER */
-    .logo { pointer-events: auto; }
+    /* B. LOGO & BURGER (DOIVENT RESTER CLIQUABLES) */
+    .logo { 
+        pointer-events: auto; 
+    }
     .logo img { height: 50px !important; width: auto !important; }
     
     .menu-toggle {
@@ -571,16 +573,17 @@ body.scroll-down .menu-toggle {
         width: 35px; height: 30px;
         pointer-events: auto;
         
+        /* Reste dans le flux sous le logo */
         position: relative !important; 
         margin: 0 auto; 
+        z-index: 1300; /* Toujours au-dessus du menu noir */
     }
     
     .menu-toggle .bar {
         width: 30px; height: 2px; margin: 6px auto; 
         background-color: #fff; display: block; transition: 0.3s;
         border-radius: 2px;
-        /* Ombre légère pour contraste si le fond est blanc */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.3); 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.5); 
     }
 
     /* ANIMATION CROIX */
@@ -588,34 +591,35 @@ body.scroll-down .menu-toggle {
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* C. LE MENU (OVERLAY FOND NOIR TOTAL) */
+    /* C. LE MENU (CORRECTION HORS CADRE) */
     .nav-menu {
         position: fixed; 
-        top: 0; left: 0;
-        width: 100vw;     /* Largeur écran force */
-        height: 100vh;    /* Hauteur écran force */
+        top: 0; 
+        left: 0; /* Force le collage à gauche */
+        width: 100vw; /* Largeur totale de l'écran */
+        height: 100vh; /* Hauteur totale de l'écran */
         
-        /* LE FOND NOIR OPAQUE */
+        /* FOND NOIR OPAQUE */
         background-color: #000000 !important; 
         
+        /* CENTRAGE DU TEXTE */
         display: flex !important; 
         flex-direction: column; 
         align-items: center;      
         justify-content: center;  
-        gap: 2rem;
+        gap: 1.5rem;
+        
+        /* CORRECTION DU DÉCALAGE (TRES IMPORTANT) */
+        padding: 0 !important; 
+        margin: 0 !important;
         
         visibility: hidden; 
         opacity: 0; 
         transition: opacity 0.3s ease-in-out;
         
-        /* Z-index un peu plus bas que le header pour que la croix reste visible */
-        z-index: -1; 
-        
-        /* Sécurité supplémentaire pour le fond */
-        mix-blend-mode: normal !important;
+        z-index: 1100; /* Juste en dessous du burger */
     }
     
-    /* QUAND LE MENU EST ACTIF */
     .nav-menu.active { 
         visibility: visible !important; 
         opacity: 1 !important; 
@@ -626,18 +630,21 @@ body.scroll-down .menu-toggle {
         display: block !important; 
         width: 100%; 
         text-align: center; 
+        margin: 0;
+        padding: 0;
     }
     
     .nav-link { 
-        font-size: 2rem !important; 
+        font-size: 1.8rem !important; /* Taille ajustée pour ne pas couper */
+        line-height: 1.2;
         color: #ffffff !important;
         text-transform: uppercase; 
-        letter-spacing: 4px; 
+        letter-spacing: 3px; 
         display: inline-block !important; 
         text-shadow: none !important;
     }
 
-    /* D. RESTE DU MOBILE (GRILLE, ETC.) */
+    /* D. RESTE DU MOBILE */
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
     .bento-item, .bento-big, .bento-tall { 
         grid-column: span 1 !important; grid-row: span 1 !important; 
