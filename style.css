@@ -186,6 +186,36 @@ footer {
     width: 100%;
 }
 
+/* --- LE LOGO GÉANT (ACCUEIL) --- */
+.hero-logo-main {
+    display: block;
+    margin: 0 auto 2rem auto; /* Centré + espace en bas vers le sous-titre */
+    
+    /* GESTION DE LA TAILLE (RESPONSIVE) */
+    /* Min: 300px (mobile) | Idéal: 60% de l'écran | Max: 900px (grand écran) */
+    width: clamp(300px, 60vw, 900px);
+    
+    height: auto; /* Garde les proportions */
+    
+    /* L'ombre portée (Indispensable pour qu'il ressorte sur la vidéo) */
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
+    
+    /* Petite animation d'apparition douce */
+    opacity: 0;
+    animation: fadeInLogo 1.5s ease-out forwards 0.5s;
+}
+
+@keyframes fadeInLogo {
+    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(20px); }
+}
+
+/* On s'assure que le sous-titre est bien visible en dessous */
+#production .subtitle {
+    position: relative;
+    z-index: 2;
+    margin-top: 0;
+}
 
 /* --- 7. VIDÉO D'ARRIÈRE-PLAN (HOME) --- */
 .hero-video-container {
@@ -665,6 +695,7 @@ body.scroll-down .menu-toggle {
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+
 
 
 
