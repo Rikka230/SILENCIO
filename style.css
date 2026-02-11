@@ -861,4 +861,32 @@ body.scroll-down .menu-toggle {
     }
 }
 
+/* =========================================================
+   CORRECTIF ESTHÉTIQUE MAIL (MOBILE)
+   ========================================================= */
+@media (max-width: 768px) {
+    
+    /* On cible spécifiquement le lien qui contient "mailto:" */
+    .contact-info a[href^="mailto:"] {
+        
+        /* 1. TAILLE & OPTIMISATION ESPACE */
+        font-size: 1rem !important;       /* Beaucoup plus petit (env 16px) pour tenir sur une ligne */
+        white-space: nowrap !important;   /* Interdit la coupure en deux lignes */
+        
+        /* 2. STYLE ÉLÉGANT */
+        font-family: 'Montserrat', sans-serif !important; 
+        font-weight: 200 !important;      /* Très fin (Light) */
+        letter-spacing: 1px !important;   /* Un peu d'air entre les lettres */
+        color: #cccccc !important;        /* Gris très clair (moins agressif que le blanc pur) */
+        
+        /* 3. FINITION */
+        text-decoration: none !important; /* On enlève le soulignement par défaut */
+        border-bottom: 1px solid rgba(215, 39, 37, 0.5); /* On remplace par une ligne rouge très fine */
+        padding-bottom: 5px;              /* Espace entre le texte et la ligne */
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+}
+
+
 
