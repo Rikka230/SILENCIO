@@ -623,35 +623,52 @@ body.scroll-down .menu-toggle {
 
 
 /* =========================================================
-   12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
-   C'est ici que tout se règle pour les écrans < 768px
+   12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px)
+   Master Block : Gère tout ce qui est plus petit qu'un PC
    ========================================================= */
-@media (max-width: 768px) {
+@media (max-width: 1024px) { 
     
-    /* A. HEADER MOBILE */
+    /* A. HEADER MOBILE (FIXE & STABLE) */
+    /* On force le header à rester là, sans animation de disparition */
     header {
-        flex-direction: column; 
-        justify-content: center;
-        align-items: center;
-        gap: 1.5rem; 
+        position: fixed; 
+        top: 0; left: 0;
+        width: 100%;
+        height: auto;
         padding: 1.5rem;
         background: transparent;
         mix-blend-mode: normal; 
+        
+        /* On annule l'effet "Smart Scroll" ici */
+        opacity: 1 !important; 
+        transform: none !important;
+        pointer-events: auto !important;
+        justify-content: space-between;
     }
 
-    /* B. LOGO MOBILE (FORCÉ) */
+    /* B. ON CACHE LE MENU PC (LIENS TEXTE) */
+    .nav-container ul,
+    .nav-menu.desktop-only { /* Sécurité */
+        display: none !important; 
+    }
+
+    /* C. LE LOGO MOBILE */
     a.logo {
-        position: relative; z-index: 1001; margin: 0;
+        position: relative; z-index: 1005; margin: 0;
     }
-    
     .logo img {
-        height: 100px !important; /* Taille Mobile Forcée */
-        width: auto !important; margin: 0; object-fit: contain;
+        height: 80px !important; /* Taille adaptée mobile */
+        width: auto !important; margin: 0; 
     }
 
-    /* C. MENU BURGER */
+    /* D. LE BURGER (VISIBLE) */
     .menu-toggle {
-        display: block; cursor: pointer; z-index: 1001; margin: 0;
+        display: block; 
+        cursor: pointer; 
+        z-index: 1005; /* Au-dessus de tout */
+        margin: 0;
+        opacity: 1 !important;
+        transform: none !important;
     }
 
     .menu-toggle .bar {
@@ -659,62 +676,81 @@ body.scroll-down .menu-toggle {
         background-color: #fff; transition: all 0.3s ease-in-out;
     }
 
-    /* D. NAVIGATION (MENU OUVERT) */
+    /* E. LE MENU OUVERT (OVERLAY) */
     .nav-menu {
-        position: fixed; left: -100%; top: 0; width: 100%; height: 100vh;
+        position: fixed; 
+        left: 0; top: 0; 
+        width: 100%; height: 100vh;
         background-color: #000000;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: flex-start;
-        padding-top: 40vh; gap: 2.5rem;
-        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        /* Flex pour centrer les liens verticalement */
+        display: flex; 
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+        gap: 2rem;
+        
+        /* Caché par défaut */
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.4s ease;
         z-index: 1000;
     }
-    .nav-menu.active { left: 0; }
-
+    
+    /* Quand on clique sur le burger */
+    .nav-menu.active { 
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* On réaffiche les liens dans le burger */
+    .nav-menu li { display: block; }
     .nav-link {
-        font-size: 1.8rem; font-weight: 300; color: #fff;
+        font-size: 2rem; font-weight: 300; color: #fff;
         text-transform: uppercase; letter-spacing: 3px; display: block;
     }
 
-    /* Animation Croix */
+    /* Animation Croix Burger */
     .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
     
-    /* E. AJUSTEMENTS PAGES INTERNES MOBILE */
-    .back-btn { top: 2rem; left: 2rem; }
-    .project-content { grid-template-columns: 1fr; gap: 2rem; }
+    /* F. PAGE PROJET & BENTO (1 COLONNE) */
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
+    
+    /* On remet tout en 16/9 sur mobile */
+    .bento-item, .bento-big, .bento-tall, .bento-wide { 
+        grid-column: span 1 !important; 
+        grid-row: span 1 !important; 
+        aspect-ratio: 16/9 !important; 
+    }
+    /* Exception pour l'affiche verticale */
+    .bento-tall { aspect-ratio: 2/3 !important; }
+
+    /* G. AJUSTEMENTS DIVERS MOBILE */
     .project-hero { height: 50vh; }
     .video-wrapper { aspect-ratio: 1 / 1; }
-
-    /* F. SCROLL REVEAL (BENTO GRID) */
-    .bento-overlay {
-        opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out;
-    }
-    .bento-item.is-visible .bento-overlay { opacity: 1; transform: translateY(0); }
-    .bento-item.is-visible img { opacity: 1; transform: scale(1.05); filter: brightness(1.1); }
-    .bento-item.is-visible { border-color: var(--color-accent); }
-
-    /* G. CORRECTION VIDÉO MOBILE (C'est ici que ça se règle) */
-    .full-width-video {
-        margin-top: 0 !important; 
-        padding-top: 3rem; /* CORRECTION : Valeur positive */
-    }
-
-   /* --- FIX MOBILE : DÉSACTIVER SMART SCROLL --- */
-@media (max-width: 1024px) {
+    .back-btn { top: 1.5rem; left: 1.5rem; }
     
-    /* Même si le Javascript dit de cacher (scroll-down), on force l'affichage */
-    body.scroll-down nav,
-    body.scroll-down .menu-toggle,
-    body.scroll-down header {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-        pointer-events: auto !important;
+    /* Correction du padding pour que le texte ne passe pas sous le logo */
+    section { 
+        padding-top: 150px !important; 
+        justify-content: flex-start !important;
     }
-}
+    #production { padding-top: 0 !important; justify-content: center !important; }
 
-} /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
+    /* Forcer l'affichage des infos en overlay Bento (pas de hover sur mobile) */
+    .bento-overlay { 
+        opacity: 1; 
+        transform: translateY(0); 
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
+    }
+    
+    /* Vidéo trailer fix */
+    .full-width-video { margin-top: 0 !important; padding-top: 2rem; }
+
+} /* <-- FIN DU FICHIER */
+
 
 
 
