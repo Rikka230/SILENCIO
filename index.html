@@ -73,7 +73,8 @@
             <div class="video-overlay"></div>
         </div>
         
-        <img src="image/Brand.png" alt="Silencio Pictures" class="hero-logo-main">
+        <h1>Silencio</h1>
+        <p class="subtitle">Production de films &bull; Paris</p>
     </section>
 
     <section id="projects">
@@ -150,30 +151,28 @@
    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- 1. SMART SCROLL (UNIQUEMENT SUR PC) ---
+            // --- 1. SMART SCROLL (MENU DISPARAÎT / LOGO RESTE) ---
             let lastScrollTop = 0;
-            const delta = 5; 
+            const delta = 5; // Sensibilité du scroll
 
             window.addEventListener('scroll', function() {
-                
-                // SÉCURITÉ MOBILE : Si l'écran est plus petit que 1024px, ON ARRÊTE TOUT ICI.
-                // Le menu restera toujours fixe.
-                if (window.innerWidth <= 1024) {
-                    document.body.classList.remove('scroll-down');
-                    return; 
-                }
-
-                // ... Le reste du code PC (inchangé) ...
                 const currentScroll = window.scrollY;
+                
+                // On empêche le déclenchement au rebond (haut de page)
                 if (currentScroll <= 0) {
                     document.body.classList.remove('scroll-down');
                     return;
                 }
+
+                // Si on a assez scrollé et qu'on descend
                 if (currentScroll > lastScrollTop && currentScroll > delta) {
+                    // On ajoute la classe qui cache le menu
                     document.body.classList.add('scroll-down');
                 } else {
+                    // Si on remonte, on l'enlève
                     document.body.classList.remove('scroll-down');
                 }
+                
                 lastScrollTop = currentScroll;
             });
 
@@ -261,10 +260,6 @@
     
 </body>
 </html>
-
-
-
-
 
 
 
