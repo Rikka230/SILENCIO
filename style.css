@@ -128,7 +128,7 @@ nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-
 /* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
 section {
     /* Hauteur forcée à 100% de la fenêtre visible */
-    min-height: 100vh; 
+    min-height: 100vh !important; 
     
     /* On centre tout, tout le temps */
     display: flex; 
@@ -201,7 +201,7 @@ footer {
 }
 
 
-/* --- 8. BENTO GRID (CORRECTION : CARRÉS PARFAITS & 3 COLONNES) --- */
+/* --- 8. BENTO GRID (VERSION CORRIGÉE & SÉCURISÉE) --- */
 #projects { 
     padding: 0 2rem; 
     min-height: 100vh; 
@@ -216,54 +216,50 @@ footer {
 
 .bento-grid {
     display: grid;
-    /* 1. ON FORCE 3 COLONNES (Mathématique : 3x3 = 9 blocs) */
-    grid-template-columns: repeat(3, 1fr); 
+    /* ON FORCE 3 COLONNES AVEC !important POUR ÉCRASER TOUT CONFLIT */
+    grid-template-columns: repeat(3, 1fr) !important; 
     
-    /* 2. ON SUPPRIME LA HAUTEUR FIXE (C'est ça qui créait les rectangles) */
-    /* On laisse le contenu décider de la hauteur */
     grid-auto-rows: auto; 
-    
     gap: 20px;
     grid-auto-flow: dense; 
 }
 
-/* --- LE SECRET DES FORMES GÉOMÉTRIQUES --- */
-/* On utilise 'aspect-ratio' pour forcer la forme, quelle que soit la taille de l'écran */
-
+/* --- FORMES GÉOMÉTRIQUES (CARRÉS PARFAITS) --- */
 .bento-item {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
     background: #111;
-    transition: all 0.4s ease;
-    cursor: pointer;
     border: 1px solid rgba(255,255,255,0.1);
     
     width: 100%;
-    /* PAR DÉFAUT : C'est un CARRÉ (1 sur 1) */
-    aspect-ratio: 1 / 1; 
+    /* Carré par défaut */
+    aspect-ratio: 1 / 1 !important; 
     
+    /* Place par défaut */
     grid-column: span 1;
     grid-row: span 1;
 }
 
-/* LE GROS CARRÉ (2x2) */
+/* --- LES EXCEPTIONS (FORMES SPÉCIALES) --- */
+
+/* 1. LE GROS CUBE (Doit être 2x plus large et 2x plus haut) */
 .bento-big { 
-    grid-column: span 2; 
-    grid-row: span 2; 
-    aspect-ratio: 1 / 1; /* Reste un carré parfait */
+    grid-column: span 2 !important; 
+    grid-row: span 2 !important; 
+    aspect-ratio: 1 / 1 !important; /* Reste un carré, mais géant */
 }
 
-/* LE PANORAMIQUE (Large) */
+/* 2. LE PANORAMIQUE (Large) */
 .bento-wide { 
-    grid-column: span 2; 
-    aspect-ratio: 2 / 1; /* Rectangle horizontal (2x plus large que haut) */
+    grid-column: span 2 !important; 
+    aspect-ratio: 2 / 1 !important; /* Rectangle horizontal */
 }
 
-/* LE PORTRAIT (Haut) */
+/* 3. L'AFFICHE (Haut) */
 .bento-tall { 
-    grid-row: span 2; 
-    aspect-ratio: 1 / 2; /* Rectangle vertical (2x plus haut que large) */
+    grid-row: span 2 !important; 
+    aspect-ratio: 1 / 2 !important; /* Rectangle vertical */
 }
 
 
@@ -280,43 +276,25 @@ footer {
 .bento-overlay h3 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 0.5rem; color: #fff; }
 .bento-overlay p { color: var(--color-accent); font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; }
 
-.bento-item:hover { transform: scale(1.02); z-index: 2; border-color: var(--color-accent); box-shadow: 0 10px 40px rgba(215, 39, 37, 0.4); }
+.bento-item:hover { transform: scale(1.02); z-index: 2; border-color: var(--color-accent); }
 .bento-item:hover img { transform: scale(1.1); opacity: 1; }
 .bento-item:hover .bento-overlay { transform: translateY(0); opacity: 1; }
 
 
 /* --- MOBILE (RETOUR À 1 COLONNE) --- */
 @media (max-width: 1024px) {
-    .bento-grid { grid-template-columns: 1fr; gap: 15px; }
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
     
-    /* Sur mobile, on garde les ratios ou on repasse tout en carré ? 
-       Garder les ratios est plus joli : */
-    .bento-wide, .bento-tall, .bento-big { 
-        grid-column: span 1; 
-        grid-row: span 1; 
-        aspect-ratio: 16/9; /* Tout devient format vidéo sur mobile */
+    /* Sur mobile, on remet tout en format 16/9 classique */
+    .bento-wide, .bento-tall, .bento-big, .bento-item { 
+        grid-column: span 1 !important; 
+        grid-row: span 1 !important; 
+        aspect-ratio: 16/9 !important; 
     }
-    .bento-tall { aspect-ratio: 2/3; } /* Sauf l'affiche qui reste verticale */
+    /* Sauf l'affiche verticale qui reste verticale */
+    .bento-tall { aspect-ratio: 2/3 !important; } 
 }
 
-/* --- 6. SECTIONS GÉNÉRALES (CORRECTION ÉCRAN GÉANT) --- */
-/* Ceci corrige le problème de chevauchement production/à propos */
-section {
-    min-height: 100vh !important; /* Force ABSOLUE 100% hauteur écran */
-    height: auto;
-    padding: 6rem 2rem; /* Espace en haut et en bas */
-    display: flex; flex-direction: column; justify-content: center;
-    position: relative;
-    z-index: 1;
-    overflow: hidden; /* Empêche tout débordement */
-}
-
-/* Sur Mobile, on remet le Bento en 1 seule colonne */
-@media (max-width: 768px) {
-    .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 300px; }
-    .bento-wide, .bento-tall, .bento-big { grid-column: span 1; grid-row: span 1; }
-    .bento-tall { grid-row: span 2; } /* On garde juste les verticaux hauts sur mobile */
-}
 
 /* --- 9. PAGE DÉTAIL PROJET (RÉPARÉ + FONDU) --- */
 .project-hero {
@@ -402,10 +380,7 @@ section {
 .full-width-video {
     width: 100%;
     background: transparent;
-    
-    /* LA CORRECTION EST ICI : */
-    margin-top: 0rem; /* Un petit chevauchement léger et sans risque */
-    
+    margin-top: 0rem; 
     padding: 0; 
     text-align: center;
     border: none !important;
@@ -530,48 +505,6 @@ section {
     padding-top: 4rem; 
 }
 
-/* =========================================================
-   10.5 STABILISATION DESKTOP (LA MÊME EXPÉRIENCE PARTOUT)
-   ========================================================= */
-
-@media (min-width: 1024px) {
-    
-    /* A. ON VERROUILLE LE BENTO (Forme Inchangée) */
-    .bento-container {
-        max-width: 1400px; /* On empêche que ça devienne grotesque sur écran géant */
-        margin: 0 auto;    /* On centre parfaitement */
-        padding: 0 2rem;
-    }
-
-    .bento-grid {
-        /* LE SECRET EST ICI : On force 4 colonnes. 
-           Si l'écran grandit, les colonnes grandissent, mais ne changent pas de nombre. */
-        grid-template-columns: repeat(4, 1fr) !important; 
-        gap: 30px; /* Plus d'espace sur PC */
-    }
-
-    /* Rappel de vos réglages Bento (Indispensable pour que le 4 colonnes marche) */
-    .bento-large { grid-column: span 2; grid-row: span 2; }
-    .bento-tall  { grid-column: span 1; grid-row: span 2; }
-    .bento-item  { grid-column: span 1; grid-row: span 1; }
-
-    /* B. ON VERROUILLE LE TEXTE (À Propos / Contact) */
-    /* On empêche le texte de s'étaler sur 3 mètres de large */
-    .about-text, .contact-info {
-        max-width: 800px !important; /* Largeur de lecture idéale */
-        margin-left: auto !important;
-        margin-right: auto !important;
-        
-        /* On augmente un peu la taille de police pour les grands écrans */
-        font-size: 1.5rem; 
-    }
-    
-    /* C. ON CENTRE LES SECTIONS */
-    section {
-        align-items: center; /* Centre horizontalement */
-    }
-}
-
 
 /* =========================================================
    12. RESPONSIVE MOBILE (MASTER BLOCK - UNIQUE & CLEAN)
@@ -648,21 +581,8 @@ section {
 
     /* G. CORRECTION VIDÉO MOBILE (C'est ici que ça se règle) */
     .full-width-video {
-        margin-top: 0 !important; /* Annule le décalage PC */
-        padding-top: -20rem; /* Espace propre */
+        margin-top: 0 !important; 
+        padding-top: 3rem; /* CORRECTION : Valeur positive */
     }
 
 } /* <-- FIN DU BLOC MOBILE (Ne rien ajouter après ça) */
-
-
-
-
-
-
-
-
-
-
-
-
-
