@@ -734,6 +734,65 @@ body.scroll-down .menu-toggle {
     }
 }
 
+/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE --- */
+@media (max-width: 1024px) {
+
+    /* 1. On force le conteneur en une seule colonne large pour supprimer le vide */
+    .project-content {
+        display: block !important; /* On casse la grille PC */
+        width: 100% !important;
+        padding: 2rem 1.5rem !important; /* On réduit les marges latérales */
+        box-sizing: border-box;
+    }
+
+    /* 2. Le synopsis prend toute la place et respire */
+    .synopsis {
+        width: 100% !important;
+        margin-bottom: 3rem !important;
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
+        text-align: left !important;
+    }
+
+    /* 3. Les specs techniques (Réal, Casting, etc.) passent en grille de 2 colonnes */
+    /* Cela évite que les infos soient collées et trop fines */
+    .tech-specs {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* 2 colonnes côte à côte */
+        gap: 2rem 1rem !important;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 2rem;
+    }
+
+    /* On nettoie les marges des titres de specs */
+    .tech-specs h4 {
+        margin-top: 0 !important;
+        margin-bottom: 0.3rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* 4. On ajuste le Hero (l'image du haut) pour qu'elle soit moins haute */
+    .project-hero {
+        height: 50vh !important;
+        min-height: 350px !important;
+    }
+
+    /* On réduit le titre du projet pour qu'il ne s'écrase pas */
+    .project-title {
+        font-size: 2.2rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* 5. On réduit l'espace entre le texte et la vidéo du trailer */
+    .full-width-video {
+        margin-top: 1rem !important;
+        padding-bottom: 3rem !important;
+    }
+}
+
+
 
 
 
