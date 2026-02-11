@@ -114,7 +114,7 @@ a.logo {
 }
 
 .logo img {
-    height: 200px; /* Taille Desktop préservée */
+    height: 400px; /* Taille Desktop préservée */
     width: auto;
     display: block;
     transition: opacity 0.3s;
@@ -639,7 +639,7 @@ body.scroll-down .menu-toggle {
         z-index: 1300;
         display: block !important;
     }
-    .logo img { height: 50px !important; width: auto !important; }
+    .logo img { height: 100px !important; width: auto !important; }
 
     .menu-toggle {
         display: block !important;
@@ -733,6 +733,7 @@ body.scroll-down .menu-toggle {
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
 }
+
 
 
 
