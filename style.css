@@ -231,7 +231,7 @@ footer {
     
     /* TYPOGRAPHIE */
     font-family: var(--font-main);
-    font-weight: 400;          /* Regular, comme 'PICTURES' sur le logo */
+    font-weight: 300;          /* Regular, comme 'PICTURES' sur le logo */
     font-size: clamp(1.8rem, 4vw, 2.5rem); /* Plus grand et responsive */
     text-transform: uppercase;
     letter-spacing: 0.3em;     /* Ecartement large des lettres (Signature du logo) */
@@ -719,6 +719,7 @@ body.scroll-down .menu-toggle {
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
 }
+
 
 
 
