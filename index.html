@@ -84,7 +84,7 @@
             
             <div class="bento-grid">
                 <a href="projet1.html" class="bento-item bento-big">
-                    <img src="image/F1.jpg" alt="Tales of Taipei">
+                    <iframe src="image/F1.jpg" alt="Tales of Taipei"></iframe>
                     <div class="bento-overlay">
                         <h3>TALES OF TAIPEI</h3>
                         <p>Joseph Hsu</p>
@@ -92,7 +92,7 @@
                 </a>
 
                 <a href="projet-detail.html" class="bento-item bento-tall">
-                    <img src="image/F2.jpg" alt="L'Ombre">
+                    <iframe src="image/F2.jpg" alt="L'Ombre"></iframe>
                     <div class="bento-overlay">
                         <h3>L'OMBRE</h3>
                         <p>Drame</p>
@@ -100,7 +100,7 @@
                 </a>
 
                 <a href="projet-detail.html" class="bento-item">
-                    <img src="image/F3.jpg" alt="Neon Nights">
+                    <iframe src="image/F3.jpg" alt="Neon Nights"></iframe>
                     <div class="bento-overlay">
                         <h3>NEON NIGHTS</h3>
                         <p>Court-métrage</p>
@@ -108,7 +108,7 @@
                 </a>
 
                 <a href="projet-detail.html" class="bento-item">
-                    <img src="image/F4.jpg" alt="Silencio">
+                    <iframe src="image/F4.jpg" alt="Silencio"></iframe>
                     <div class="bento-overlay">
                         <h3>SILENCIO</h3>
                         <p>Documentaire</p>
@@ -296,10 +296,26 @@ window.addEventListener('pageshow', function(event) {
                 });
             }, { threshold: 0.1 });
             document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
+
+            // --- 7. LAZY LOAD TRANSITION ---
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            
+            lazyImages.forEach(img => {
+                // Si l'image est déjà en cache, on l'affiche direct
+                if (img.complete) {
+                    img.classList.add('is-loaded');
+                } else {
+                    // Sinon on attend qu'elle charge
+                    img.onload = () => {
+                        img.classList.add('is-loaded');
+                    };
+                }
+            });
         });
     </script>
 </body>
 </html>
+
 
 
 
