@@ -898,28 +898,35 @@ body.scroll-down .menu-toggle {
 }
 
 /* =========================================================
-   LAZY LOADING (EFFET D'APPARITION)
+   LAZY LOADING (CORRECTIF FINAL - FIX SCROLLBARS)
    ========================================================= */
 
-/* État initial de l'image (avant chargement complet) */
+/* État initial (pendant le chargement) */
 img[loading="lazy"] {
     opacity: 0;
-    filter: blur(10px);
-    transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+    filter: blur(15px); /* Flou artistique */
+    transition: opacity 0.8s ease-out, filter 0.8s ease-out;
+    
+    /* --- C'EST ICI LA CORRECTION --- */
+    /* On oblige l'image à prendre toute la place, même si elle n'est pas chargée */
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    /* On supprime les bordures ou marges parasites */
+    border: none !important;
+    margin: 0 !important;
 }
 
-/* Classe ajoutée par JS une fois l'image chargée */
+/* Une fois chargée (classe ajoutée par le JS) */
 img.is-loaded {
-    opacity: 1 !important; /* Force l'affichage */
-    filter: blur(0) !important; /* Retire le flou */
+    opacity: 1 !important;
+    filter: blur(0) !important;
 }
 
-/* Cas particulier : Le logo et l'image principale ne doivent pas être lazy-loadés */
-/* Ils doivent s'afficher tout de suite pour ne pas faire "clignoter" le site */
-header img, 
-.hero-logo-main {
-    opacity: 1;
-    filter: none;
+/* SÉCURITÉ : On cache les barres de défilement dans les bento */
+.bento-item {
+    overflow: hidden !important; /* Coupe tout ce qui dépasse */
 }
 
 
