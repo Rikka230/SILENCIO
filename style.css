@@ -114,7 +114,7 @@ a.logo {
 }
 
 .logo img {
-    height: 200px; /* Taille Desktop préservée */
+    height: 150px; /* Taille Desktop préservée */
     width: auto;
     display: block;
     transition: opacity 0.3s;
@@ -896,6 +896,7 @@ body.scroll-down .menu-toggle {
     border-bottom-color: #D72725;      /* La ligne devient rouge vif */
     transform: translateY(-2px);       /* Remonte très légèrement */
 }
+
 
 
 
