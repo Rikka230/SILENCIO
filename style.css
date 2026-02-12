@@ -862,39 +862,40 @@ body.scroll-down .menu-toggle {
 }
 
 /* =========================================================
-   LAZY LOADING : CORRECTIF FINAL "INVISIBLE"
+   STYLE MAIL LUXE (PC & MOBILE UNIFIÉS)
    ========================================================= */
 
-/* 1. Le Conteneur (La case Bento) */
-/* On lui donne un fond noir ou gris très sombre pour l'attente */
-.bento-item {
-    background-color: #0a0a0a !important; 
-    overflow: hidden !important; /* Coupe tout ce qui dépasse (barres blanches) */
-    position: relative; /* Sécurité */
-}
-
-/* 2. L'Image (Avant chargement) */
-/* On cible TOUTES les images dans les bento pour éviter les bugs */
-.bento-item img {
-    opacity: 0 !important; /* INVISIBLE : Cache les bugs graphiques */
+/* On cible le lien mailto partout */
+.contact-info a[href^="mailto:"] {
     
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
-    border: none !important;
-    margin: 0 !important;
+    /* 1. TYPOGRAPHIE FINE & ÉLÉGANTE */
+    font-family: 'Montserrat', sans-serif !important; 
+    font-weight: 200 !important;       /* Ultra fin (Light) */
+    letter-spacing: 2px !important;    /* Lettres espacées (Cinéma) */
+    color: #cccccc !important;         /* Gris argenté doux */
     
-    /* Transition douce pour l'apparition */
-    transition: opacity 0.8s ease-out;
+    /* 2. TAILLE INTELLIGENTE */
+    /* Sur mobile ça sera ~16px, sur PC ça montera doucement vers ~22px */
+    font-size: clamp(1rem, 1.5vw, 1.4rem) !important; 
+    
+    /* 3. FINITION */
+    white-space: nowrap !important;    /* Jamais coupé en deux */
+    text-decoration: none !important;  /* On retire le trait moche par défaut */
+    
+    /* 4. LE SOULIGNEMENT ROUGE DISCRET */
+    border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
+    padding-bottom: 8px;               /* Espace entre texte et ligne */
+    
+    display: inline-block;
+    transition: all 0.3s ease;
 }
 
-/* 3. L'Image (Une fois chargée) */
-/* Cette classe sera ajoutée par le JavaScript */
-.bento-item img.is-loaded {
-    opacity: 1 !important; /* APPARITION */
+/* EFFET AU SURVOL (Uniquement sur PC) */
+.contact-info a[href^="mailto:"]:hover {
+    color: #ffffff !important;         /* Devient blanc pur */
+    border-bottom-color: #D72725;      /* La ligne devient rouge vif */
+    transform: translateY(-2px);       /* Remonte très légèrement */
 }
-
 
 
 
