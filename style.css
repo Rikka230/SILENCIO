@@ -897,5 +897,31 @@ body.scroll-down .menu-toggle {
     transform: translateY(-2px);       /* Remonte très légèrement */
 }
 
+/* =========================================================
+   LAZY LOADING (EFFET D'APPARITION)
+   ========================================================= */
+
+/* État initial de l'image (avant chargement complet) */
+img[loading="lazy"] {
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+}
+
+/* Classe ajoutée par JS une fois l'image chargée */
+img.is-loaded {
+    opacity: 1 !important; /* Force l'affichage */
+    filter: blur(0) !important; /* Retire le flou */
+}
+
+/* Cas particulier : Le logo et l'image principale ne doivent pas être lazy-loadés */
+/* Ils doivent s'afficher tout de suite pour ne pas faire "clignoter" le site */
+header img, 
+.hero-logo-main {
+    opacity: 1;
+    filter: none;
+}
+
+
 
 
