@@ -297,24 +297,37 @@ window.addEventListener('pageshow', function(event) {
             }, { threshold: 0.1 });
             document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
 
-            // --- 7. LAZY LOAD TRANSITION ---
-            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            // ... (votre code bento existant) ...
+            document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
+
+
+            // --- 7. LAZY LOAD (SCRIPT CORRIGÉ) ---
+            // On cible toutes les images à l'intérieur des items Bento
+            const bentoImages = document.querySelectorAll('.bento-item img');
             
-            lazyImages.forEach(img => {
-                // Si l'image est déjà en cache, on l'affiche direct
-                if (img.complete) {
+            bentoImages.forEach(img => {
+                // Fonction pour afficher l'image
+                const revealImage = () => {
                     img.classList.add('is-loaded');
+                };
+
+                // Si l'image est déjà en cache, on l'affiche tout de suite
+                if (img.complete) {
+                    revealImage();
                 } else {
-                    // Sinon on attend qu'elle charge
-                    img.onload = () => {
-                        img.classList.add('is-loaded');
-                    };
+                    // Sinon on attend la fin du chargement
+                    img.onload = revealImage;
+                    // Sécurité : si ça plante, on affiche quand même pour ne pas laisser un trou
+                    img.onerror = revealImage; 
                 }
             });
-        });
+
+        }); // Fin du script
+    </script>
     </script>
 </body>
 </html>
+
 
 
 
