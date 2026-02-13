@@ -1,5 +1,5 @@
 /* =========================================
-   SILENCIO PICTURES - STYLE MASTER (FINAL CLEAN V2)
+   SILENCIO PICTURES - STYLE MASTER (FINAL CLEAN V3)
    ========================================= */
 
 /* --- 1. VARIABLES & RESET --- */
@@ -159,13 +159,9 @@ h1 {
 
 /* Page À Propos */
 .about-text {
-    /* Utilisation de Montserrat pour permettre le rendu extra-fin sur PC */
     font-family: 'Montserrat', sans-serif;
-    
-    /* On règle sur 200 pour une finesse élégante, ou 300 pour un peu plus de lisibilité */
     font-weight: 200; 
-    
-    font-size: clamp(1.1rem, 2vw, 1.5rem); /* Taille ajustée pour la finesse */
+    font-size: clamp(1.1rem, 2vw, 1.5rem); 
     line-height: 1.6;
     opacity: 0.9;
     max-width: 800px;
@@ -173,7 +169,6 @@ h1 {
     text-align: center;
 }
 
-/* Optionnel : On peut aussi affiner les paragraphes à l'intérieur */
 .about-text p {
     font-weight: 200;
 }
@@ -235,18 +230,15 @@ footer {
     pointer-events: none;
 }
 
-/* --- NOUVEAU STYLE TITRES (CORRIGÉ POUR PC) --- */
+/* --- TITRES SECTIONS --- */
 .section-title {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     margin: 0 auto 3rem auto;
-    
-    /* C'EST ICI LE SECRET : On utilise Montserrat au lieu de Helvetica/Arial */
     font-family: 'Montserrat', sans-serif; 
-    font-weight: 200;  /* 100=Invisible, 200=Ultra Fin (Luxe), 300=Fin, 400=Normal */
-    
+    font-weight: 200;  
     font-size: clamp(1.8rem, 4vw, 2.5rem);
     text-transform: uppercase;
     letter-spacing: 0.3em;
@@ -254,7 +246,6 @@ footer {
     text-align: center;
 }
 
-/* LES LIGNES ROUGES (Inchangé) */
 .section-title::before,
 .section-title::after {
     content: '';
@@ -267,28 +258,16 @@ footer {
     opacity: 0.8;
 }
 
-/* Ajustement Mobile pour les titres */
 @media (max-width: 768px) {
     .section-title {
-        /* On réduit légèrement la taille pour que les longs mots rentrent */
         font-size: 1.1rem; 
-        
-        /* On réduit l'espacement des lettres (tout en gardant l'effet luxe) */
         letter-spacing: 2px; 
-        
-        /* On empêche le titre de se casser sur deux lignes */
         white-space: nowrap; 
     }
-
     .section-title::before,
     .section-title::after {
-        /* On raccourcit les lignes rouges pour laisser plus de place au texte */
         max-width: 40px;       
-        
-        /* IMPORTANT : On force une taille minimale pour qu'elles ne disparaissent jamais */
         min-width: 20px;       
-        
-        /* On réduit l'espace entre le texte et la ligne */
         margin: 0 10px;
     }
 }
@@ -465,7 +444,7 @@ footer {
 }
 .synopsis { 
     font-family: 'Montserrat', sans-serif !important;
-    font-weight: 200 !important; /* Force la finesse sur tous les supports */
+    font-weight: 200 !important; 
     font-size: 1.2rem; 
     line-height: 1.8; 
     color: #ddd; 
@@ -616,10 +595,7 @@ body.scroll-down .menu-toggle {
    ========================================================= */
 @media (max-width: 1024px) {
 
-    /* 1. RESET SÉCURISÉ
-       On applique ces corrections UNIQUEMENT au header principal et au menu 
-       On exclut explicitement la classe .project-hero pour ne pas casser les pages films */
-    
+    /* 1. RESET SÉCURISÉ */
     header:not(.project-hero), 
     nav, 
     .nav-container {
@@ -637,14 +613,13 @@ body.scroll-down .menu-toggle {
         box-shadow: none !important;
     }
 
-    /* 2. LE HEADER PRINCIPAL (LOGO + BURGER) */
-    /* On utilise :not(.project-hero) pour être sûr de ne pas toucher à l'image du film */
+    /* 2. LE HEADER PRINCIPAL */
     header:not(.project-hero) {
         position: fixed !important;
         top: 0; left: 0;
         z-index: 1200;
         padding: 1.5rem 1rem !important;
-        pointer-events: none; /* Laisse cliquer le site derrière */
+        pointer-events: none; 
         
         display: flex !important;
         flex-direction: column !important;
@@ -736,40 +711,48 @@ body.scroll-down .menu-toggle {
         text-shadow: none !important;
     }
 
-    /* 5. GESTION DES ESPACES (Padding Sections) */
-    /* On applique le padding de sécurité UNIQUEMENT aux sections principales */
-    /* Et surtout PAS à la section Hero du projet (.project-hero) */
+    /* 5. GESTION DES ESPACES */
     section:not(.project-hero) { 
         padding-top: 160px !important; 
     }
     
-    /* Le #production sur la home n'en a pas besoin car il a la vidéo full screen */
     #production { padding-top: 0 !important; }
     
-    /* GRILLES ET IMAGES */
     .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
     .bento-item, .bento-big, .bento-tall { 
         grid-column: span 1 !important; grid-row: span 1 !important; 
         width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
     }
+
+    /* --- G. CORRECTION VIDÉO MOBILE --- */
+    .full-width-video {
+        margin-top: 0 !important; 
+        padding-top: 3rem; 
+    }
+
+    /* ICI J'AI SUPPRIMÉ LE BLOC QUI BLOQUAIT LE SCROLL */
+
 }
 
-/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE (OPTIMISÉ VIDES) --- */
+/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE --- */
 @media (max-width: 1024px) {
 
     section:not(.project-hero) { 
-        padding-top: 20px !important; /* Rapproche le contenu de l'image du haut */
+        padding-top: 20px !important; 
     }
 
     .project-content {
-        display: block !important;
-        width: 100% !important;
-        padding: 1rem 1.5rem !important; /* Réduit le vide interne */
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: 0 !important;
+        min-height: auto !important;
+        gap: 2rem !important;
+        padding: 1rem 1.5rem !important;
     }
 
     .synopsis {
         width: 100% !important;
-        margin-bottom: 1rem !important; /* Rapproche des specs techniques */
+        margin-bottom: 1rem !important;
         font-size: 1.1rem !important;
     }
 
@@ -780,6 +763,8 @@ body.scroll-down .menu-toggle {
         gap: 1.5rem 1rem !important;
         border-top: 1px solid rgba(255,255,255,0.1);
         padding-top: 1.5rem;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
     }
 
     .project-hero {
@@ -787,77 +772,24 @@ body.scroll-down .menu-toggle {
         min-height: 280px !important;
     }
 
+    /* --- FIX VIDÉO ESPACE --- */
     .full-width-video {
-        margin-top: 0rem !important;
-        padding-top: 0.5rem !important; /* Réduit drastiquement l'espace haut vidéo */
-        padding-bottom: 2rem !important;
-    }
-}
-
-/* =========================================================
-   CORRECTIF ESPACE VIDE MOBILE (PAGE PROJET)
-   ========================================================= */
-
-@media (max-width: 1024px) {
-    
-    /* 1. On retire la hauteur minimale forcée qui crée le vide */
-    .project-content {
-        display: flex !important;
-        flex-direction: column !important;
-        padding-bottom: 0 !important; /* Colle le bas du texte au bloc suivant */
         min-height: auto !important;
-        gap: 2rem !important; /* Espace maîtrisé entre synopsis et infos */
-    }
-
-    /* 2. On remonte drastiquement la section vidéo */
-    .full-width-video {
-        margin-top: -2rem !important; /* On tire la vidéo vers le haut */
+        height: auto !important;
+        display: block !important;
+        margin-top: -2rem !important;
         padding-top: 0 !important;
+        padding-bottom: 2rem !important;
         position: relative;
         z-index: 10;
     }
 
-    /* 3. On réduit l'espace sous les infos techniques (Réalisation, Casting...) */
-    .tech-specs {
-        margin-bottom: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    
-    /* 4. On s'assure que le titre "BANDE ANNONCE" est proche de la vidéo */
-    .video-label {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* =========================================================
-   CORRECTIF ESPACE VIDE VIDÉO (MOBILE)
-   ========================================================= */
-@media (max-width: 1024px) {
-
-    /* 1. On annule le comportement "Plein Écran" de la section vidéo */
-    section.full-width-video {
-        min-height: auto !important;   /* Annule les 100vh */
-        height: auto !important;       /* Hauteur naturelle */
-        display: block !important;     /* Annule le centrage Flex vertical */
-        padding-top: 0 !important;     /* Enlève le padding du haut */
-        padding-bottom: 2rem !important;
-        margin-top: 0 !important;
-    }
-
-    /* 2. On gère l'espacement du titre "BANDE ANNONCE" */
     .video-label {
         display: block !important;
-        margin-top: 3rem !important;    /* Espace propre après le Casting */
-        margin-bottom: 1.5rem !important;
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
         position: relative;
         z-index: 20;
-    }
-
-    /* 3. On s'assure que le bloc texte du dessus ne pousse pas trop */
-    .project-content {
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
     }
 }
 
@@ -865,58 +797,40 @@ body.scroll-down .menu-toggle {
    STYLE MAIL LUXE (PC & MOBILE UNIFIÉS)
    ========================================================= */
 
-/* On cible le lien mailto partout */
 .contact-info a[href^="mailto:"] {
-    
-    /* 1. TYPOGRAPHIE FINE & ÉLÉGANTE */
     font-family: 'Montserrat', sans-serif !important; 
-    font-weight: 200 !important;       /* Ultra fin (Light) */
-    letter-spacing: 2px !important;    /* Lettres espacées (Cinéma) */
-    color: #cccccc !important;         /* Gris argenté doux */
-    
-    /* 2. TAILLE INTELLIGENTE */
-    /* Sur mobile ça sera ~16px, sur PC ça montera doucement vers ~22px */
+    font-weight: 200 !important;       
+    letter-spacing: 2px !important;    
+    color: #cccccc !important;         
     font-size: clamp(1rem, 1.5vw, 1.4rem) !important; 
-    
-    /* 3. FINITION */
-    white-space: nowrap !important;    /* Jamais coupé en deux */
-    text-decoration: none !important;  /* On retire le trait moche par défaut */
-    
-    /* 4. LE SOULIGNEMENT ROUGE DISCRET */
+    white-space: nowrap !important;    
+    text-decoration: none !important;  
     border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
-    padding-bottom: 8px;               /* Espace entre texte et ligne */
-    
+    padding-bottom: 8px;               
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-/* EFFET AU SURVOL (Uniquement sur PC) */
 .contact-info a[href^="mailto:"]:hover {
-    color: #ffffff !important;         /* Devient blanc pur */
-    border-bottom-color: #D72725;      /* La ligne devient rouge vif */
-    transform: translateY(-2px);       /* Remonte très légèrement */
+    color: #ffffff !important;         
+    border-bottom-color: #D72725;      
+    transform: translateY(-2px);       
 }
 
 /* =========================================================
    GESTION LOGO (VISIBLE UNIQUEMENT EN HAUT)
    ========================================================= */
 
-/* Par défaut le logo a une transition */
+/* Par défaut le logo est visible */
 .logo {
     transition: all 0.4s ease-in-out;
     opacity: 1;
     transform: translateY(0);
 }
 
-/* Dès qu'on scrolle un peu (>50px), le logo disparaît définitivement */
+/* Dès qu'on quitte le haut de page, le logo part */
 body.not-at-top .logo {
     opacity: 0 !important;
-    pointer-events: none; /* On ne peut plus cliquer dessus */
-    transform: translateY(-20px); /* Il remonte un peu */
+    pointer-events: none;
+    transform: translateY(-20px);
 }
-
-
-
-
-
-
