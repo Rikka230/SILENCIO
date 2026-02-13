@@ -183,35 +183,30 @@ window.addEventListener('pageshow', function(event) {
         }, 50); 
     }
 });
-            // --- 1. SMART SCROLL (PC UNIQUEMENT) ---
+            // --- 1. GESTION SCROLL (LOGO & MENU) ---
             let lastScrollTop = 0;
-            let isAutoScrolling = false; // Nouvelle sécurité
-
+            
             window.addEventListener('scroll', function() {
-                // Sur mobile, on ne fait rien
-                if (window.innerWidth <= 1024) {
-                    document.body.classList.remove('scroll-down');
-                    return; 
-                }
-
-                // Si c'est un défilement automatique (clic), on ne cache PAS le menu
-                if (isAutoScrolling) return;
-
                 const currentScroll = window.scrollY;
                 
-                // Si on est tout en haut, on affiche
-                if (currentScroll <= 0) {
-                    document.body.classList.remove('scroll-down');
-                    return;
+                // A. GESTION DU LOGO (Disparaît dès qu'on quitte le haut)
+                // Si on dépasse 50px de scroll, on considère qu'on n'est plus en haut
+                if (currentScroll > 50) {
+                    document.body.classList.add('not-at-top');
+                } else {
+                    document.body.classList.remove('not-at-top');
                 }
 
-                // Logique standard : on descend = on cache, on monte = on affiche
-                if (currentScroll > lastScrollTop && currentScroll > 5) {
+                // B. GESTION DU MENU (Smart Scroll : Cache en bas, Affiche en haut)
+                // Note : On a retiré la sécurité Mobile pour que l'animation marche partout
+                if (currentScroll > lastScrollTop && currentScroll > 10) {
                     document.body.classList.add('scroll-down');
                 } else {
                     document.body.classList.remove('scroll-down');
                 }
-                lastScrollTop = currentScroll;
+                
+                // Sécurité pour ne pas avoir de valeurs négatives (rebond iOS)
+                lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
             });
 
             // --- 2. VARIABLES ---
@@ -300,6 +295,7 @@ window.addEventListener('pageshow', function(event) {
     </script>
 </body>
 </html>
+
 
 
 
