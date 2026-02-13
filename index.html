@@ -214,26 +214,29 @@
                 }
             });
 
-            // --- 1. SMART SCROLL & LOGO (MOBILE & PC) ---
+            // --- 1. GESTION DU SCROLL (LOGO + MENU) ---
             let lastScrollTop = 0;
             let isAutoScrolling = false; 
 
             window.addEventListener('scroll', function() {
-                // Si c'est un clic automatique, on ne fait rien
-                if (isAutoScrolling) return;
-
                 const currentScroll = window.scrollY;
                 
-                // A. GESTION DU LOGO (Disparaît dès qu'on n'est plus en haut)
-                // Valeur 50 = seuil de disparition
+                // A. LE LOGO (PRIORITÉ ABSOLUE)
+                // Cette partie s'exécute TOUJOURS, même lors d'un clic automatique.
+                // Dès qu'on dépasse 50px, on ajoute la classe qui cache le logo.
                 if (currentScroll > 50) {
                     document.body.classList.add('not-at-top');
                 } else {
                     document.body.classList.remove('not-at-top');
                 }
 
-                // B. GESTION DU MENU (Smart Scroll)
-                // Sécurité haut de page (rebond iOS)
+                // B. SÉCURITÉ CLIC (AUTO-SCROLL)
+                // C'est ICI qu'on arrête le script si c'est un clic.
+                // Le menu ne bougera pas (il restera affiché) tant que ça défile tout seul.
+                if (isAutoScrolling) return;
+
+                // C. SMART SCROLL DU MENU
+                // Sécurité rebond (haut de page)
                 if (currentScroll <= 0) {
                     document.body.classList.remove('scroll-down');
                     return;
@@ -250,7 +253,7 @@
                 lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
             });
 
-            // --- 2. VARIABLES GLOBALES ---
+            // --- 2. VARIABLES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
             const transitionOverlay = document.querySelector('.page-transition');
@@ -259,7 +262,6 @@
             function closeMenu() {
                 if(menuToggle) menuToggle.classList.remove('is-active');
                 if(navMenu) navMenu.classList.remove('active');
-                // Sécurité conteneur
                 const navContainer = document.querySelector('.nav-container'); 
                 if(navContainer) navContainer.classList.remove('active');
             }
@@ -273,36 +275,38 @@
                 }
             }
 
-            // --- 4. NAVIGATION & BURGER ---
+            // --- 4. MENU BURGER ---
             if(menuToggle) {
                 menuToggle.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Empêche le clic de traverser
+                    e.stopPropagation();
                     
                     this.classList.toggle('is-active');
                     if(navMenu) navMenu.classList.toggle('active');
                     
-                    // Gestion du Logo quand le menu est ouvert
-                    // Si le menu est ouvert, on force l'affichage du logo pour ne pas avoir un menu sans marque
+                    // Force l'affichage du logo quand le menu est ouvert sur mobile
                     const logo = document.querySelector('.logo');
                     if (this.classList.contains('is-active')) {
                         if(logo) logo.style.opacity = '1';
                     } else {
-                        // Si on ferme et qu'on n'est pas en haut, le CSS gérera la disparition
+                        // Si on referme, le CSS reprend le relais (caché si pas en haut)
                         if(logo) logo.style.opacity = ''; 
                     }
                 });
             }
 
-            // --- 5. GESTION DES CLICS ---
+            // --- 5. GESTION DES CLICS LIENS ---
             document.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
-                    if (!href || href.startsWith('mailto:') || href === '#' || this.target === '_blank') return;
+                    const target = this.getAttribute('target');
+
+                    if (!href || href.startsWith('mailto:') || href === '#') return;
+                    if (target === '_blank') return; 
 
                     e.preventDefault();
                     closeMenu();
 
-                    // SÉCURITÉ : On signale que c'est un clic pour ne pas cacher le menu pendant le scroll auto
+                    // ON ACTIVE LA SÉCURITÉ : "C'est un clic, touche pas au menu !"
                     isAutoScrolling = true;
 
                     if (href.includes('#')) {
@@ -311,16 +315,16 @@
 
                         if (targetElement) {
                             fadeToBlack(() => {
-                                // 1. On affiche le menu
+                                // 1. On s'assure que le menu est visible avant de partir
                                 document.body.classList.remove('scroll-down');
                                 
-                                // 2. On scroll
+                                // 2. On lance le scroll
                                 targetElement.scrollIntoView({ behavior: 'auto' });
                                 
                                 // 3. On enlève le noir
                                 transitionOverlay.classList.remove('active');
                                 
-                                // 4. On remet la détection scroll après 1 seconde
+                                // 4. On remet la détection normale après 1 seconde
                                 setTimeout(() => {
                                     lastScrollTop = window.scrollY;
                                     isAutoScrolling = false;
@@ -335,7 +339,7 @@
                 });
             });
 
-            // --- 6. ANIMATION BENTO & ÉQUIPE ---
+            // --- 6. ANIMATIONS ---
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
                     if (e.isIntersecting) e.target.classList.add('is-visible');
@@ -343,12 +347,12 @@
             }, { threshold: 0.1 });
             
             document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
-            // On observe aussi les cartes équipes pour l'effet d'apparition si besoin
             document.querySelectorAll('.team-card').forEach(i => observer.observe(i));
         });
     </script>
 </body>
 </html>
+
 
 
 
