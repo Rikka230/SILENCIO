@@ -1038,3 +1038,27 @@ body.not-at-top .logo {
     }
 }
 
+/* =========================================================
+   CORRECTIF BOUTON SON MOBILE (CENTRÉ)
+   ========================================================= */
+@media (max-width: 768px) {
+    .sound-btn {
+        /* 1. On annule l'alignement à droite */
+        right: auto !important;
+        
+        /* 2. On le centre parfaitement */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        
+        /* 3. On le remonte un peu pour ne pas gêner la barre de lecture YouTube */
+        bottom: 25px !important;
+        
+        /* 4. Ajustements visuels mobile */
+        width: auto !important;
+        white-space: nowrap !important;
+        padding: 8px 20px !important;
+        background: rgba(0, 0, 0, 0.7) !important; /* Fond un peu plus sombre pour la lisibilité */
+    }
+}
+
+
