@@ -951,3 +951,38 @@ body.not-at-top .logo {
         filter: grayscale(100%); /* On peut laisser 100% ou mettre 50% selon votre goût */
     }
 }
+
+/* =========================================================
+   CORRECTIF ÉQUIPE MOBILE (2 COLONNES / 2 LIGNES)
+   ========================================================= */
+@media (max-width: 768px) {
+    
+    .team-grid {
+        /* On force 2 colonnes au lieu d'une seule */
+        grid-template-columns: repeat(2, 1fr) !important; 
+        
+        /* On réduit l'espace entre les carrés pour gagner de la place */
+        gap: 10px !important; 
+        padding: 0 10px !important;
+        margin-top: 2rem !important;
+    }
+
+    /* On ajuste la taille du texte pour qu'il rentre dans les petits carrés */
+    .team-overlay {
+        padding: 0.8rem !important; /* Moins de marge interne */
+    }
+
+    .team-overlay h3 {
+        font-size: 0.85rem !important; /* Nom un peu plus petit */
+        margin-bottom: 0.2rem !important;
+        white-space: nowrap; /* Évite que le nom se coupe bêtement */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .team-overlay p {
+        font-size: 0.6rem !important; /* Rôle plus discret */
+        letter-spacing: 1px !important;
+    }
+}
+
