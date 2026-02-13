@@ -202,57 +202,66 @@
 
    <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // --- SÉCURITÉ ET ANIMATION D'OUVERTURE ---
-window.addEventListener('pageshow', function(event) {
-    const transitionOverlay = document.querySelector('.page-transition');
-    
-    if (transitionOverlay) {
-        // On s'assure que le rideau est là au départ
-        transitionOverlay.classList.add('active');
-        
-        // On lance l'effacement progressif (l'animation) après un micro-délai
-        setTimeout(() => {
-            transitionOverlay.classList.remove('active');
-        }, 50); 
-    }
-});
-            // --- 1. GESTION SCROLL (LOGO & MENU) ---
-            let lastScrollTop = 0;
             
+            // --- 0. SÉCURITÉ AU CHARGEMENT ---
+            window.addEventListener('pageshow', function(event) {
+                const transitionOverlay = document.querySelector('.page-transition');
+                if (transitionOverlay) {
+                    transitionOverlay.classList.add('active');
+                    setTimeout(() => {
+                        transitionOverlay.classList.remove('active');
+                    }, 50); 
+                }
+            });
+
+            // --- 1. GESTION SCROLL (LOGO & MENU SÉPARÉS) ---
+            let lastScrollTop = 0;
+            let isAutoScrolling = false; // La sécurité "Clic"
+
             window.addEventListener('scroll', function() {
+                // Sur mobile, on ne fait rien pour le menu (il est fixe)
+                if (window.innerWidth <= 1024) return;
+
+                // SI C'EST UN DÉFILEMENT AUTOMATIQUE (CLIC), ON ARRÊTE TOUT ICI
+                if (isAutoScrolling) return;
+
                 const currentScroll = window.scrollY;
                 
-                // A. GESTION DU LOGO (Disparaît dès qu'on quitte le haut)
-                // Si on dépasse 50px de scroll, on considère qu'on n'est plus en haut
+                // A. LE LOGO : Disparaît dès qu'on quitte le haut (>50px)
                 if (currentScroll > 50) {
                     document.body.classList.add('not-at-top');
                 } else {
                     document.body.classList.remove('not-at-top');
                 }
 
-                // B. GESTION DU MENU (Smart Scroll : Cache en bas, Affiche en haut)
-                // Note : On a retiré la sécurité Mobile pour que l'animation marche partout
+                // B. LE MENU : Smart Scroll (Caché en bas, Visible en haut)
+                // On empêche le déclenchement au rebond (haut de page)
+                if (currentScroll <= 0) {
+                    document.body.classList.remove('scroll-down');
+                    return;
+                }
+
+                // Logique : Si on descend ET qu'on n'est pas en haut
                 if (currentScroll > lastScrollTop && currentScroll > 10) {
                     document.body.classList.add('scroll-down');
                 } else {
                     document.body.classList.remove('scroll-down');
                 }
                 
-                // Sécurité pour ne pas avoir de valeurs négatives (rebond iOS)
                 lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
             });
 
-            // --- 2. VARIABLES ---
+
+            // --- 2. VARIABLES GLOBALES ---
             const menuToggle = document.querySelector('#mobile-menu');
             const navMenu = document.querySelector('.nav-menu');
             const transitionOverlay = document.querySelector('.page-transition');
             
-            // --- 3. FONCTIONS ---
+            // --- 3. FONCTIONS UTILES ---
             function closeMenu() {
                 if(menuToggle) menuToggle.classList.remove('is-active');
-                if(navMenu) navMenu.classList.remove('active'); // Corrige le sélecteur JS
-                // Note: votre JS précédent ciblait .nav-menu mais le CSS mobile utilisait .nav-container parfois.
-                // Ici on garde la logique propre.
+                if(navMenu) navMenu.classList.remove('active');
+                // Sécurité Mobile
                 const navContainer = document.querySelector('.nav-container'); 
                 if(navContainer && window.innerWidth <= 1024) navContainer.classList.remove('active');
             }
@@ -272,41 +281,47 @@ window.addEventListener('pageshow', function(event) {
                     e.stopPropagation();
                     this.classList.toggle('is-active');
                     navMenu.classList.toggle('active');
-                    
-                    // Petit fix pour le conteneur parent sur mobile si besoin
-                    const navContainer = document.querySelector('.nav-container');
-                    if(navContainer) navContainer.classList.toggle('active');
                 });
             }
 
-            // --- 5. TRANSITIONS & CLICS (CORRIGÉ POUR LE MENU FIXE) ---
+            // --- 5. GESTION DES CLICS (CORRECTIF MENU DISPARU) ---
             document.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
-                    if (!href || href.startsWith('mailto:') || href === '#' || this.target === '_blank') return;
+                    const target = this.getAttribute('target');
+
+                    if (!href || href.startsWith('mailto:') || href === '#') return;
+                    if (target === '_blank') return; 
 
                     e.preventDefault();
                     closeMenu();
 
-                    // ON ACTIVE LA SÉCURITÉ : "C'est un clic, pas un scroll manuel"
+                    // *** C'EST ICI QUE LA MAGIE OPÈRE ***
+                    // On active la sécurité : "C'est un clic, touche pas au menu !"
                     isAutoScrolling = true;
 
                     if (href.includes('#')) {
                         const targetId = href.split('#')[1];
                         const targetElement = document.getElementById(targetId);
+
                         if (targetElement) {
                             fadeToBlack(() => {
-                                targetElement.scrollIntoView({ behavior: 'auto' });
-                                transitionOverlay.classList.remove('active');
-                                
-                                // ICI : On force le menu à réapparaître immédiatement
+                                // 1. On force le menu à être visible AVANT de scroller
                                 document.body.classList.remove('scroll-down');
                                 
-                                // On réinitialise la position connue pour éviter un bug au prochain scroll
+                                // 2. On scrolle
+                                targetElement.scrollIntoView({ behavior: 'auto' });
+                                
+                                // 3. On enlève le rideau noir
+                                transitionOverlay.classList.remove('active');
+                                
+                                // 4. On met à jour la position connue pour ne pas piéger le script
+                                lastScrollTop = window.scrollY;
+                                
+                                // 5. On attend un peu (800ms) avant de réautoriser le menu à se cacher
                                 setTimeout(() => {
-                                    lastScrollTop = window.scrollY;
-                                    isAutoScrolling = false; // On libère la sécurité
-                                }, 100);
+                                    isAutoScrolling = false;
+                                }, 800);
                             });
                         } else {
                             fadeToBlack(() => { window.location.href = href; });
@@ -317,17 +332,21 @@ window.addEventListener('pageshow', function(event) {
                 });
             });
 
-            // --- 6. ANIMATION BENTO ---
+            // --- 6. ANIMATION BENTO & ÉQUIPE ---
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
                     if (e.isIntersecting) e.target.classList.add('is-visible');
                 });
             }, { threshold: 0.1 });
+            
             document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
+            // On ajoute aussi les cartes équipe si vous les avez ajoutées
+            document.querySelectorAll('.team-card').forEach(i => observer.observe(i));
         });
     </script>
 </body>
 </html>
+
 
 
 
