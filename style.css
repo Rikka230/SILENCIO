@@ -897,6 +897,25 @@ body.scroll-down .menu-toggle {
     transform: translateY(-2px);       /* Remonte très légèrement */
 }
 
+/* =========================================================
+   GESTION LOGO (VISIBLE UNIQUEMENT EN HAUT)
+   ========================================================= */
+
+/* Par défaut le logo a une transition */
+.logo {
+    transition: all 0.4s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Dès qu'on scrolle un peu (>50px), le logo disparaît définitivement */
+body.not-at-top .logo {
+    opacity: 0 !important;
+    pointer-events: none; /* On ne peut plus cliquer dessus */
+    transform: translateY(-20px); /* Il remonte un peu */
+}
+
+
 
 
 
