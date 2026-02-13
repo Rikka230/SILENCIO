@@ -69,19 +69,19 @@
         <h3 class="video-label">Bande Annonce</h3>
         
         <div class="video-wrapper">
-            <div id="youtube-player"></div>
-
-            <button id="sound-toggle" class="sound-btn">
-                <span class="sound-icon">🔇</span>
-                <span class="sound-text">ACTIVER LE SON</span>
-            </button>
+            <iframe 
+                src="https://www.youtube.com/embed/tr4Uk7WaBKo?si=nW7EyuBXIGDrx-Nc&controls=1" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
         </div>
     </section>
 
     <footer style="text-align: center; padding: 2rem; border-top: 1px solid #222;">
         <p style="font-size: 0.8rem; color: #666;">© 2026 Silencio Pictures. Powered by NOCX WEB. All rights reserved.</p>
     </footer>
-<script src="https://www.youtube.com/iframe_api"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // --- SÉCURITÉ ET ANIMATION D'OUVERTURE ---
@@ -159,56 +159,11 @@ window.addEventListener('pageshow', function(event) {
                 });
             });
         });
-
-        var player;
-        
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
-                height: '100%',
-                width: '100%',
-                videoId: 'tr4Uk7WaBKo', // <--- REMPLACEZ L'ID ICI SI BESOIN
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 1, // On garde les contrôles normaux au cas où
-                    'rel': 0,
-                    'showinfo': 0,
-                    'mute': 1,     // Muet au démarrage (obligatoire pour autoplay)
-                    'loop': 1,
-                    'playlist': 'tr4Uk7WaBKo' // Nécessaire pour le loop
-                },
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            const soundBtn = document.getElementById('sound-toggle');
-            const icon = soundBtn.querySelector('.sound-icon');
-            const text = soundBtn.querySelector('.sound-text');
-            
-            // La vidéo se lance
-            event.target.playVideo();
-
-            // Gestion du Clic sur le bouton
-            soundBtn.addEventListener('click', function() {
-                if (player.isMuted()) {
-                    player.unMute();
-                    player.setVolume(100); // Son à fond
-                    icon.textContent = '🔊';
-                    text.textContent = 'COUPER LE SON';
-                    soundBtn.style.borderColor = 'var(--color-accent)'; // Bordure rouge active
-                } else {
-                    player.mute();
-                    icon.textContent = '🔇';
-                    text.textContent = 'ACTIVER LE SON';
-                    soundBtn.style.borderColor = 'rgba(255,255,255,0.3)';
-                }
-            });
         }
     </script>
 </body>
 </html>
+
 
 
 
