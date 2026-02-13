@@ -834,3 +834,23 @@ body.not-at-top .logo {
     pointer-events: none;
     transform: translateY(-20px);
 }
+
+/* =========================================================
+   CORRECTIF TAILLE NOM CONTACT (MOBILE)
+   ========================================================= */
+@media (max-width: 768px) {
+    
+    /* On cible le premier paragraphe de contact (Le Nom) */
+    .contact-info p:first-child {
+        /* On le passe à 1rem (16px) pour qu'il soit plus petit que le titre (1.1rem) */
+        font-size: 1rem !important; 
+        line-height: 1.4 !important;
+        margin-bottom: 0.2rem !important; /* On réduit aussi l'espace sous le nom */
+    }
+    
+    /* On ajuste aussi l'espace global de la section contact sur mobile */
+    .contact-info {
+        padding-top: 1rem !important;
+    }
+}
+
