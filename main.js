@@ -3,18 +3,22 @@
 // =========================================
 
 // 1. IMPORTATION FIREBASE (BaaS)
-// Remplace la configuration par celle que Firebase te donnera à la création du projet
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "TON_API_KEY",
-    authDomain: "silencio-pictures.firebaseapp.com",
-    projectId: "silencio-pictures",
-    storageBucket: "silencio-pictures.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:12345:web:67890"
+  apiKey: "AIzaSyDQVsBz82xBBLTdV12yrDiGFwqATttZ71I",
+  authDomain: "silencio-6f751.firebaseapp.com",
+  projectId: "silencio-6f751",
+  storageBucket: "silencio-6f751.firebasestorage.app",
+  messagingSenderId: "573153999359",
+  appId: "1:573153999359:web:4d650208a06b9fa8280fca",
+  measurementId: "G-2BVN0T02GF"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -110,5 +114,87 @@ function renderProject(data) {
 // =========================================
 function initAdmin() {
     console.log("Espace Admin initialisé.");
-    // C'est ici que l'on va coder le Drag & Drop et l'upload d'images
+    setupDropzone();
+}
+
+function setupDropzone() {
+    const dropzone = document.getElementById('image-dropzone');
+    const fileInput = document.getElementById('proj-image');
+    const imagePreview = document.getElementById('image-preview');
+    const dropText = dropzone.querySelector('.drop-text');
+
+    if (!dropzone) return;
+
+    // Empêcher le navigateur d'ouvrir l'image sur une nouvelle page
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault(); e.stopPropagation();
+    }
+
+    // Effets visuels au survol (Feedback UX)
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+    });
+
+    // Gestion du clic et du glisser-déposer
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+    fileInput.addEventListener('change', function() {
+        if (this.files.length) handleFile(this.files[0]);
+    });
+
+    // Moteur d'optimisation
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            UI.showToast("Format invalide. Veuillez uploader une image.", "error");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            
+            img.onload = () => {
+                // Création du Canvas pour redimensionner
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1920;
+                let width = img.width;
+                let height = img.height;
+
+                // Calcul du ratio si l'image est trop grande
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Conversion en format WebP (Qualité 80%)
+                canvas.toBlob((blob) => {
+                    optimizedImageBlob = blob; // On stocke le blob pour l'envoyer à Firebase plus tard
+                    
+                    // Création d'une URL locale pour afficher la miniature instantanément
+                    const compressedUrl = URL.createObjectURL(blob);
+                    imagePreview.src = compressedUrl;
+                    imagePreview.classList.remove('hidden');
+                    dropText.style.display = 'none'; // On cache le texte de la dropzone
+                    
+                    UI.showToast("Image compressée et optimisée !");
+                }, 'image/webp', 0.8);
+            };
+        };
+    }
 }
