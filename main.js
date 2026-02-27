@@ -152,7 +152,12 @@ function renderProject(data) {
     // Injection des nouvelles données
     document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>'); // Garde les sauts de ligne
     document.getElementById('dyn-realisateur').textContent = data.realisateur || '-';
-    document.getElementById('dyn-casting').textContent = data.casting || '-';
+    const castingCible = document.getElementById('dyn-casting');
+    if (data.casting) {
+        castingCible.innerHTML = data.casting.split(',').map(nom => nom.trim()).join('<br>');
+    } else {
+        castingCible.textContent = '-';
+    }
     document.getElementById('dyn-genre').textContent = data.genre || '-';
     document.getElementById('dyn-annee').textContent = data.annee || '-';
 
@@ -568,6 +573,7 @@ async function saveNewOrder() {
         document.body.style.cursor = 'default';
     }
 }
+
 
 
 
