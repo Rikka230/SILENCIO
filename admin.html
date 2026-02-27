@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silencio - Administration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <div id="toast" class="toast hidden">Mise à jour réussie.</div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">SILENCIO <span>ADMIN</span></div>
+            <nav>
+                <a href="#projets" class="active">Gestion des Projets</a>
+                <a href="#accueil">Vidéo d'Accueil</a>
+                <a href="#equipe">L'Équipe</a>
+            </nav>
+            <a href="index.html" class="logout-btn">← Retour au site</a>
+        </aside>
+
+        <main class="admin-content">
+            <header class="content-header">
+                <h1>Projets en Production</h1>
+                <button id="btn-add-new" class="btn-primary">+ Nouveau Projet</button>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <section class="panel list-panel">
+                    <h2>Projets existants</h2>
+                    <p class="help-text">Glissez-déposez pour réorganiser l'ordre d'affichage sur l'accueil.</p>
+                    
+                    <ul id="project-list" class="sortable-list">
+                        <li class="sortable-item" data-id="1">
+                            <div class="drag-handle">☰</div>
+                            <img src="image/F1.jpg" class="item-thumb" alt="Miniature">
+                            <div class="item-info">
+                                <strong>Tales of Taipei</strong>
+                                <span>En post-production</span>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-icon edit" title="Modifier">✎</button>
+                                <button class="btn-icon delete" title="Supprimer">✕</button>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="panel form-panel">
+                    <h2 id="form-title">Ajouter un projet</h2>
+                    
+                    <form id="project-form">
+                        <div class="form-group">
+                            <label>Titre du projet</label>
+                            <input type="text" id="proj-title" placeholder="Ex: Neon Nights" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Statut / Sous-titre</label>
+                            <input type="text" id="proj-subtitle" placeholder="Ex: Court-métrage" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Affiche (Image Principale)</label>
+                            <div id="image-dropzone" class="dropzone">
+                                <span class="drop-text">Glissez une image ici ou cliquez pour parcourir</span>
+                                <input type="file" id="proj-image" accept="image/jpeg, image/png, image/webp" hidden>
+                                <img id="image-preview" class="hidden" alt="Aperçu">
+                            </div>
+                            <p class="help-text">Sera auto-optimisée (1920px max, WebP/JPEG compressé).</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Lien Vidéo YouTube (Trailer)</label>
+                            <input type="url" id="proj-video" placeholder="https://www.youtube.com/embed/...">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary">Annuler</button>
+                            <button type="submit" id="btn-save" class="btn-primary">Enregistrer le projet</button>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>
