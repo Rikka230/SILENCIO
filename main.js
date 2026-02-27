@@ -116,6 +116,7 @@ function initAdmin() {
             loginOverlay.classList.add('hidden');
             setupDropzone();
             setupProjectForm();
+            loadAdminProjects();
         } else {
             // Déconnecté : on s'assure que le rideau est là, ET on affiche la boîte de connexion
             loginOverlay.classList.remove('hidden');
@@ -293,6 +294,7 @@ function setupProjectForm() {
             optimizedImageBlob = null; 
 
             UI.showToast("Projet publié avec succès !");
+            loadAdminProjects()
 
         } catch (error) {
             console.error("Erreur lors de l'enregistrement :", error);
@@ -302,5 +304,67 @@ function setupProjectForm() {
             btnSave.disabled = false;
         }
     });
+}
+
+// =========================================
+// 9. CHARGEMENT DES PROJETS DANS L'ADMIN
+// =========================================
+async function loadAdminProjects() {
+    const projectList = document.getElementById('project-list');
+    if (!projectList) return;
+
+    try {
+        // On récupère tous les projets depuis Firestore
+        const querySnapshot = await getDocs(collection(db, "projects"));
+        let projects = [];
+        
+        querySnapshot.forEach((doc) => {
+            projects.push({ id: doc.id, ...doc.data() });
+        });
+
+        // On trie par ordre d'affichage (le plus récent en premier par défaut)
+        projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
+
+        // On vide la liste HTML (adieu le faux "Tales of Taipei")
+        projectList.innerHTML = '';
+
+        // On génère le code HTML pour chaque vrai projet
+        projects.forEach(project => {
+            const li = document.createElement('li');
+            li.className = 'sortable-item';
+            li.dataset.id = project.id;
+            
+            li.innerHTML = `
+                <div class="drag-handle">☰</div>
+                <img src="${project.imageAffiche}" class="item-thumb" alt="Miniature">
+                <div class="item-info">
+                    <strong>${project.titre}</strong>
+                    <span>${project.statut}</span>
+                </div>
+                <div class="item-actions">
+                    <button class="btn-icon delete" title="Supprimer">✕</button>
+                </div>
+            `;
+
+            // On ajoute l'action de suppression (Anti-frustration avec confirmation)
+            const deleteBtn = li.querySelector('.delete');
+            deleteBtn.addEventListener('click', async () => {
+                if(confirm(`Es-tu sûr de vouloir supprimer définitivement "${project.titre}" ?`)) {
+                    try {
+                        await deleteDoc(doc(db, "projects", project.id));
+                        UI.showToast("Projet supprimé !");
+                        loadAdminProjects(); // On rafraîchit la liste instantanément
+                    } catch (error) {
+                        UI.showToast("Erreur lors de la suppression.", "error");
+                    }
+                }
+            });
+
+            projectList.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error("Erreur lors du chargement des projets :", error);
+    }
 }
 
