@@ -430,5 +430,85 @@ async function loadAdminProjects() {
     }
 }
 
+// =========================================
+// 10. DRAG & DROP (Réorganisation visuelle et sauvegarde)
+// =========================================
+function setupDragAndDrop() {
+    const list = document.getElementById('project-list');
+    const items = list.querySelectorAll('.sortable-item');
+
+    items.forEach(item => {
+        const handle = item.querySelector('.drag-handle');
+
+        // On ne rend la ligne "glissable" que si on attrape la poignée (évite les bugs en cliquant sur le texte)
+        handle.addEventListener('mousedown', () => item.setAttribute('draggable', 'true'));
+        handle.addEventListener('mouseleave', () => item.removeAttribute('draggable'));
+        handle.addEventListener('mouseup', () => item.removeAttribute('draggable'));
+
+        // Début du glissement
+        item.addEventListener('dragstart', (e) => {
+            setTimeout(() => item.classList.add('dragging'), 0);
+        });
+
+        // Fin du glissement
+        item.addEventListener('dragend', async () => {
+            item.classList.remove('dragging');
+            item.removeAttribute('draggable');
+            
+            // Une fois relâché, on sauvegarde le nouvel ordre dans Firebase
+            await saveNewOrder();
+        });
+    });
+
+    // Gestion du survol pendant le glissement (déplace les éléments visuellement)
+    list.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Nécessaire pour autoriser le "drop"
+        const draggingItem = document.querySelector('.dragging');
+        if (!draggingItem) return;
+
+        const siblings = [...list.querySelectorAll('.sortable-item:not(.dragging)')];
+
+        // Trouve l'élément juste en dessous de la souris
+        let nextSibling = siblings.find(sibling => {
+            return e.clientY <= sibling.getBoundingClientRect().top + sibling.offsetHeight / 2;
+        });
+
+        // Insère l'élément glissé avant le suivant
+        list.insertBefore(draggingItem, nextSibling);
+    });
+}
+
+// Fonction pour sauvegarder le nouvel ordre dans la base de données
+async function saveNewOrder() {
+    const items = document.querySelectorAll('.sortable-item');
+    
+    // On change silencieusement le curseur et on affiche un petit message
+    document.body.style.cursor = 'wait';
+    
+    try {
+        const promises = [];
+        
+        // On boucle sur chaque élément selon son nouvel ordre visuel
+        items.forEach((item, index) => {
+            const id = item.dataset.id;
+            // On calcule un nouveau poids : le 1er de la liste a le chiffre le plus haut
+            const newOrder = Date.now() - (index * 1000); 
+            
+            const docRef = doc(db, "projects", id);
+            promises.push(updateDoc(docRef, { ordreAffichage: newOrder }));
+        });
+
+        // On attend que toutes les mises à jour soient terminées
+        await Promise.all(promises);
+        UI.showToast("Ordre d'affichage sauvegardé !");
+        
+    } catch (error) {
+        console.error("Erreur de tri :", error);
+        UI.showToast("Erreur lors de la sauvegarde de l'ordre.", "error");
+    } finally {
+        document.body.style.cursor = 'default';
+    }
+}
+
 
 
