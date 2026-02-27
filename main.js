@@ -2,13 +2,11 @@
 // SILENCIO PICTURES - MAIN JS (ES6 MODULES)
 // =========================================
 
-// 1. IMPORTATION FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-// Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDQVsBz82xBBLTdV12yrDiGFwqATttZ71I",
     authDomain: "silencio-6f751.firebaseapp.com",
@@ -27,7 +25,6 @@ let optimizedImageBlob = null;
 let currentEditId = null;
 let currentEditImageUrl = null;
 
-// 2. UTILITAIRES UX
 const UI = {
     showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
@@ -39,7 +36,6 @@ const UI = {
     }
 };
 
-// 3. ROUTEUR INTELLIGENT
 const path = window.location.pathname.toLowerCase();
 
 if (path.includes('admin')) {
@@ -76,7 +72,8 @@ async function initHomePage(){
 
         projects.forEach((project) => {
             const extraClass = project.formatAffichage || '';
-            const focus = project.imageFocus || 'center';
+            // On utilise le focus spécifique Bento, ou l'ancien focus global, ou center par défaut
+            const focus = project.imageFocusBento || project.imageFocus || 'center';
 
             const a = document.createElement('a');
             a.href = `projet.html?id=${project.id}`; 
@@ -116,7 +113,7 @@ async function initProjectPage() {
         if (docSnap.exists()) renderProject(docSnap.data());
         else window.location.href = 'index.html';
     } catch (error) {
-        console.error("Erreur de chargement du projet :", error);
+        console.error("Erreur :", error);
     }
 }
 
@@ -127,24 +124,20 @@ function renderProject(data) {
     const heroImage = document.querySelector('.project-hero img');
     heroImage.src = data.imageAffiche;
     heroImage.alt = `Affiche du film ${data.titre}`;
-    heroImage.style.objectPosition = data.imageFocus || 'center';
+    // Focus spécifique à l'en-tête (Header)
+    heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || 'center';
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
 
     const shortSynopsis = data.synopsis ? data.synopsis.substring(0, 150) + '...' : `Découvrez ${data.titre}.`;
-    
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', shortSynopsis);
-
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) ogTitle.setAttribute('content', data.titre);
-
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', shortSynopsis);
-
     const twTitle = document.querySelector('meta[name="twitter:title"]');
     if (twTitle) twTitle.setAttribute('content', data.titre);
-
     const twDesc = document.querySelector('meta[name="twitter:description"]');
     if (twDesc) twDesc.setAttribute('content', shortSynopsis);
 
@@ -198,20 +191,17 @@ function initAdmin() {
             const password = document.getElementById('admin-password').value;
             const btn = loginForm.querySelector('button');
 
-            btn.textContent = "Vérification...";
-            btn.disabled = true;
+            btn.textContent = "Vérification..."; btn.disabled = true;
 
             signInWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     loginError.classList.add('hidden');
                     UI.showToast("Connexion réussie");
-                    btn.textContent = "Connexion";
-                    btn.disabled = false;
+                    btn.textContent = "Connexion"; btn.disabled = false;
                 })
                 .catch((error) => {
                     loginError.classList.remove('hidden');
-                    btn.textContent = "Connexion";
-                    btn.disabled = false;
+                    btn.textContent = "Connexion"; btn.disabled = false;
                 });
         });
     }
@@ -224,10 +214,20 @@ function initAdmin() {
         });
     }
 
+    // GESTION DU BOUTON "+ NOUVEAU"
+    const btnAddNew = document.getElementById('btn-add-new');
+    if (btnAddNew) {
+        btnAddNew.addEventListener('click', () => {
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-form').classList.remove('hidden');
+            btnAddNew.style.display = 'none'; // On cache le bouton
+            resetProjectForm();
+        });
+    }
+
     const navLinks = document.querySelectorAll('.admin-sidebar nav a');
     const allPanels = document.querySelectorAll('[data-tab]');
     const mainTitle = document.querySelector('.content-header h1');
-    const btnAddNew = document.getElementById('btn-add-new');
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -239,12 +239,15 @@ function initAdmin() {
             link.classList.add('active');
 
             allPanels.forEach(panel => panel.classList.add('hidden'));
-            document.querySelectorAll(`[data-tab="${target}"]`).forEach(p => p.classList.remove('hidden'));
-
+            
+            // Si on clique sur Projets, on remet l'affichage de base (Liste seule)
             if (target === 'projets') {
                 mainTitle.textContent = "Projets en Production";
+                document.getElementById('view-list').classList.remove('hidden');
+                document.getElementById('view-form').classList.add('hidden');
                 if (btnAddNew) btnAddNew.style.display = 'block';
             } else if (target === 'accueil') {
+                document.getElementById('panel-accueil').classList.remove('hidden');
                 mainTitle.textContent = "Vidéo d'Accueil";
                 if (btnAddNew) btnAddNew.style.display = 'none';
             } else if (target === 'equipe') {
@@ -256,7 +259,7 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR D'OPTIMISATION ET VISUALISATION DIVISÉE
+// 7. MOTEUR DE VISUALISATION DOUBLE CADRAGE
 // =========================================
 function syncBentoDA() {
     const daContainer = document.getElementById('image-da-container');
@@ -268,7 +271,8 @@ function syncBentoDA() {
     const blocWrapper = document.getElementById('da-bloc-wrapper');
 
     const formatSelect = document.getElementById('proj-format');
-    const focusSelect = document.getElementById('proj-focus');
+    const focusSelectBento = document.getElementById('proj-focus-bento');
+    const focusSelectHeader = document.getElementById('proj-focus-header');
 
     if (!daContainer || !previewsGroup || !previewBloc) return;
 
@@ -278,14 +282,14 @@ function syncBentoDA() {
         blocWrapper.className = '';
         if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
 
-        if (focusSelect) {
-            previewBloc.style.objectPosition = focusSelect.value;
-            if(previewCadrage) previewCadrage.style.objectPosition = focusSelect.value;
-        }
+        // Application des DEUX focus distincts
+        if (focusSelectBento) previewBloc.style.objectPosition = focusSelectBento.value;
+        if (focusSelectHeader && previewCadrage) previewCadrage.style.objectPosition = focusSelectHeader.value;
     }
 
     if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
-    if (focusSelect) focusSelect.addEventListener('change', updateLiveView);
+    if (focusSelectBento) focusSelectBento.addEventListener('change', updateLiveView);
+    if (focusSelectHeader) focusSelectHeader.addEventListener('change', updateLiveView);
 
     const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
 
@@ -351,8 +355,16 @@ function setupDropzone() {
 }
 
 // =========================================
-// 8. ENREGISTREMENT ET NETTOYAGE
+// 8. ENREGISTREMENT ET INTERFACE FORMAULAIRE
 // =========================================
+function returnToListView() {
+    document.getElementById('view-list').classList.remove('hidden');
+    document.getElementById('view-form').classList.add('hidden');
+    const btnAddNew = document.getElementById('btn-add-new');
+    if (btnAddNew) btnAddNew.style.display = 'block';
+    resetProjectForm();
+}
+
 function resetProjectForm() {
     const form = document.getElementById('project-form');
     if(!form) return;
@@ -377,7 +389,7 @@ function setupProjectForm() {
     const btnCancel = form ? form.querySelector('.btn-secondary') : null;
     if (!form) return;
 
-    if (btnCancel) btnCancel.addEventListener('click', resetProjectForm);
+    if (btnCancel) btnCancel.addEventListener('click', returnToListView);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -394,7 +406,8 @@ function setupProjectForm() {
             casting: document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '',
             synopsis: document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '',
             formatAffichage: document.getElementById('proj-format') ? document.getElementById('proj-format').value : '',
-            imageFocus: document.getElementById('proj-focus') ? document.getElementById('proj-focus').value : 'center'
+            imageFocusBento: document.getElementById('proj-focus-bento') ? document.getElementById('proj-focus-bento').value : 'center',
+            imageFocusHeader: document.getElementById('proj-focus-header') ? document.getElementById('proj-focus-header').value : 'center'
         };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
@@ -421,7 +434,7 @@ function setupProjectForm() {
             }
 
             loadAdminProjects();
-            resetProjectForm();
+            returnToListView(); // On retourne sur la liste auto !
 
         } catch (error) { UI.showToast("Erreur d'enregistrement.", "error"); console.error(error);} finally { btnSave.disabled = false; }
     });
@@ -446,9 +459,11 @@ async function loadAdminProjects() {
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
 
             const imageSource = project.imageAffiche;
+            const focus = project.imageFocusBento || project.imageFocus || 'center';
+            
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                ${imageSource ? `<img src="${imageSource}" class="item-thumb" style="object-position: ${project.imageFocus || 'center'}; object-fit: cover;">` : `<div class="item-thumb placeholder-thumb" style="background:#222; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">IMG</div>`}
+                ${imageSource ? `<img src="${imageSource}" class="item-thumb" style="object-position: ${focus}; object-fit: cover;">` : `<div class="item-thumb placeholder-thumb" style="background:#222; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">IMG</div>`}
                 <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
@@ -462,6 +477,12 @@ async function loadAdminProjects() {
             li.querySelector('.edit').addEventListener('click', () => {
                 resetProjectForm();
 
+                // On bascule la vue vers le formulaire
+                document.getElementById('view-list').classList.add('hidden');
+                document.getElementById('view-form').classList.remove('hidden');
+                const btnAddNew = document.getElementById('btn-add-new');
+                if (btnAddNew) btnAddNew.style.display = 'none';
+
                 document.getElementById('proj-title').value = project.titre || '';
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
@@ -472,7 +493,8 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
 
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
-                if(document.getElementById('proj-focus')) document.getElementById('proj-focus').value = project.imageFocus || 'center';
+                if(document.getElementById('proj-focus-bento')) document.getElementById('proj-focus-bento').value = project.imageFocusBento || project.imageFocus || 'center';
+                if(document.getElementById('proj-focus-header')) document.getElementById('proj-focus-header').value = project.imageFocusHeader || project.imageFocus || 'center';
 
                 const previewBloc = document.getElementById('image-preview-bloc');
                 const previewCadrage = document.getElementById('image-preview-cadrage');
