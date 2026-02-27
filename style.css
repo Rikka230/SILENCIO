@@ -991,22 +991,30 @@ body.not-at-top .logo {
    ========================================================= */
 .bento-item img, 
 .project-hero img {
-    position: absolute; /* Cloue l'image pour empêcher tout saut de mise en page */
+    position: absolute !important; 
     top: 0; 
     left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover !important; /* Force le remplissage sans déformation */
-    object-position: center;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; 
+    object-position: center !important;
     display: block;
+    opacity: 0; /* On cache l'image par défaut */
 }
 
-/* On s'assure que les boîtes parentes gardent l'image à l'intérieur */
+/* Le fond noir qui tient la place pendant le chargement */
 .bento-item, .project-hero {
-    position: relative;
-    overflow: hidden;
-    background-color: #050505; /* Fond noir très profond en attendant l'image */
+    position: relative !important;
+    overflow: hidden !important;
+    background-color: #050505 !important;
 }
+
+/* Révélation en douceur une fois chargée */
+.bento-item img {
+    opacity: 0.8; /* Opacité normale de ta grille */
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 
 
 
