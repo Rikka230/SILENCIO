@@ -273,6 +273,42 @@ function initAdmin() {
             });
         });
     }
+
+    // 4. GESTION DES ONGLETS (MENU LATÉRAL)
+    const navLinks = document.querySelectorAll('.admin-sidebar nav a');
+    const allPanels = document.querySelectorAll('[data-tab]');
+    const mainTitle = document.querySelector('.content-header h1');
+    const btnAddNew = document.getElementById('btn-add-new');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const target = link.getAttribute('href').replace('#', ''); 
+            if (!target || target.startsWith('http')) return;
+            e.preventDefault();
+
+            // 1. Changer l'état visuel du menu (Le trait rouge)
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            // 2. Cacher tous les panneaux de l'écran
+            allPanels.forEach(panel => panel.classList.add('hidden'));
+
+            // 3. Afficher uniquement les panneaux de l'onglet cliqué
+            document.querySelectorAll(`[data-tab="${target}"]`).forEach(p => p.classList.remove('hidden'));
+
+            // 4. Adapter le titre de la page et le bouton "+ Nouveau"
+            if (target === 'projets') {
+                mainTitle.textContent = "Projets en Production";
+                if (btnAddNew) btnAddNew.style.display = 'block';
+            } else if (target === 'accueil') {
+                mainTitle.textContent = "Vidéo d'Accueil";
+                if (btnAddNew) btnAddNew.style.display = 'none'; // On cache le bouton sur cet onglet
+            } else if (target === 'equipe') {
+                mainTitle.textContent = "L'Équipe";
+                if (btnAddNew) btnAddNew.style.display = 'block';
+            }
+        });
+    });
 }
 
 // =========================================
@@ -677,6 +713,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
