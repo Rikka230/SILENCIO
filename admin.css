@@ -182,4 +182,13 @@ input:focus { outline: none; border-color: var(--color-accent); }
     display: none !important; 
 }
 
+/* --- ÉTAT DRAG & DROP --- */
+.sortable-item.dragging {
+    opacity: 0.6;
+    background: rgba(215, 39, 37, 0.1);
+    border-style: dashed;
+    border-color: var(--color-accent);
+}
+
+
 
