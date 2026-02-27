@@ -124,14 +124,17 @@
                             <label>Synopsis</label>
                             <textarea id="proj-synopsis" rows="5" placeholder="Résumé du film..." style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                         </div>
-                        ```
 
-### Étape 2 : Préparer la page Film (`projet.html`)
-On va vider le faux texte de ta page de détail et préparer le terrain pour que Javascript puisse y injecter les vraies infos.
+                        <div class="form-group">
+                            <label>Lien Vidéo YouTube (Trailer)</label>
+                            <input type="url" id="proj-video" placeholder="[https://www.youtube.com/embed/](https://www.youtube.com/embed/)...">
+                        </div>
 
-Ouvre `projet.html` et remplace entièrement tes deux sections `<section class="project-content">` et `<section class="full-width-video">` par ceci :
-
-```html
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary">Annuler</button>
+                            <button type="submit" id="btn-save" class="btn-primary">Enregistrer le projet</button>
+                        </div>
+                    </form>
     <section class="project-content auto-height-section">
         
         <div class="synopsis">
@@ -186,6 +189,7 @@ Ouvre `projet.html` et remplace entièrement tes deux sections `<section class="
 </body>
 
 </html>
+
 
 
 
