@@ -3,8 +3,10 @@
 // =========================================
 
 // 1. IMPORTATION FIREBASE (BaaS)
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDQVsBz82xBBLTdV12yrDiGFwqATttZ71I",
@@ -19,9 +21,9 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
 
 // 2. UTILITAIRES UX (Micro-interactions)
 const UI = {
@@ -114,7 +116,59 @@ function renderProject(data) {
 // =========================================
 function initAdmin() {
     console.log("Espace Admin initialisé.");
-    setupDropzone();
+    
+    const loginOverlay = document.getElementById('login-overlay');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+
+    // 1. Écouteur de l'état de connexion (Le Videur)
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Le client est connecté : on lève le rideau
+            loginOverlay.classList.add('hidden');
+            setupDropzone(); // On lance la suite du script seulement maintenant
+        } else {
+            // Pas connecté : on affiche le formulaire de login
+            loginOverlay.classList.remove('hidden');
+        }
+    });
+
+    // 2. Traitement de la tentative de connexion
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const btn = loginForm.querySelector('button');
+
+            btn.textContent = "Vérification...";
+            btn.disabled = true;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    loginError.classList.add('hidden');
+                    UI.showToast("Connexion réussie");
+                    btn.textContent = "Connexion";
+                    btn.disabled = false;
+                })
+                .catch((error) => {
+                    loginError.classList.remove('hidden');
+                    btn.textContent = "Connexion";
+                    btn.disabled = false;
+                });
+        });
+    }
+
+    // 3. Bouton Déconnexion
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => {
+                window.location.href = 'index.html'; // Retour à l'accueil
+            });
+        });
+    }
 }
 
 function setupDropzone() {
@@ -198,3 +252,4 @@ function setupDropzone() {
         };
     }
 }
+
