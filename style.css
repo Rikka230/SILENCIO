@@ -986,6 +986,24 @@ body.not-at-top .logo {
     }
 }
 
+/* =========================================================
+   CORRECTION ANTI-STRETCH (IMAGES DYNAMIQUES)
+   ========================================================= */
+.bento-item img, 
+.project-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Empêche toute déformation */
+    object-position: center; /* Garde toujours le centre de l'image visible */
+    display: block;
+}
+
+/* Petite sécurité pour que l'image du Hero Banner ne fasse pas de "saut" au chargement */
+.project-hero {
+    background-color: #111; /* Un fond noir très chic le temps que l'image charge */
+    overflow: hidden;
+}
+
 
 
 
