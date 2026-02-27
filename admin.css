@@ -438,4 +438,49 @@ input:focus { outline: none; border-color: var(--color-accent); }
     border-radius: 4px;
 }
 
+/* =========================================================
+   CORRECTION DÉBORDEMENT MOBILE (ADMIN)
+   ========================================================= */
+@media (max-width: 768px) {
+    /* 1. On réduit les marges du panneau pour récupérer de l'espace */
+    .admin-content {
+        padding: 1rem !important;
+    }
+    .panel {
+        padding: 1.5rem 1rem !important;
+    }
+
+    /* 2. On empile les boîtes de prévisualisation à la verticale */
+    #previews-group {
+        flex-direction: column !important;
+    }
+    .da-preview-box {
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 1rem 0 !important;
+    }
+    .da-preview-box:last-child {
+        border-bottom: none !important;
+    }
+
+    /* 3. On réduit la taille de la boîte de cadrage pour qu'elle rentre parfaitement */
+    #da-cadrage-wrapper {
+        min-height: 100px !important;
+    }
+
+    /* 4. On autorise les boutons "Annuler" et "Enregistrer" à s'empiler */
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .form-actions button {
+        width: 100%;
+    }
+
+    /* 5. Sécurité absolue contre le débordement des longues URLs (YouTube) */
+    input, select, textarea {
+        max-width: 100%;
+    }
+}
 
