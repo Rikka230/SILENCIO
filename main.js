@@ -105,19 +105,21 @@ function initAdmin() {
     console.log("Espace Admin initialisé.");
     
     const loginOverlay = document.getElementById('login-overlay');
+    const loginBox = document.getElementById('login-box'); // <-- La nouvelle variable
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
     // 1. Écouteur de l'état de connexion (Le Videur)
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Connecté : on lève le rideau et on active les outils
+            // Connecté : on enlève le rideau noir en douceur
             loginOverlay.classList.add('hidden');
             setupDropzone();
             setupProjectForm();
         } else {
-            // Déconnecté : on affiche le formulaire
+            // Déconnecté : on s'assure que le rideau est là, ET on affiche la boîte de connexion
             loginOverlay.classList.remove('hidden');
+            if(loginBox) loginBox.classList.remove('hidden');
         }
     });
 
@@ -301,3 +303,4 @@ function setupProjectForm() {
         }
     });
 }
+
