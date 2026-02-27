@@ -125,6 +125,18 @@
                     </form>
                 </section>
 
+                <section id="panel-accueil" class="panel form-panel" style="margin-top: 2rem; grid-column: 1 / -1;">
+                    <h2>Vidéo d'Accueil (Arrière-plan)</h2>
+                    <form id="home-video-form">
+                        <div class="form-group">
+                            <label>Uploader une nouvelle vidéo (MP4)</label>
+                            <input type="file" id="home-video-file" accept="video/mp4" style="width: 100%; padding: 10px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
+                            <p class="help-text">Privilégie une vidéo très courte et compressée (moins de 5Mo) pour un chargement instantané sur mobile.</p>
+                        </div>
+                        <button type="submit" id="btn-save-video" class="btn-primary">Mettre à jour la vidéo</button>
+                    </form>
+                </section>
+
             </div>
         </main>
     </div>
@@ -132,6 +144,7 @@
 </body>
 
 </html>
+
 
 
 
