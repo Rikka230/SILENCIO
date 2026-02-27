@@ -104,15 +104,46 @@ input:focus { outline: none; border-color: var(--color-accent); }
 .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
 
 /* --- DROPZONE --- */
+.dropzone {
+    border: 2px dashed var(--color-border); 
+    border-radius: 8px; 
+    padding: 2rem; 
+    text-align: center;
+    cursor: pointer; 
+    transition: all 0.3s; 
+    position: relative; 
+    min-height: 200px; /* Hauteur fixe pour que le cadre soit toujours beau */
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    overflow: hidden; /* C'EST LA CLÉ : empêche l'image de déborder */
+    background: var(--color-bg);
+}
+
+.dropzone:hover, .dropzone.dragover { 
+    border-color: var(--color-accent); 
+    background: rgba(215, 39, 37, 0.05); 
+}
+
 .dropzone img { 
-    max-width: 90%; 
-    max-height: 90%; 
-    object-fit: contain; 
-    border-radius: 4px; 
-    position: absolute; 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    object-fit: contain; /* L'image rentre en entier sans être coupée ni déformée */
+    padding: 15px; /* Laisse un espace élégant entre l'image et les pointillés */
+    z-index: 1;
+    pointer-events: none; /* Permet de cliquer/glisser à travers l'image */
+}
+
+.dropzone img.hidden { 
+    display: none; 
+}
+
+.drop-text {
+    position: relative;
+    z-index: 2;
 }
 
 /* --- TOAST NOTIFICATION --- */
@@ -150,4 +181,5 @@ input:focus { outline: none; border-color: var(--color-accent); }
 .hidden { 
     display: none !important; 
 }
+
 
