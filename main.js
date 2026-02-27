@@ -26,6 +26,8 @@ const auth = getAuth(app);
 
 // Variable globale pour stocker l'image optimisée avant envoi à la base de données
 let optimizedImageBlob = null; 
+let currentEditId = null;
+let currentEditImageUrl = null;
 
 // 2. UTILITAIRES UX (Micro-interactions)
 const UI = {
@@ -367,4 +369,5 @@ async function loadAdminProjects() {
         console.error("Erreur lors du chargement des projets :", error);
     }
 }
+
 
