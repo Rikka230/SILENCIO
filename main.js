@@ -15,11 +15,10 @@ const firebaseConfig = {
     projectId: "silencio-6f751",
     storageBucket: "silencio-6f751.firebasestorage.app",
     messagingSenderId: "573153999359",
-    appId: "1:573153999359:web:4d650208a06b9fa8280fca",
-    measurementId: "G-2BVN0T02GF"
+    appId: "1:573153999359:web:4d650208a06b9fa8280fca"
 };
 
-// Initialisation des services (Sans Analytics pour éviter le crash)
+// Initialisation des services
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -43,20 +42,17 @@ const UI = {
     }
 };
 
-// 3. ROUTEUR INTELLIGENT
-document.addEventListener('DOMContentLoaded', () => {
-    // On convertit l'URL en minuscules pour éviter les casses accidentelles
-    const path = window.location.pathname.toLowerCase();
+// 3. ROUTEUR INTELLIGENT (Exécution immédiate)
+const path = window.location.pathname.toLowerCase();
 
-    // On cherche juste le mot-clé, avec ou sans ".html"
-    if (path.includes('admin')) {
-        initAdmin();
-    } else if (path.includes('projet')) {
-        initProjectPage();
-    } else {
-        initHomePage();
-    }
-});
+if (path.includes('admin')) {
+    initAdmin();
+} else if (path.includes('projet')) {
+    initProjectPage();
+} else {
+    initHomePage();
+}
+
 
 // =========================================
 // 4. LOGIQUE : PAGE D'ACCUEIL (index.html)
@@ -115,7 +111,7 @@ function initAdmin() {
     // 1. Écouteur de l'état de connexion (Le Videur)
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Connecté : on lève le rideau
+            // Connecté : on lève le rideau et on active les outils
             loginOverlay.classList.add('hidden');
             setupDropzone();
             setupProjectForm();
@@ -252,55 +248,47 @@ function setupProjectForm() {
     if (!form) return;
 
     form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Empêche le rechargement brutal de la page
+        e.preventDefault(); 
 
-        // 1. Récupération des valeurs du formulaire
         const title = document.getElementById('proj-title').value.trim();
         const subtitle = document.getElementById('proj-subtitle').value.trim();
         const videoUrl = document.getElementById('proj-video').value.trim();
 
-        // 2. Anti-Erreur : Vérifier si l'image est bien là
         if (!optimizedImageBlob) {
             UI.showToast("Veuillez ajouter une affiche (image) pour ce projet.", "error");
             return;
         }
 
-        // 3. Feedback UX : On désactive le bouton pour éviter les doubles clics
         const originalBtnText = btnSave.textContent;
         btnSave.textContent = "Enregistrement en cours...";
         btnSave.disabled = true;
 
         try {
-            // ÉTAPE A : Upload de l'image compressée dans Firebase Storage
-            // On crée un nom de fichier unique basé sur la date et le titre
+            // Upload Storage
             const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
             const fileName = `affiches/${Date.now()}_${safeTitle}.webp`;
             
-            // "storage" est déjà initialisé en haut de ton fichier
             const imageRef = ref(storage, fileName); 
             await uploadBytes(imageRef, optimizedImageBlob);
-            
-            // On récupère le lien public de l'image fraîchement uploadée
             const imageUrl = await getDownloadURL(imageRef);
 
-            // ÉTAPE B : Sauvegarde des textes dans Firestore
+            // Upload Firestore
             const projectData = {
                 titre: title,
                 statut: subtitle,
                 imageAffiche: imageUrl,
                 videoTrailer: videoUrl,
-                ordreAffichage: Date.now(), // Utile pour le Drag & Drop plus tard
+                ordreAffichage: Date.now(), 
                 dateCreation: new Date().toISOString()
             };
 
-            // "db" est déjà initialisé en haut de ton fichier
             await addDoc(collection(db, "projects"), projectData);
 
-            // 4. Succès ! On nettoie le formulaire pour le prochain projet
+            // Nettoyage
             form.reset();
             document.getElementById('image-preview').classList.add('hidden');
             document.querySelector('.drop-text').style.display = 'block';
-            optimizedImageBlob = null; // On vide la mémoire de l'image
+            optimizedImageBlob = null; 
 
             UI.showToast("Projet publié avec succès !");
 
@@ -308,10 +296,8 @@ function setupProjectForm() {
             console.error("Erreur lors de l'enregistrement :", error);
             UI.showToast("Erreur lors de l'enregistrement.", "error");
         } finally {
-            // Quoi qu'il arrive (succès ou échec), on remet le bouton à son état normal
             btnSave.textContent = originalBtnText;
             btnSave.disabled = false;
         }
     });
 }
-
