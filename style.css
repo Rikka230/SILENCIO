@@ -985,7 +985,7 @@ body.not-at-top .logo {
 }
 
 /* =========================================================
-   CORRECTION ANTI-STRETCH ABSOLUE
+   CORRECTION ANTI-STRETCH ET PRÉVISUALISATION ADMIN
    ========================================================= */
 .bento-item img, 
 .project-hero img {
@@ -995,13 +995,34 @@ body.not-at-top .logo {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important; 
-    object-position: center !important;
+    /* On a retiré le !important ici pour laisser le Javascript gérer le Focus : */
+    object-position: center; 
     display: block;
 }
 
-/* Le fond noir qui tient la place pendant le chargement */
 .bento-item, .project-hero {
     position: relative !important;
     overflow: hidden !important;
     background-color: #050505 !important;
 }
+
+/* --- Styles pour la Prévisualisation dans l'Admin --- */
+#image-preview {
+    width: 100%;
+    max-width: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 1rem auto;
+    display: block;
+    transition: aspect-ratio 0.4s ease, object-position 0.4s ease, max-width 0.4s ease;
+    aspect-ratio: 1 / 1; /* Carré Standard par défaut */
+}
+#image-preview.bento-tall {
+    aspect-ratio: 1 / 2; /* Format Vertical */
+    max-width: 250px;
+}
+#image-preview.bento-big {
+    aspect-ratio: 1 / 1;
+    max-width: 100%; /* S'étend pour simuler le Grand Format */
+}
+
