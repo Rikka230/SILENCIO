@@ -244,13 +244,31 @@ function setupDropzone() {
 }
 
 // =========================================
-// 8. ENREGISTREMENT DU PROJET (Storage + Firestore)
+// 8. ENREGISTREMENT DU PROJET (Création ou Modification)
 // =========================================
 function setupProjectForm() {
     const form = document.getElementById('project-form');
     const btnSave = document.getElementById('btn-save');
+    const btnCancel = document.querySelector('.btn-secondary'); // Le bouton Annuler
 
     if (!form) return;
+
+    // Fonction pour nettoyer le formulaire et revenir au mode "Ajout"
+    function resetProjectForm() {
+        form.reset();
+        document.getElementById('image-preview').classList.add('hidden');
+        document.querySelector('.drop-text').style.display = 'block';
+        document.getElementById('form-title').textContent = "Ajouter un projet";
+        btnSave.textContent = "Enregistrer le projet";
+        optimizedImageBlob = null; 
+        currentEditId = null;
+        currentEditImageUrl = null;
+    }
+
+    // Action du bouton Annuler
+    if (btnCancel) {
+        btnCancel.addEventListener('click', resetProjectForm);
+    }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault(); 
@@ -259,51 +277,62 @@ function setupProjectForm() {
         const subtitle = document.getElementById('proj-subtitle').value.trim();
         const videoUrl = document.getElementById('proj-video').value.trim();
 
-        if (!optimizedImageBlob) {
+        // Si on crée un NOUVEAU projet, l'image est obligatoire.
+        // Si on MODIFIE, on peut garder l'ancienne.
+        if (!currentEditId && !optimizedImageBlob) {
             UI.showToast("Veuillez ajouter une affiche (image) pour ce projet.", "error");
             return;
         }
 
-        const originalBtnText = btnSave.textContent;
         btnSave.textContent = "Enregistrement en cours...";
         btnSave.disabled = true;
 
         try {
-            // Upload Storage
-            const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
-            const fileName = `affiches/${Date.now()}_${safeTitle}.webp`;
-            
-            const imageRef = ref(storage, fileName); 
-            await uploadBytes(imageRef, optimizedImageBlob);
-            const imageUrl = await getDownloadURL(imageRef);
+            let imageUrl = currentEditImageUrl; // Par défaut, on garde l'ancienne image
 
-            // Upload Firestore
-            const projectData = {
-                titre: title,
-                statut: subtitle,
-                imageAffiche: imageUrl,
-                videoTrailer: videoUrl,
-                ordreAffichage: Date.now(), 
-                dateCreation: new Date().toISOString()
-            };
+            // Si le client a glissé une NOUVELLE image, on l'upload
+            if (optimizedImageBlob) {
+                const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
+                const fileName = `affiches/${Date.now()}_${safeTitle}.webp`;
+                const imageRef = ref(storage, fileName); 
+                await uploadBytes(imageRef, optimizedImageBlob);
+                imageUrl = await getDownloadURL(imageRef);
+            }
 
-            await addDoc(collection(db, "projects"), projectData);
+            if (currentEditId) {
+                // MODE MODIFICATION : On met à jour le document existant
+                const projectRef = doc(db, "projects", currentEditId);
+                await updateDoc(projectRef, {
+                    titre: title,
+                    statut: subtitle,
+                    imageAffiche: imageUrl,
+                    videoTrailer: videoUrl
+                });
+                UI.showToast("Projet mis à jour avec succès !");
+            } else {
+                // MODE CRÉATION : On crée un nouveau document
+                const projectData = {
+                    titre: title,
+                    statut: subtitle,
+                    imageAffiche: imageUrl,
+                    videoTrailer: videoUrl,
+                    ordreAffichage: Date.now(), 
+                    dateCreation: new Date().toISOString()
+                };
+                await addDoc(collection(db, "projects"), projectData);
+                UI.showToast("Projet publié avec succès !");
+            }
 
-            // Nettoyage
-            form.reset();
-            document.getElementById('image-preview').classList.add('hidden');
-            document.querySelector('.drop-text').style.display = 'block';
-            optimizedImageBlob = null; 
-
-            UI.showToast("Projet publié avec succès !");
-            loadAdminProjects()
+            // Nettoyage et rafraîchissement
+            resetProjectForm();
+            loadAdminProjects(); 
 
         } catch (error) {
             console.error("Erreur lors de l'enregistrement :", error);
             UI.showToast("Erreur lors de l'enregistrement.", "error");
         } finally {
-            btnSave.textContent = originalBtnText;
             btnSave.disabled = false;
+            if (!currentEditId) btnSave.textContent = "Enregistrer le projet";
         }
     });
 }
@@ -361,7 +390,53 @@ async function loadAdminProjects() {
                     }
                 }
             });
+            // 1. Action de suppression (Déjà existante)
+            const deleteBtn = li.querySelector('.delete');
+            deleteBtn.addEventListener('click', async () => {
+                if(confirm(`Es-tu sûr de vouloir supprimer définitivement "${project.titre}" ?`)) {
+                    try {
+                        await deleteDoc(doc(db, "projects", project.id));
+                        UI.showToast("Projet supprimé !");
+                        loadAdminProjects(); 
+                    } catch (error) {
+                        UI.showToast("Erreur lors de la suppression.", "error");
+                    }
+                }
+            });
 
+            // 2. NOUVEAU : Action de modification
+            const editBtn = li.querySelector('.edit');
+            editBtn.addEventListener('click', () => {
+                // On remplit les champs texte
+                document.getElementById('proj-title').value = project.titre;
+                document.getElementById('proj-subtitle').value = project.statut || '';
+                document.getElementById('proj-video').value = project.videoTrailer || '';
+
+                // On affiche la miniature actuelle
+                const imagePreview = document.getElementById('image-preview');
+                const dropText = document.querySelector('.drop-text');
+                imagePreview.src = project.imageAffiche;
+                imagePreview.classList.remove('hidden');
+                dropText.style.display = 'none';
+
+                // On met en mémoire qu'on est en train d'éditer ce projet précis
+                currentEditId = project.id;
+                currentEditImageUrl = project.imageAffiche;
+                optimizedImageBlob = null; // On vide la mémoire des nouveaux uploads
+                
+                // On met à jour l'interface visuellement
+                document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
+                document.getElementById('btn-save').textContent = "Mettre à jour";
+                
+                // On fait défiler la page en douceur jusqu'au formulaire
+                document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // On ajoute la ligne à la liste HTML (Déjà existante)
+            projectList.appendChild(li);
+        });
+
+    } catch (error) {
             projectList.appendChild(li);
         });
 
@@ -369,5 +444,6 @@ async function loadAdminProjects() {
         console.error("Erreur lors du chargement des projets :", error);
     }
 }
+
 
 
