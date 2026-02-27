@@ -126,20 +126,14 @@ async function initProjectPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = urlParams.get('id');
 
-    if (!projectId) {
-        window.location.href = 'index.html';
-        return;
-    }
+    if (!projectId) { window.location.href = 'index.html'; return; }
 
     try {
         const docRef = doc(db, "projects", projectId);
         const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            renderProject(docSnap.data());
-        } else {
-            window.location.href = 'index.html';
-        }
+        if (docSnap.exists()) renderProject(docSnap.data());
+        else window.location.href = 'index.html';
     } catch (error) {
         console.error("Erreur de chargement du projet :", error);
     }
@@ -147,13 +141,30 @@ async function initProjectPage() {
 
 function renderProject(data) {
     document.querySelector('.project-title').textContent = data.titre;
-    document.querySelector('.project-hero p').textContent = `${data.format} • ${data.statut}`;
+    document.querySelector('.project-hero p').innerHTML = `${data.genre || ''} &bull; ${data.statut}`;
     
     const heroImage = document.querySelector('.project-hero img');
     heroImage.src = data.imageAffiche;
     heroImage.alt = `Affiche du film ${data.titre}`;
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
+
+    // Injection des nouvelles données
+    document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>'); // Garde les sauts de ligne
+    document.getElementById('dyn-realisateur').textContent = data.realisateur || '-';
+    document.getElementById('dyn-casting').textContent = data.casting || '-';
+    document.getElementById('dyn-genre').textContent = data.genre || '-';
+    document.getElementById('dyn-annee').textContent = data.annee || '-';
+
+    // Gestion Intelligente de la Vidéo
+    const videoSection = document.getElementById('dyn-video-section');
+    const videoIframe = document.getElementById('dyn-video-iframe');
+    if (data.videoTrailer) {
+        videoIframe.src = data.videoTrailer;
+        videoSection.style.display = 'block';
+    } else {
+        videoSection.style.display = 'none';
+    }
 }
 
 // =========================================
@@ -300,18 +311,15 @@ function setupDropzone() {
 }
 
 // =========================================
-// 8. ENREGISTREMENT DU PROJET (Création ou Modification)
+// 8. ENREGISTREMENT DU PROJET
 // =========================================
 function setupProjectForm() {
     const form = document.getElementById('project-form');
     const btnSave = document.getElementById('btn-save');
-    
-    // CORRECTION ICI : On cherche le bouton Annuler UNIQUEMENT à l'intérieur du formulaire
     const btnCancel = form ? form.querySelector('.btn-secondary') : null; 
 
     if (!form) return;
 
-    // Fonction pour nettoyer le formulaire et revenir au mode "Ajout"
     function resetProjectForm() {
         form.reset();
         document.getElementById('image-preview').classList.add('hidden');
@@ -323,10 +331,7 @@ function setupProjectForm() {
         currentEditImageUrl = null;
     }
 
-    // Action du bouton Annuler
-    if (btnCancel) {
-        btnCancel.addEventListener('click', resetProjectForm);
-    }
+    if (btnCancel) btnCancel.addEventListener('click', resetProjectForm);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault(); 
@@ -334,10 +339,16 @@ function setupProjectForm() {
         const title = document.getElementById('proj-title').value.trim();
         const subtitle = document.getElementById('proj-subtitle').value.trim();
         const videoUrl = document.getElementById('proj-video').value.trim();
+        
+        // Récupération des nouveaux champs
+        const genre = document.getElementById('proj-genre') ? document.getElementById('proj-genre').value.trim() : '';
+        const annee = document.getElementById('proj-annee') ? document.getElementById('proj-annee').value.trim() : '';
+        const realisateur = document.getElementById('proj-realisateur') ? document.getElementById('proj-realisateur').value.trim() : '';
+        const casting = document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '';
+        const synopsis = document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '';
 
         if (!currentEditId && !optimizedImageBlob) {
-            UI.showToast("Veuillez ajouter une affiche (image) pour ce projet.", "error");
-            return;
+            UI.showToast("Veuillez ajouter une affiche.", "error"); return;
         }
 
         btnSave.textContent = "Enregistrement en cours...";
@@ -354,24 +365,17 @@ function setupProjectForm() {
                 imageUrl = await getDownloadURL(imageRef);
             }
 
+            const projectData = {
+                titre: title, statut: subtitle, imageAffiche: imageUrl, videoTrailer: videoUrl,
+                genre: genre, annee: annee, realisateur: realisateur, casting: casting, synopsis: synopsis
+            };
+
             if (currentEditId) {
-                const projectRef = doc(db, "projects", currentEditId);
-                await updateDoc(projectRef, {
-                    titre: title,
-                    statut: subtitle,
-                    imageAffiche: imageUrl,
-                    videoTrailer: videoUrl
-                });
+                await updateDoc(doc(db, "projects", currentEditId), projectData);
                 UI.showToast("Projet mis à jour avec succès !");
             } else {
-                const projectData = {
-                    titre: title,
-                    statut: subtitle,
-                    imageAffiche: imageUrl,
-                    videoTrailer: videoUrl,
-                    ordreAffichage: Date.now(), 
-                    dateCreation: new Date().toISOString()
-                };
+                projectData.ordreAffichage = Date.now(); 
+                projectData.dateCreation = new Date().toISOString();
                 await addDoc(collection(db, "projects"), projectData);
                 UI.showToast("Projet publié avec succès !");
             }
@@ -380,7 +384,6 @@ function setupProjectForm() {
             loadAdminProjects(); 
 
         } catch (error) {
-            console.error("Erreur lors de l'enregistrement :", error);
             UI.showToast("Erreur lors de l'enregistrement.", "error");
         } finally {
             btnSave.disabled = false;
@@ -388,7 +391,6 @@ function setupProjectForm() {
         }
     });
 }
-
 // =========================================
 // 9. CHARGEMENT DES PROJETS DANS L'ADMIN
 // =========================================
@@ -399,11 +401,7 @@ async function loadAdminProjects() {
     try {
         const querySnapshot = await getDocs(collection(db, "projects"));
         let projects = [];
-        
-        querySnapshot.forEach((doc) => {
-            projects.push({ id: doc.id, ...doc.data() });
-        });
-
+        querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
         projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
         projectList.innerHTML = '';
 
@@ -411,49 +409,41 @@ async function loadAdminProjects() {
             const li = document.createElement('li');
             li.className = 'sortable-item';
             li.dataset.id = project.id;
-            
-            // CORRECTION ICI : On rend la ligne entière glissable nativement (fini les bugs)
             li.setAttribute('draggable', 'true');
             
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
                 <img src="${project.imageAffiche}" class="item-thumb" alt="Miniature">
-                <div class="item-info">
-                    <strong>${project.titre}</strong>
-                    <span>${project.statut}</span>
-                </div>
+                <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
                     <button class="btn-icon delete" title="Supprimer">✕</button>
                 </div>
             `;
 
-            // 1. Action de suppression
-            const deleteBtn = li.querySelector('.delete');
-            deleteBtn.addEventListener('click', async () => {
-                if(confirm(`Es-tu sûr de vouloir supprimer définitivement "${project.titre}" ?`)) {
-                    try {
-                        await deleteDoc(doc(db, "projects", project.id));
-                        UI.showToast("Projet supprimé !");
-                        loadAdminProjects(); 
-                    } catch (error) {
-                        UI.showToast("Erreur lors de la suppression.", "error");
-                    }
+            li.querySelector('.delete').addEventListener('click', async () => {
+                if(confirm(`Supprimer définitivement "${project.titre}" ?`)) {
+                    await deleteDoc(doc(db, "projects", project.id));
+                    UI.showToast("Projet supprimé !"); loadAdminProjects(); 
                 }
             });
 
-            // 2. Action de modification
-            const editBtn = li.querySelector('.edit');
-            editBtn.addEventListener('click', () => {
-                document.getElementById('proj-title').value = project.titre;
+            li.querySelector('.edit').addEventListener('click', () => {
+                // Remplissage de tous les champs
+                document.getElementById('proj-title').value = project.titre || '';
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
+                
+                if(document.getElementById('proj-genre')) document.getElementById('proj-genre').value = project.genre || '';
+                if(document.getElementById('proj-annee')) document.getElementById('proj-annee').value = project.annee || '';
+                if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
+                if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
+                if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
 
                 const imagePreview = document.getElementById('image-preview');
-                const dropText = document.querySelector('.drop-text');
                 imagePreview.src = project.imageAffiche;
                 imagePreview.classList.remove('hidden');
-                dropText.style.display = 'none';
+                document.querySelector('.drop-text').style.display = 'none';
 
                 currentEditId = project.id;
                 currentEditImageUrl = project.imageAffiche;
@@ -461,19 +451,13 @@ async function loadAdminProjects() {
                 
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
-                
                 document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
             });
 
             projectList.appendChild(li);
         });
-
-        // Activation du Drag & Drop une fois la liste générée
         setupDragAndDrop();
-
-    } catch (error) {
-        console.error("Erreur lors du chargement des projets :", error);
-    }
+    } catch (error) { console.error("Erreur", error); }
 }
 
 // =========================================
@@ -584,6 +568,7 @@ async function saveNewOrder() {
         document.body.style.cursor = 'default';
     }
 }
+
 
 
 
