@@ -401,5 +401,4 @@ input:focus { outline: none; border-color: var(--color-accent); }
 #da-bloc-wrapper { max-width: 300px; aspect-ratio: 1 / 1; margin: 0 auto; transition: all 0.4s ease; }
 #da-bloc-wrapper.bento-big { aspect-ratio: 1 / 1; max-width: 100%; }
 #da-bloc-wrapper.bento-tall { aspect-ratio: 1 / 2; max-width: 200px; }
-
-#da-cadrage-wrapper { aspect-ratio: 21 / 9; width: 100%; max-width: 100%; }
+#da-bloc-wrapper.bento-wide { aspect-ratio: 2 / 1; max-width: 100%; }
