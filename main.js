@@ -60,7 +60,63 @@ if (path.includes('admin')) {
 // 4. LOGIQUE : PAGE D'ACCUEIL (index.html)
 // =========================================
 async function initHomePage() {
-    console.log("Accueil chargée. Prêt à générer la grille bento dynamiquement.");
+    console.log("Accueil chargée. Récupération des projets depuis Firebase...");
+    const bentoGrid = document.querySelector('.bento-grid');
+
+    if (!bentoGrid) return;
+
+    try {
+        // 1. On aspire tous les projets depuis Firestore
+        const querySnapshot = await getDocs(collection(db, "projects"));
+        let projects = [];
+        
+        querySnapshot.forEach((doc) => {
+            projects.push({ id: doc.id, ...doc.data() });
+        });
+
+        // 2. On trie en respectant fidèlement ton Drag & Drop de l'admin
+        projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
+
+        // 3. On vide la grille statique de l'index.html
+        bentoGrid.innerHTML = '';
+
+        // 4. On génère le HTML dynamique pour chaque projet
+        projects.forEach((project, index) => {
+            // On reproduit ton design : le 1er est grand, le 2ème est haut
+            let extraClass = '';
+            if (index === 0) extraClass = 'bento-big';
+            else if (index === 1) extraClass = 'bento-tall';
+
+            const a = document.createElement('a');
+            // Le lien dynamique qui servira pour la page détail
+            a.href = `projet.html?id=${project.id}`; 
+            a.className = `bento-item ${extraClass}`;
+            
+            // On injecte les vraies données (Image, Titre, Sous-titre)
+            a.innerHTML = `
+                <img src="${project.imageAffiche}" alt="Affiche de ${project.titre}" loading="lazy">
+                <div class="bento-overlay">
+                    <h3>${project.titre.toUpperCase()}</h3>
+                    <p>${project.statut}</p>
+                </div>
+            `;
+
+            bentoGrid.appendChild(a);
+        });
+
+        // 5. On relance ton effet d'apparition au scroll (Intersection Observer)
+        // (Car les nouveaux éléments viennent d'être créés et doivent être détectés)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) e.target.classList.add('is-visible');
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
+
+    } catch (error) {
+        console.error("Erreur lors du chargement de la grille :", error);
+    }
 }
 
 // =========================================
@@ -528,6 +584,7 @@ async function saveNewOrder() {
         document.body.style.cursor = 'default';
     }
 }
+
 
 
 
