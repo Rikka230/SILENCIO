@@ -106,23 +106,8 @@ async function initHomePage(){
         }, { threshold: 0.1 });
         document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
 
-    } catch (error) { console.error(error); }
+    } catch (error) { console.error("Erreur de grille :", error); }
 }
-        // 5. On relance ton effet d'apparition au scroll (Intersection Observer)
-        // (Car les nouveaux éléments viennent d'être créés et doivent être détectés)
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) e.target.classList.add('is-visible');
-            });
-        }, { threshold: 0.1 });
-        
-        document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
-
-    } catch (error) {
-        console.error("Erreur lors du chargement de la grille :", error);
-    }
-}
-
 // =========================================
 // 5. LOGIQUE : PAGE PROJET DYNAMIQUE
 // =========================================
@@ -655,6 +640,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
