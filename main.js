@@ -356,7 +356,7 @@ async function loadAdminProjects() {
         // On trie par ordre d'affichage (le plus récent en premier par défaut)
         projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
 
-        // On vide la liste HTML (adieu le faux "Tales of Taipei")
+        // On vide la liste HTML
         projectList.innerHTML = '';
 
         // On génère le code HTML pour chaque vrai projet
@@ -365,6 +365,7 @@ async function loadAdminProjects() {
             li.className = 'sortable-item';
             li.dataset.id = project.id;
             
+            // On intègre BIEN le bouton "Modifier" (edit) ici
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
                 <img src="${project.imageAffiche}" class="item-thumb" alt="Miniature">
@@ -373,38 +374,26 @@ async function loadAdminProjects() {
                     <span>${project.statut}</span>
                 </div>
                 <div class="item-actions">
+                    <button class="btn-icon edit" title="Modifier">✎</button>
                     <button class="btn-icon delete" title="Supprimer">✕</button>
                 </div>
             `;
 
-            // On ajoute l'action de suppression (Anti-frustration avec confirmation)
+            // 1. Action de suppression
             const deleteBtn = li.querySelector('.delete');
             deleteBtn.addEventListener('click', async () => {
                 if(confirm(`Es-tu sûr de vouloir supprimer définitivement "${project.titre}" ?`)) {
                     try {
                         await deleteDoc(doc(db, "projects", project.id));
                         UI.showToast("Projet supprimé !");
-                        loadAdminProjects(); // On rafraîchit la liste instantanément
-                    } catch (error) {
-                        UI.showToast("Erreur lors de la suppression.", "error");
-                    }
-                }
-            });
-            // 1. Action de suppression (Déjà existante)
-            const deleteBtn = li.querySelector('.delete');
-            deleteBtn.addEventListener('click', async () => {
-                if(confirm(`Es-tu sûr de vouloir supprimer définitivement "${project.titre}" ?`)) {
-                    try {
-                        await deleteDoc(doc(db, "projects", project.id));
-                        UI.showToast("Projet supprimé !");
-                        loadAdminProjects(); 
+                        loadAdminProjects(); // On rafraîchit la liste
                     } catch (error) {
                         UI.showToast("Erreur lors de la suppression.", "error");
                     }
                 }
             });
 
-            // 2. NOUVEAU : Action de modification
+            // 2. Action de modification
             const editBtn = li.querySelector('.edit');
             editBtn.addEventListener('click', () => {
                 // On remplit les champs texte
@@ -419,7 +408,7 @@ async function loadAdminProjects() {
                 imagePreview.classList.remove('hidden');
                 dropText.style.display = 'none';
 
-                // On met en mémoire qu'on est en train d'éditer ce projet précis
+                // On met en mémoire qu'on est en train d'éditer ce projet
                 currentEditId = project.id;
                 currentEditImageUrl = project.imageAffiche;
                 optimizedImageBlob = null; // On vide la mémoire des nouveaux uploads
@@ -432,11 +421,7 @@ async function loadAdminProjects() {
                 document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
             });
 
-            // On ajoute la ligne à la liste HTML (Déjà existante)
-            projectList.appendChild(li);
-        });
-
-    } catch (error) {
+            // On ajoute la ligne à la liste HTML
             projectList.appendChild(li);
         });
 
