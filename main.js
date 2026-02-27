@@ -4,7 +4,7 @@
 
 // 1. IMPORTATION FIREBASE (Via CDN pour Vanilla JS)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
@@ -662,11 +662,8 @@ function setupHomeVideo() {
             await uploadBytes(videoRef, file);
             const videoUrl = await getDownloadURL(videoRef);
 
-            // 2. On sauvegarde le lien dans la base de données (collection "settings", document "homepage")
-            await updateDoc(doc(db, "settings", "homepage"), { backgroundVideo: videoUrl }).catch(async () => {
-                // Si le document n'existe pas encore, on le crée
-                await addDoc(collection(db, "settings"), { backgroundVideo: videoUrl }, "homepage");
-            });
+            // 2. CORRECTION ICI : On utilise setDoc pour créer ou mettre à jour proprement
+            await setDoc(doc(db, "settings", "homepage"), { backgroundVideo: videoUrl }, { merge: true });
 
             UI.showToast("Vidéo d'accueil mise à jour !");
             form.reset();
@@ -680,6 +677,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
