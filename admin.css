@@ -411,8 +411,31 @@ input:focus { outline: none; border-color: var(--color-accent); }
     object-fit: cover !important; transition: object-position 0.4s ease;
 }
 
-#da-bloc-wrapper { max-width: 300px; aspect-ratio: 1 / 1; margin: 0 auto; transition: all 0.4s ease; }
+/* =========================================
+   RESTAURATION & SÉCURITÉ DES BOÎTES DE D.A.
+   ========================================= */
+
+/* 1. La boîte du Bloc Bento (Gauche) */
+#da-bloc-wrapper { 
+    max-width: 300px; 
+    aspect-ratio: 1 / 1; 
+    margin: 0 auto; 
+    transition: all 0.4s ease; 
+    display: block;
+}
 #da-bloc-wrapper.bento-big { aspect-ratio: 1 / 1; max-width: 100%; }
 #da-bloc-wrapper.bento-tall { aspect-ratio: 1 / 2; max-width: 200px; }
 #da-bloc-wrapper.bento-wide { aspect-ratio: 2 / 1; max-width: 100%; }
+
+/* 2. La boîte du Cadrage En-tête (Celle qui était cassée - Droite) */
+#da-cadrage-wrapper { 
+    width: 100%; 
+    max-width: 100%; 
+    aspect-ratio: 21 / 9; /* Le format panoramique de ton en-tête public */
+    margin: auto 0;
+    display: block;
+    min-height: 150px; /* Sécurité absolue pour empêcher l'écrasement */
+    border-radius: 4px;
+}
+
 
