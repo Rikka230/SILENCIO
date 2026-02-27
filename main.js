@@ -59,7 +59,23 @@ if (path.includes('admin')) {
 // =========================================
 // 4. LOGIQUE : PAGE D'ACCUEIL (index.html)
 // =========================================
-async function initHomePage() {
+async function initHomePage(){
+    // --- 1. CHARGEMENT DE LA VIDÉO DE FOND ---
+    try {
+        const settingsRef = doc(db, "settings", "homepage");
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists() && settingsSnap.data().backgroundVideo) {
+            const heroVideo = document.querySelector('.hero-video');
+            if (heroVideo) {
+                heroVideo.src = settingsSnap.data().backgroundVideo;
+                heroVideo.load(); // Force le navigateur à lire la nouvelle vidéo
+            }
+        }
+    } catch (error) {
+        console.log("Impossible de charger la vidéo dynamique, utilisation de la vidéo par défaut.");
+    }
+    
     console.log("Accueil chargée. Récupération des projets depuis Firebase...");
     const bentoGrid = document.querySelector('.bento-grid');
 
@@ -618,6 +634,52 @@ async function saveNewOrder() {
     }
 }
 
+// =========================================
+// 11. GESTION DE LA VIDÉO D'ACCUEIL
+// =========================================
+function setupHomeVideo() {
+    const form = document.getElementById('home-video-form');
+    const btnSave = document.getElementById('btn-save-video');
+    const fileInput = document.getElementById('home-video-file');
+
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const file = fileInput.files[0];
+        if (!file) {
+            UI.showToast("Veuillez sélectionner une vidéo MP4.", "error");
+            return;
+        }
+
+        btnSave.textContent = "Upload en cours... Patientez.";
+        btnSave.disabled = true;
+
+        try {
+            // 1. On envoie la vidéo dans le Storage
+            const videoRef = ref(storage, `site-assets/background.mp4`);
+            await uploadBytes(videoRef, file);
+            const videoUrl = await getDownloadURL(videoRef);
+
+            // 2. On sauvegarde le lien dans la base de données (collection "settings", document "homepage")
+            await updateDoc(doc(db, "settings", "homepage"), { backgroundVideo: videoUrl }).catch(async () => {
+                // Si le document n'existe pas encore, on le crée
+                await addDoc(collection(db, "settings"), { backgroundVideo: videoUrl }, "homepage");
+            });
+
+            UI.showToast("Vidéo d'accueil mise à jour !");
+            form.reset();
+
+        } catch (error) {
+            console.error(error);
+            UI.showToast("Erreur lors de l'envoi de la vidéo.", "error");
+        } finally {
+            btnSave.textContent = "Mettre à jour la vidéo";
+            btnSave.disabled = false;
+        }
+    });
+}
 
 
 
