@@ -133,3 +133,7 @@ input:focus { outline: none; border-color: var(--color-accent); }
 .login-box h2 { font-weight: 200; letter-spacing: 2px; margin-bottom: 2rem; font-size: 1.8rem; }
 .login-box h2 span { color: var(--color-accent); font-weight: 600; font-size: 0.8rem; vertical-align: top; }
 .error-text { color: #ff0000; font-size: 0.8rem; margin-top: 1rem; }
+
+.hidden { 
+    display: none !important; 
+}
