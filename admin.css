@@ -190,5 +190,94 @@ input:focus { outline: none; border-color: var(--color-accent); }
     border-color: var(--color-accent);
 }
 
+/* =========================================================
+   RESPONSIVE ADMIN (MOBILE & TABLETTE)
+   ========================================================= */
+@media (max-width: 1024px) {
+    
+    /* 1. On passe le layout en colonne (la sidebar passe en haut) */
+    .admin-layout { 
+        flex-direction: column; 
+    }
+
+    /* 2. On transforme la Sidebar en En-tête */
+    .admin-sidebar { 
+        width: 100%; 
+        padding: 1.5rem; 
+        border-right: none; 
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .admin-logo { 
+        margin-bottom: 0; 
+        text-align: center;
+    }
+
+    .admin-sidebar nav { 
+        flex-direction: row; 
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin: 1.5rem 0;
+    }
+    
+    .admin-sidebar nav a {
+        font-size: 0.8rem;
+    }
+
+    /* 3. Les boutons d'action s'alignent côte à côte */
+    .sidebar-footer { 
+        display: flex; 
+        flex-direction: row; 
+        gap: 10px; 
+        padding-top: 0; 
+        margin-top: 0;
+    }
+    .sidebar-footer a, .sidebar-footer button { 
+        margin-bottom: 0 !important; 
+        width: auto !important; 
+        flex: 1; /* Ils prennent chacun 50% de la largeur */
+    }
+
+    /* 4. On adapte le contenu principal */
+    .admin-content { 
+        padding: 1.5rem; 
+    }
+    
+    .content-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 15px; 
+        margin-bottom: 2rem; 
+    }
+    
+    .content-header h1 { 
+        font-size: 1.5rem; 
+    }
+
+    /* 5. On empile la liste et le formulaire */
+    .dashboard-grid { 
+        grid-template-columns: 1fr; 
+        gap: 2rem;
+    }
+
+    /* 6. On évite que la boîte de login ne touche les bords de l'écran */
+    .login-box { 
+        margin: 1.5rem; 
+        padding: 2rem; 
+    }
+}
+
+/* Petite optimisation pour les très petits écrans (iPhone SE etc.) */
+@media (max-width: 480px) {
+    .sortable-item {
+        flex-wrap: wrap;
+    }
+    .item-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+}
 
 
