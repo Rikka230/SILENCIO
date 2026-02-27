@@ -61,66 +61,53 @@ if (path.includes('admin')) {
 // 4. LOGIQUE : PAGE D'ACCUEIL (index.html)
 // =========================================
 async function initHomePage(){
-    // --- 1. CHARGEMENT DE LA VIDÉO DE FOND ---
     try {
         const settingsRef = doc(db, "settings", "homepage");
         const settingsSnap = await getDoc(settingsRef);
-        
         if (settingsSnap.exists() && settingsSnap.data().backgroundVideo) {
             const heroVideo = document.querySelector('.hero-video');
-            if (heroVideo) {
-                heroVideo.src = settingsSnap.data().backgroundVideo;
-                heroVideo.load(); // Force le navigateur à lire la nouvelle vidéo
-            }
+            if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
-    } catch (error) {
-        console.log("Impossible de charger la vidéo dynamique, utilisation de la vidéo par défaut.");
-    }
+    } catch (error) { console.log("Erreur vidéo"); }
     
-    console.log("Accueil chargée. Récupération des projets depuis Firebase...");
     const bentoGrid = document.querySelector('.bento-grid');
-
     if (!bentoGrid) return;
 
     try {
-        // 1. On aspire tous les projets depuis Firestore
         const querySnapshot = await getDocs(collection(db, "projects"));
         let projects = [];
-        
-        querySnapshot.forEach((doc) => {
-            projects.push({ id: doc.id, ...doc.data() });
-        });
-
-        // 2. On trie en respectant fidèlement ton Drag & Drop de l'admin
+        querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
         projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
-
-        // 3. On vide la grille statique de l'index.html
+        
         bentoGrid.innerHTML = '';
 
-        // 4. On génère le HTML dynamique pour chaque projet
         projects.forEach((project) => {
-            
-            // On récupère le format calculé par l'IA lors de l'upload
+            // On récupère tes choix manuels
             const extraClass = project.formatAffichage || '';
+            const focus = project.imageFocus || 'center';
 
             const a = document.createElement('a');
             a.href = `projet.html?id=${project.id}`; 
             a.className = `bento-item ${extraClass}`;
             
-            // Astuce anti-stretch absolue : le "object-position: top center" pour les portraits
-            const objectPosition = extraClass === 'bento-tall' ? 'top center' : 'center center';
-
+            // On injecte le focus directement dans le style de l'image
             a.innerHTML = `
-                <img src="${project.imageAffiche}" alt="Affiche de ${project.titre}" loading="lazy" style="object-position: ${objectPosition} !important;">
+                <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
                 <div class="bento-overlay">
                     <h3>${project.titre.toUpperCase()}</h3>
                     <p>${project.statut}</p>
                 </div>
             `;
-
             bentoGrid.appendChild(a);
         });
 
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
+
+    } catch (error) { console.error(error); }
+}
         // 5. On relance ton effet d'apparition au scroll (Intersection Observer)
         // (Car les nouveaux éléments viennent d'être créés et doivent être détectés)
         const observer = new IntersectionObserver((entries) => {
@@ -313,80 +300,63 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR D'OPTIMISATION ET D'ANALYSE D'IMAGE
+// 7. MOTEUR D'OPTIMISATION & PRÉVISUALISATION
 // =========================================
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
     const fileInput = document.getElementById('proj-image');
     const imagePreview = document.getElementById('image-preview');
     const dropText = dropzone.querySelector('.drop-text');
+    
+    const formatSelect = document.getElementById('proj-format');
+    const focusSelect = document.getElementById('proj-focus');
 
     if (!dropzone) return;
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, preventDefaults, false);
-    });
+    // --- MISE À JOUR VISUELLE EN DIRECT ---
+    function updateLivePreview() {
+        if (!imagePreview.src || imagePreview.src === window.location.href) return;
+        imagePreview.className = '';
+        if (formatSelect && formatSelect.value) imagePreview.classList.add(formatSelect.value);
+        if (focusSelect) imagePreview.style.objectPosition = focusSelect.value;
+    }
 
+    if (formatSelect) formatSelect.addEventListener('change', updateLivePreview);
+    if (focusSelect) focusSelect.addEventListener('change', updateLivePreview);
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
     function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
-    });
+    ['dragenter', 'dragover'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false); });
+    ['dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false); });
 
     dropzone.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
-    fileInput.addEventListener('change', function() {
-        if (this.files.length) handleFile(this.files[0]);
-    });
+    fileInput.addEventListener('change', function() { if (this.files.length) handleFile(this.files[0]); });
 
     function handleFile(file) {
-        if (!file.type.startsWith('image/')) {
-            UI.showToast("Format invalide. Veuillez uploader une image.", "error"); return;
-        }
+        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide.", "error"); return; }
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        
         reader.onload = (event) => {
             const img = new Image();
             img.src = event.target.result;
-            
             img.onload = () => {
-                // --- INTELLIGENCE DE CADRAGE ---
-                const ratio = img.width / img.height;
-                if (ratio > 1.2) {
-                    optimizedImageFormat = 'bento-big'; // Image Paysage = Grand Bloc
-                } else if (ratio < 0.8) {
-                    optimizedImageFormat = 'bento-tall'; // Image Portrait = Bloc Haut
-                } else {
-                    optimizedImageFormat = ''; // Standard / Carré
-                }
-
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 1920;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > MAX_WIDTH) {
-                    height *= MAX_WIDTH / width;
-                    width = MAX_WIDTH;
-                }
+                let width = img.width, height = img.height;
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
 
                 canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
 
                 canvas.toBlob((blob) => {
                     optimizedImageBlob = blob; 
-                    const compressedUrl = URL.createObjectURL(blob);
-                    imagePreview.src = compressedUrl;
-                    imagePreview.classList.remove('hidden');
+                    imagePreview.src = URL.createObjectURL(blob);
                     dropText.style.display = 'none'; 
-                    UI.showToast(`Image optimisée (Format détecté : ${optimizedImageFormat || 'Standard'})`);
+                    updateLivePreview(); // Lance l'aperçu du cadrage
+                    UI.showToast("Image prête. Choisissez le format !");
                 }, 'image/webp', 0.8);
             };
         };
@@ -403,68 +373,49 @@ function setupProjectForm() {
 
     if (!form) return;
 
-    // --- LA MOULINETTE MAGIQUE YOUTUBE ---
     function cleanYouTubeLink(rawUrl) {
         if (!rawUrl) return '';
-        // Si l'utilisateur a mis le bon lien embed par hasard, on ne touche à rien
         if (rawUrl.includes('youtube.com/embed/')) return rawUrl;
-        
-        // Regex pour capturer l'ID unique de la vidéo peu importe le format du lien
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\/shorts\/)([^#\&\?]*).*/;
-        const match = rawUrl.match(regExp);
-        
-        // Un ID YouTube fait toujours 11 caractères
-        if (match && match[2].length === 11) {
-            // On reconstruit le lien proprement pour la base de données
-            return `https://www.youtube.com/embed/${match[2]}`;
-        }
-        return rawUrl; // Par sécurité, si ça échoue, on garde ce qui a été tapé
+        const match = rawUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\/shorts\/)([^#\&\?]*).*/);
+        return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : rawUrl;
     }
 
     function resetProjectForm() {
         form.reset();
-        document.getElementById('image-preview').classList.add('hidden');
+        document.getElementById('image-preview').removeAttribute('src');
+        document.getElementById('image-preview').className = '';
         document.querySelector('.drop-text').style.display = 'block';
         document.getElementById('form-title').textContent = "Ajouter un projet";
         btnSave.textContent = "Enregistrer le projet";
-        optimizedImageBlob = null; 
-        currentEditId = null;
-        currentEditImageUrl = null;
+        optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null;
     }
 
     if (btnCancel) btnCancel.addEventListener('click', resetProjectForm);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault(); 
-
         const title = document.getElementById('proj-title').value.trim();
         const subtitle = document.getElementById('proj-subtitle').value.trim();
-        
-        // L'utilisateur colle ce qu'il veut, on nettoie silencieusement ici :
-        const rawVideoUrl = document.getElementById('proj-video').value.trim();
-        const videoUrl = cleanYouTubeLink(rawVideoUrl);
-        
-        // Récupération des autres champs
+        const videoUrl = cleanYouTubeLink(document.getElementById('proj-video').value.trim());
         const genre = document.getElementById('proj-genre') ? document.getElementById('proj-genre').value.trim() : '';
         const annee = document.getElementById('proj-annee') ? document.getElementById('proj-annee').value.trim() : '';
         const realisateur = document.getElementById('proj-realisateur') ? document.getElementById('proj-realisateur').value.trim() : '';
         const casting = document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '';
         const synopsis = document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '';
+        
+        // TES CHOIX MANUELS
+        const format = document.getElementById('proj-format') ? document.getElementById('proj-format').value : '';
+        const focus = document.getElementById('proj-focus') ? document.getElementById('proj-focus').value : 'center';
 
-        if (!currentEditId && !optimizedImageBlob) {
-            UI.showToast("Veuillez ajouter une affiche.", "error"); return;
-        }
+        if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
 
-        btnSave.textContent = "Enregistrement en cours...";
-        btnSave.disabled = true;
+        btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
 
         try {
             let imageUrl = currentEditImageUrl; 
-
             if (optimizedImageBlob) {
                 const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
-                const fileName = `affiches/${Date.now()}_${safeTitle}.webp`;
-                const imageRef = ref(storage, fileName); 
+                const imageRef = ref(storage, `affiches/${Date.now()}_${safeTitle}.webp`); 
                 await uploadBytes(imageRef, optimizedImageBlob);
                 imageUrl = await getDownloadURL(imageRef);
             }
@@ -472,29 +423,20 @@ function setupProjectForm() {
             const projectData = {
                 titre: title, statut: subtitle, imageAffiche: imageUrl, videoTrailer: videoUrl,
                 genre: genre, annee: annee, realisateur: realisateur, casting: casting, synopsis: synopsis,
-                // On enregistre le format détecté (ou on garde l'ancien si on ne fait que modifier le texte)
-                formatAffichage: optimizedImageBlob ? optimizedImageFormat : (currentEditId ? undefined : '')
+                formatAffichage: format, imageFocus: focus // SAUVEGARDE
             };
 
             if (currentEditId) {
                 await updateDoc(doc(db, "projects", currentEditId), projectData);
-                UI.showToast("Projet mis à jour avec succès !");
+                UI.showToast("Mis à jour !");
             } else {
                 projectData.ordreAffichage = Date.now(); 
                 projectData.dateCreation = new Date().toISOString();
                 await addDoc(collection(db, "projects"), projectData);
-                UI.showToast("Projet publié avec succès !");
+                UI.showToast("Publié !");
             }
-
-            resetProjectForm();
-            loadAdminProjects(); 
-
-        } catch (error) {
-            UI.showToast("Erreur lors de l'enregistrement.", "error");
-        } finally {
-            btnSave.disabled = false;
-            if (!currentEditId) btnSave.textContent = "Enregistrer le projet";
-        }
+            resetProjectForm(); loadAdminProjects(); 
+        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
     });
 }
 
@@ -514,59 +456,53 @@ async function loadAdminProjects() {
 
         projects.forEach(project => {
             const li = document.createElement('li');
-            li.className = 'sortable-item';
-            li.dataset.id = project.id;
-            li.setAttribute('draggable', 'true');
-            
+            li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                <img src="${project.imageAffiche}" class="item-thumb" alt="Miniature">
+                <img src="${project.imageAffiche}" class="item-thumb" style="object-position: ${project.imageFocus || 'center'}; object-fit: cover;">
                 <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
                     <button class="btn-icon delete" title="Supprimer">✕</button>
-                </div>
-            `;
+                </div>`;
 
             li.querySelector('.delete').addEventListener('click', async () => {
-                if(confirm(`Supprimer définitivement "${project.titre}" ?`)) {
-                    await deleteDoc(doc(db, "projects", project.id));
-                    UI.showToast("Projet supprimé !"); loadAdminProjects(); 
-                }
+                if(confirm(`Supprimer "${project.titre}" ?`)) { await deleteDoc(doc(db, "projects", project.id)); loadAdminProjects(); }
             });
 
             li.querySelector('.edit').addEventListener('click', () => {
-                // Remplissage de tous les champs
                 document.getElementById('proj-title').value = project.titre || '';
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
-                
                 if(document.getElementById('proj-genre')) document.getElementById('proj-genre').value = project.genre || '';
                 if(document.getElementById('proj-annee')) document.getElementById('proj-annee').value = project.annee || '';
                 if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
                 if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
+                
+                // Chargement de tes choix de format
+                const formatSelect = document.getElementById('proj-format');
+                const focusSelect = document.getElementById('proj-focus');
+                if(formatSelect) formatSelect.value = project.formatAffichage || '';
+                if(focusSelect) focusSelect.value = project.imageFocus || 'center';
 
                 const imagePreview = document.getElementById('image-preview');
                 imagePreview.src = project.imageAffiche;
-                imagePreview.classList.remove('hidden');
                 document.querySelector('.drop-text').style.display = 'none';
 
-                currentEditId = project.id;
-                currentEditImageUrl = project.imageAffiche;
-                optimizedImageBlob = null; 
-                
+                // Force le rafraîchissement de l'aperçu
+                if (formatSelect) formatSelect.dispatchEvent(new Event('change'));
+
+                currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null; 
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
                 document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
             });
-
             projectList.appendChild(li);
         });
         setupDragAndDrop();
-    } catch (error) { console.error("Erreur", error); }
+    } catch (error) {}
 }
-
 // =========================================
 // 10. DRAG & DROP (PC + Tactile Mobile)
 // =========================================
@@ -719,6 +655,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
