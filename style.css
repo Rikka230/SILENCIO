@@ -1,128 +1,1022 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projet - Silencio Pictures</title>
-    <meta name="description" content="Découvrez ce film produit par Silencio Pictures.">
-    <meta property="og:image" content="https://www.silenciopictures.com/share.jpg">
-    <meta name="twitter:image" content="https://www.silenciopictures.com/share.jpg">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2.0">
-</head>
-<body>
-    <div class="page-transition"></div>
-    <div class="ambient-light"></div>
-    <div class="corner-glow"></div>
+/* =========================================
+   SILENCIO PICTURES - STYLE MASTER (FINAL CLEAN V3)
+   ========================================= */
 
-    <a href="index.html#projects" class="back-btn">Retour</a>
+/* --- 1. VARIABLES & RESET --- */
+:root {
+    --color-bg: #000000;
+    --color-text: #ffffff;
+    --color-accent: #D72725; /* Rouge Silencio */
+    --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
 
-    <header class="project-hero">
-        <img src="" alt="">
-        <div class="project-header-content">
-            <h1 class="project-title"></h1>
-            <p style="color: var(--color-accent); letter-spacing: 2px; text-transform: uppercase;"></p>
-        </div>
-    </header>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    <section class="project-content auto-height-section">
-        <div class="synopsis">
-            <h3 style="margin-bottom: 1rem; color: #fff;">Synopsis</h3>
-            <div id="dyn-synopsis" style="line-height: 1.6;"></div>
-        </div>
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-main);
+    overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+}
 
-        <aside class="tech-specs">
-            <div class="spec-group">
-                <h4>Réalisation</h4>
-                <p id="dyn-realisateur"></p>
-            </div>
-            <div class="spec-group">
-                <h4>Casting</h4>
-                <p id="dyn-casting"></p>
-            </div>
-            <div class="spec-group">
-                <h4>Genre</h4>
-                <p id="dyn-genre"></p>
-            </div>
-            <div class="spec-group">
-                <h4>Année</h4>
-                <p id="dyn-annee"></p>
-            </div>
-        </aside>
-    </section>
+a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
+a:hover { opacity: 0.7; }
 
-    <section class="full-width-video" id="dyn-video-section" style="display: none;">
-        <h3 class="video-label">Bande Annonce</h3>
-        <div class="video-wrapper">
-            <iframe id="dyn-video-iframe" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        </div>
-    </section>
+/* --- 2. AMBIENT LIGHT (VERSION DOUCE) --- */
+.ambient-light {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    z-index: -2;
+    background: #000;
+    pointer-events: none;
+}
 
-    <footer style="text-align: center; padding: 2rem; border-top: 1px solid #222;">
-        <p style="font-size: 0.8rem; color: #666;">© 2026 Silencio Pictures. Powered by NOCX WEB. All rights reserved.</p>
-    </footer>
+ambient-light::before {
+    content: ''; position: absolute;
+    width: 150vw; height: 150vw;
+    top: -50%; left: -50%;
+    background: radial-gradient(circle, rgba(215, 39, 37, 0.25) 0%, rgba(0,0,0,0) 60%);
+    filter: blur(80px);
+    animation: drift1 12s infinite alternate ease-in-out;
+}
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            window.addEventListener('pageshow', function(event) {
-                const transitionOverlay = document.querySelector('.page-transition');
-                if (transitionOverlay) {
-                    transitionOverlay.classList.add('active');
-                    setTimeout(() => { transitionOverlay.classList.remove('active'); }, 50); 
-                }
-            });
-            
-            const menuToggle = document.querySelector('#mobile-menu');
-            const navMenu = document.querySelector('.nav-menu');
-            const transitionOverlay = document.querySelector('.page-transition');
-            
-            function closeMenu() {
-                if(menuToggle) menuToggle.classList.remove('is-active');
-                if(navMenu) navMenu.classList.remove('active');
-            }
+.ambient-light::after {
+    content: ''; position: absolute;
+    width: 120vw; height: 120vw;
+    bottom: -20%; right: -20%;
+    background: radial-gradient(circle, rgba(180, 20, 20, 0.2) 0%, rgba(0,0,0,0) 60%);
+    filter: blur(60px);
+    animation: drift2 15s infinite alternate-reverse ease-in-out;
+}
 
-            function fadeToBlack(callback) {
-                if(transitionOverlay) {
-                    transitionOverlay.classList.add('active'); setTimeout(callback, 500); 
-                } else { callback(); }
-            }
+/* --- 3. CORNER GLOW (LUMIÈRES COINS DOUCES) --- */
+.corner-glow {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%; height: 100%; 
+    pointer-events: none;
+    z-index: 10;
+    mix-blend-mode: screen;
+    background: 
+        radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.5) 0%, transparent 40%),
+        radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.5) 0%, transparent 40%);
+    animation: breathe 5s infinite alternate ease-in-out;
+}
 
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted && transitionOverlay) {
-                    transitionOverlay.classList.remove('active');
-                    transitionOverlay.style.opacity = '0';
-                }
-            });
+@keyframes breathe {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0.8; transform: scale(1.05); }
+}
 
-            document.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    const target = this.getAttribute('target');
+/* --- 4. LOADER / INTRO --- */
+#loader {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: var(--color-bg);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
+    animation: fadeOut 1s ease-out 3.5s forwards;
+    pointer-events: none;
+}
 
-                    if (!href || href.startsWith('mailto:') || href === '#') return;
-                    if (target === '_blank') return; 
+.loader-logo {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: bold;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: blurPulse 3s infinite alternate;
+}
 
-                    e.preventDefault();
-                    closeMenu();
+/* --- 5. HEADER (DESKTOP) --- */
+header {
+    position: fixed;
+    top: 0; width: 100%;
+    padding: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100;
+    mix-blend-mode: exclusion;
+}
 
-                    if (href.includes('#')) {
-                        const targetId = href.split('#')[1];
-                        const targetElement = document.getElementById(targetId);
+/* Logo Image */
+a.logo {
+    display: flex; align-items: center;
+    height: auto; width: auto;
+    text-decoration: none;
+    z-index: 1001;
+}
 
-                        if (targetElement) {
-                            fadeToBlack(() => {
-                                targetElement.scrollIntoView({ behavior: 'auto' });
-                                transitionOverlay.classList.remove('active');
-                            });
-                        } else { fadeToBlack(() => { window.location.href = href; }); }
-                    } else { fadeToBlack(() => { window.location.href = href; }); }
-                });
-            });
-        });
-    </script>
-    <script type="module" src="main.js?v=5.0"></script>
-</body>
-</html>
+.logo img {
+    height: 120px; /* Taille Desktop préservée */
+    width: auto;
+    display: block;
+    transition: opacity 0.3s;
+}
+
+.logo:hover img { opacity: 0.8; }
+
+/* Menu Desktop */
+nav ul { display: flex; gap: 2rem; list-style: none; }
+nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+
+/* Bouton Burger (Caché sur Desktop) */
+.menu-toggle { display: none; }
+
+
+/* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
+section {
+    min-height: 100vh !important; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    overflow: hidden; 
+}
+
+h1 {
+    font-size: clamp(3rem, 10vw, 8rem);
+    text-transform: uppercase;
+    letter-spacing: -3px;
+    line-height: 0.9;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 30px rgba(215, 39, 37, 0.4);
+}
+
+.subtitle {
+    font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;
+}
+
+/* Page Accueil */
+#production { align-items: center; text-align: center; }
+
+/* Page À Propos */
+.about-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200; 
+    font-size: clamp(1.1rem, 2vw, 1.5rem); 
+    line-height: 1.6;
+    opacity: 0.9;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-text p {
+    font-weight: 200;
+}
+
+/* Page Contact */
+#contact { text-align: center; border-top: none; }
+.contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
+footer { 
+    margin-top: 0; 
+    padding-bottom: 2rem; 
+    font-size: 0.8rem; 
+    opacity: 0.5; 
+    border: none !important;
+    text-align: center; 
+    width: 100%;
+}
+
+/* --- LE LOGO GÉANT (ACCUEIL) --- */
+.hero-logo-main {
+    display: block;
+    margin: 0 auto 2rem auto;
+    width: clamp(300px, 60vw, 900px);
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
+    opacity: 0;
+    animation: fadeInLogo 1.5s ease-out forwards 0.5s;
+}
+
+@keyframes fadeInLogo {
+    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(20px); }
+}
+
+#production .subtitle {
+    position: relative;
+    z-index: 2;
+    margin-top: 0;
+}
+
+/* --- 7. VIDÉO D'ARRIÈRE-PLAN (HOME) --- */
+.hero-video-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1; overflow: hidden;
+}
+
+.hero-video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
+    pointer-events: none;
+}
+
+/* --- TITRES SECTIONS --- */
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 3rem auto;
+    font-family: 'Montserrat', sans-serif; 
+    font-weight: 200;  
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #ffffff;
+    text-align: center;
+}
+
+.section-title::before,
+.section-title::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background-color: var(--color-accent);
+    flex-grow: 1;
+    max-width: 150px;
+    margin: 0 30px;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.1rem; 
+        letter-spacing: 2px; 
+        white-space: nowrap; 
+    }
+    .section-title::before,
+    .section-title::after {
+        max-width: 40px;       
+        min-width: 20px;       
+        margin: 0 10px;
+    }
+}
+
+
+/* --- 8. BENTO GRID --- */
+#projects { 
+    padding: 0 2rem; 
+    min-height: 100vh; 
+    display: flex; flex-direction: column; justify-content: center;
+}
+
+.bento-container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    width: 100%; 
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) !important; 
+    grid-auto-rows: auto; 
+    gap: 20px;
+    grid-auto-flow: dense; 
+}
+
+.bento-item {
+    position: relative;
+    display: block;
+    border-radius: 12px; 
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden; 
+    background: #000;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    width: 100%;
+    aspect-ratio: 1 / 1 !important; 
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.bento-big { 
+    grid-column: span 2 !important; 
+    grid-row: span 2 !important; 
+    aspect-ratio: 1 / 1 !important; 
+}
+.bento-tall { 
+    grid-column: span 1 !important; 
+    grid-row: span 2 !important; 
+    aspect-ratio: 1 / 2 !important; 
+}
+
+.bento-item img {
+    width: 100%; height: 100%; 
+    object-fit: cover; 
+    object-position: center center;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    opacity: 0.8;
+}
+
+.bento-tall img { object-position: top center !important; }
+
+.bento-overlay {
+    position: absolute; 
+    bottom: 0; left: 0; width: 100%; 
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    opacity: 0; 
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+    z-index: 10;
+}
+
+.bento-overlay h3 { 
+    font-size: 1.4rem; 
+    text-transform: uppercase; 
+    margin-bottom: 0.3rem; 
+    color: #fff; 
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.bento-overlay p { 
+    color: var(--color-accent); 
+    font-size: 0.8rem; 
+    font-weight: bold; 
+    letter-spacing: 2px; 
+    text-transform: uppercase;
+}
+
+.bento-item:hover { 
+    border-color: var(--color-accent); 
+    box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2);
+}
+.bento-item:hover img { transform: scale(1.1); opacity: 1; }
+.bento-item:hover .bento-overlay { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 1024px) {
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
+    
+    .bento-item, .bento-big, .bento-tall { 
+        grid-column: span 1 !important; 
+        grid-row: span 1 !important; 
+        aspect-ratio: 16/9 !important; 
+    }
+    .bento-overlay { opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+}
+
+/* --- 9. PAGE DÉTAIL PROJET --- */
+.project-hero {
+    height: 70vh;
+    min-height: 70vh; 
+    position: relative;
+    overflow: hidden;
+    display: block;
+    background-color: #000;
+}
+
+.project-hero img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0; 
+    animation: fadeInImage 0.5s ease forwards;
+    -webkit-mask-image: 
+        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%), 
+        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%); 
+    -webkit-mask-composite: source-in;
+    mask-image: 
+        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%),
+        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%);
+    mask-composite: intersect;
+    transition: all 0.5s ease;
+}
+
+@keyframes fadeInImage {
+    to { opacity: 0.8; }
+}
+
+.project-header-content {
+    position: absolute; 
+    bottom: 0; left: 0; width: 100%;
+    padding: 4rem 2rem;
+    z-index: 2;
+    background: linear-gradient(to top, var(--color-bg), transparent);
+}
+
+.project-title {
+    font-size: clamp(3rem, 6vw, 5rem);
+    text-transform: uppercase;
+    line-height: 1; margin-bottom: 1rem; color: #fff;
+    text-shadow: 0 0 30px rgba(215, 39, 37, 0.6);
+}
+
+.back-btn {
+    position: fixed; top: 2rem; left: 2rem;
+    z-index: 1001;
+    color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+    mix-blend-mode: exclusion;
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    padding: 10px 15px; border-radius: 30px;
+    background: rgba(0,0,0,0.2); backdrop-filter: blur(5px);
+}
+.back-btn:hover::before { transform: translateX(-5px); }
+.back-btn::before { content: '←'; font-size: 1.2rem; transition: transform 0.3s; }
+
+.project-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 4rem 2rem 2rem 2rem; 
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    position: relative;
+    z-index: 5;
+}
+.synopsis { 
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 200 !important; 
+    font-size: 1.2rem; 
+    line-height: 1.8; 
+    color: #ddd; 
+}
+.tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
+.tech-specs h4:first-child { margin-top: 0; }
+.tech-specs p { color: #888; margin-bottom: 0.5rem; }
+
+/* --- 9.5. TRAILER --- */
+.full-width-video {
+    width: 100%;
+    background: transparent;
+    margin-top: 0rem; 
+    padding: 0; 
+    text-align: center;
+    border: none !important;
+    position: relative;
+    z-index: 10;
+}
+
+.video-label {
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+    display: inline-block;
+    background: transparent; 
+    padding: 0;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 16 / 9;
+    margin: 0;
+    -webkit-mask-image: 
+        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
+        linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: 
+        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
+        linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-composite: intersect;
+}
+
+.video-wrapper iframe {
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    border: none;
+    display: block;
+}
+
+/* --- 10. MENTIONS LÉGALES --- */
+.legal-section {
+    padding: 8rem 2rem 4rem; max-width: 800px; margin: 0 auto; color: #ccc;
+}
+.legal-section h1 {
+    color: #fff; text-transform: uppercase; text-align: center; margin-bottom: 4rem;
+    font-size: clamp(2rem, 4vw, 3rem); text-shadow: 0 0 20px rgba(215, 39, 37, 0.4);
+}
+.legal-block { margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; }
+.legal-block:last-child { border-bottom: none; }
+.legal-block h2 { color: var(--color-accent); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.legal-block p { line-height: 1.8; margin-bottom: 1rem; font-weight: 300; }
+.legal-block strong { color: #fff; font-weight: 500; }
+.legal-block a { text-decoration: underline; text-decoration-color: var(--color-accent); }
+.legal-block a:hover { color: var(--color-accent); }
+
+/* --- 11. ANIMATIONS KEYFRAMES --- */
+@keyframes drift1 {
+    0% { transform: translate(10%, 10%) scale(1); }
+    50% { transform: translate(40%, 20%) scale(1.1); }
+    100% { transform: translate(20%, 50%) scale(0.9); }
+}
+@keyframes drift2 {
+    0% { transform: translate(-10%, -10%) scale(0.9); }
+    50% { transform: translate(-30%, -40%) scale(1.2); }
+    100% { transform: translate(-10%, -60%) scale(1); }
+}
+@keyframes blurPulse {
+    0% { filter: blur(15px); opacity: 0.4; }
+    50% { filter: blur(0px); opacity: 1; }
+    100% { filter: blur(8px); opacity: 0.7; }
+}
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* --- TRANSITIONS --- */
+.page-transition {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #000;
+    z-index: 99999;
+    pointer-events: none; 
+    opacity: 0; 
+    transition: opacity 0.5s ease-in-out;
+}
+.page-transition.active { opacity: 1; pointer-events: all; }
+
+/* --- BOUTON INSTAGRAM --- */
+.insta-link {
+    display: inline-block;
+    color: #fff;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    opacity: 0.7;
+}
+.insta-link svg { width: 40px; height: 40px; }
+.insta-link:hover {
+    color: var(--color-accent); opacity: 1; transform: scale(1.1);
+}
+
+.auto-height-section {
+    min-height: auto !important; 
+    justify-content: flex-start !important; 
+    padding-bottom: 4 !important; 
+    padding-top: 4rem; 
+}
+
+/* --- SMART NAVIGATION (SCROLL) --- */
+nav, .menu-toggle {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 1;
+    transform: translateY(0);
+}
+
+body.scroll-down nav,
+body.scroll-down .menu-toggle {
+    opacity: 0; 
+    transform: translateY(-20px); 
+    pointer-events: none; 
+}
+
+.logo {
+    transition: opacity 0.3s;
+    z-index: 1002; 
+}
+
+
+/* =========================================================
+   12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px)
+   ========================================================= */
+@media (max-width: 1024px) {
+
+    /* 1. RESET SÉCURISÉ */
+    header:not(.project-hero), 
+    nav, 
+    .nav-container {
+        position: static !important;
+        transform: none !important;
+        mix-blend-mode: normal !important;
+        filter: none !important;
+        perspective: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* 2. LE HEADER PRINCIPAL */
+    header:not(.project-hero) {
+        position: fixed !important;
+        top: 0; left: 0;
+        z-index: 1200;
+        padding: 1.5rem 1rem !important;
+        pointer-events: none; 
+        
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 20px !important;
+    }
+
+    /* 3. LOGO & BURGER */
+    .logo {
+        pointer-events: auto;
+        position: relative;
+        z-index: 1300;
+        display: block !important;
+    }
+    .logo img { height: 100px !important; width: auto !important; }
+
+    .menu-toggle {
+        display: block !important;
+        pointer-events: auto;
+        cursor: pointer;
+        width: 35px; height: 30px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1300;
+    }
+    
+    .menu-toggle .bar {
+        width: 30px; height: 2px; margin: 6px auto;
+        background-color: #ffffff !important;
+        display: block; transition: 0.3s;
+        border-radius: 2px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
+    
+    .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+
+    /* 4. LE MENU NOIR (PLEIN ÉCRAN) */
+    .nav-menu {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        
+        background-color: #000000 !important;
+        background: #000000 !important;
+        isolation: isolate !important;
+        
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        
+        padding: 0 !important;
+        margin: 0 !important;
+        list-style: none !important;
+        
+        visibility: hidden !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease-in-out;
+        
+        z-index: 1250 !important;
+    }
+
+    .nav-menu.active {
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .nav-menu li {
+        display: block !important;
+        width: 100%;
+        text-align: center;
+        padding: 0; margin: 0;
+    }
+
+    .nav-link {
+        font-size: 2rem !important;
+        color: #ffffff !important;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-decoration: none !important;
+        display: block;
+        text-shadow: none !important;
+    }
+
+    /* 5. GESTION DES ESPACES */
+    section:not(.project-hero) { 
+        padding-top: 160px !important; 
+    }
+    
+    #production { padding-top: 0 !important; }
+    
+    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
+    .bento-item, .bento-big, .bento-tall { 
+        grid-column: span 1 !important; grid-row: span 1 !important; 
+        width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
+    }
+
+    /* --- G. CORRECTION VIDÉO MOBILE --- */
+    .full-width-video {
+        margin-top: 0 !important; 
+        padding-top: 3rem; 
+    }
+
+    /* ICI J'AI SUPPRIMÉ LE BLOC QUI BLOQUAIT LE SCROLL */
+
+}
+
+/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE --- */
+@media (max-width: 1024px) {
+
+    section:not(.project-hero) { 
+        padding-top: 20px !important; 
+    }
+
+    .project-content {
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: 0 !important;
+        min-height: auto !important;
+        gap: 2rem !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    .synopsis {
+        width: 100% !important;
+        margin-bottom: 1rem !important;
+        font-size: 1.1rem !important;
+    }
+
+    .tech-specs {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1.5rem 1rem !important;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1.5rem;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .project-hero {
+        height: 45vh !important;
+        min-height: 280px !important;
+    }
+
+    /* --- FIX VIDÉO ESPACE --- */
+    .full-width-video {
+        min-height: auto !important;
+        height: auto !important;
+        display: block !important;
+        margin-top: -2rem !important;
+        padding-top: 0 !important;
+        padding-bottom: 2rem !important;
+        position: relative;
+        z-index: 10;
+    }
+
+    .video-label {
+        display: block !important;
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+        position: relative;
+        z-index: 20;
+    }
+}
+
+/* =========================================================
+   STYLE MAIL LUXE (PC & MOBILE UNIFIÉS)
+   ========================================================= */
+
+.contact-info a[href^="mailto:"] {
+    font-family: 'Montserrat', sans-serif !important; 
+    font-weight: 200 !important;       
+    letter-spacing: 2px !important;    
+    color: #cccccc !important;         
+    font-size: clamp(1rem, 1.5vw, 1.4rem) !important; 
+    white-space: nowrap !important;    
+    text-decoration: none !important;  
+    border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
+    padding-bottom: 8px;               
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.contact-info a[href^="mailto:"]:hover {
+    color: #ffffff !important;         
+    border-bottom-color: #D72725;      
+    transform: translateY(-2px);       
+}
+
+/* =========================================================
+   GESTION LOGO (VISIBLE UNIQUEMENT EN HAUT)
+   ========================================================= */
+
+/* Par défaut le logo est visible */
+.logo {
+    transition: all 0.4s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Dès qu'on quitte le haut de page, le logo part */
+body.not-at-top .logo {
+    opacity: 0 !important;
+    pointer-events: none;
+    transform: translateY(-20px);
+}
+
+/* =========================================================
+   CORRECTIF TAILLE NOM CONTACT (MOBILE)
+   ========================================================= */
+@media (max-width: 768px) {
+    
+    /* On cible le premier paragraphe de contact (Le Nom) */
+    .contact-info p:first-child {
+        /* On le passe à 1rem (16px) pour qu'il soit plus petit que le titre (1.1rem) */
+        font-size: 1rem !important; 
+        line-height: 1.4 !important;
+        margin-bottom: 0.2rem !important; /* On réduit aussi l'espace sous le nom */
+    }
+    
+    /* On ajuste aussi l'espace global de la section contact sur mobile */
+    .contact-info {
+        padding-top: 1rem !important;
+    }
+}
+
+/* =========================================================
+   SECTION ÉQUIPE (STYLE BENTO CARRÉ)
+   ========================================================= */
+
+/* 1. La Grille (4 colonnes sur PC, 2 sur Tablette, 1 sur Mobile) */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 carrés alignés */
+    gap: 20px;
+    max-width: 1100px;
+    margin: 3rem auto 0 auto; /* Espace au-dessus */
+    padding: 0 2rem;
+    width: 100%;
+}
+
+/* 2. La Carte (Le Carré) */
+.team-card {
+    position: relative;
+    aspect-ratio: 1 / 1; /* Carré parfait */
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #000;
+}
+
+/* 3. La Photo (L'effet "Cinéma") */
+.team-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    
+    /* L'EFFET MAGIQUE D'INTÉGRATION : */
+    filter: grayscale(100%) contrast(1.1) brightness(0.9); /* Noir et blanc + Contraste */
+    transition: all 0.5s ease;
+    opacity: 0.8;
+}
+
+/* 4. Le Texte (Nom + Rôle) - Toujours visible en bas */
+.team-overlay {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    padding: 1.5rem;
+    
+    /* Dégradé pour que le texte soit lisible sur n'importe quelle image */
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent);
+    
+    text-align: center;
+    z-index: 2;
+}
+
+.team-overlay h3 {
+    color: #fff;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+    font-weight: 400;
+}
+
+.team-overlay p {
+    color: var(--color-accent); /* Rouge */
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* 5. L'Animation au Survol (PC uniquement) */
+@media (hover: hover) {
+    .team-card:hover {
+        border-color: var(--color-accent); /* Bordure rouge */
+    }
+    
+    .team-card:hover img {
+        filter: grayscale(0%) contrast(1) brightness(1); /* La couleur revient ! */
+        transform: scale(1.05); /* Zoom léger */
+        opacity: 1;
+    }
+}
+
+/* 6. RESPONSIVE (Tablette & Mobile) */
+@media (max-width: 1024px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 par ligne sur tablette */
+        gap: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    .team-grid {
+        grid-template-columns: 1fr; /* 1 par ligne sur mobile (Gros portraits) */
+        padding: 0 15px;
+    }
+    /* Sur mobile, on garde un peu de couleur pour que ce soit vivant */
+    .team-card img {
+        filter: grayscale(100%); /* On peut laisser 100% ou mettre 50% selon votre goût */
+    }
+}
+
+/* =========================================================
+   CORRECTIF ÉQUIPE MOBILE (2 COLONNES / 2 LIGNES)
+   ========================================================= */
+@media (max-width: 768px) {
+    
+    .team-grid {
+        /* On force 2 colonnes au lieu d'une seule */
+        grid-template-columns: repeat(2, 1fr) !important; 
+        
+        /* On réduit l'espace entre les carrés pour gagner de la place */
+        gap: 10px !important; 
+        padding: 0 10px !important;
+        margin-top: 2rem !important;
+    }
+
+    /* On ajuste la taille du texte pour qu'il rentre dans les petits carrés */
+    .team-overlay {
+        padding: 0.8rem !important; /* Moins de marge interne */
+    }
+
+    .team-overlay h3 {
+        font-size: 0.85rem !important; /* Nom un peu plus petit */
+        margin-bottom: 0.2rem !important;
+        white-space: nowrap; /* Évite que le nom se coupe bêtement */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .team-overlay p {
+        font-size: 0.6rem !important; /* Rôle plus discret */
+        letter-spacing: 1px !important;
+    }
+}
+
+/* =========================================================
+   CORRECTION ANTI-STRETCH ABSOLUE
+   ========================================================= */
+.bento-item img, 
+.project-hero img {
+    position: absolute !important; 
+    top: 0; 
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; 
+    object-position: center !important;
+    display: block;
+    opacity: 0; /* On cache l'image par défaut */
+}
+
+/* Le fond noir qui tient la place pendant le chargement */
+.bento-item, .project-hero {
+    position: relative !important;
+    overflow: hidden !important;
+    background-color: #050505 !important;
+}
+
+/* Révélation en douceur une fois chargée */
+.bento-item img {
+    opacity: 0.8; /* Opacité normale de ta grille */
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+
+
+
+
+
