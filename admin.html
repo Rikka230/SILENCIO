@@ -82,14 +82,25 @@
                             <input type="text" id="proj-subtitle" placeholder="Ex: Court-métrage" required>
                         </div>
 
-                        <div class="form-group">
-                            <label>Affiche (Image Principale)</label>
-                            <div id="image-dropzone" class="dropzone">
-                                <span class="drop-text">Glissez une image ici ou cliquez pour parcourir</span>
-                                <input type="file" id="proj-image" accept="image/jpeg, image/png, image/webp" hidden>
-                                <img id="image-preview" class="hidden" alt="Aperçu">
+                        <div class="form-group" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <div style="flex: 1;">
+                                <label>Format de la Grille</label>
+                                <select id="proj-format" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
+                                    <option value="">Standard (Carré 1x1)</option>
+                                    <option value="bento-big">Grand Panoramique (2x2)</option>
+                                    <option value="bento-tall">Vertical Affiche (1x2)</option>
+                                </select>
                             </div>
-                            <p class="help-text">Sera auto-optimisée (1920px max, WebP/JPEG compressé).</p>
+                            <div style="flex: 1;">
+                                <label>Focus (Cadrage)</label>
+                                <select id="proj-focus" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
+                                    <option value="center">Centré (Défaut)</option>
+                                    <option value="top">Vers le Haut (Visages)</option>
+                                    <option value="bottom">Vers le Bas</option>
+                                    <option value="left">Vers la Gauche</option>
+                                    <option value="right">Vers la Droite</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -144,6 +155,7 @@
 </body>
 
 </html>
+
 
 
 
