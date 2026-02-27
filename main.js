@@ -212,6 +212,7 @@ function initAdmin() {
             setupDropzone();
             setupProjectForm();
             loadAdminProjects();
+            setupHomeVideo();
         } else {
             // Déconnecté : on s'assure que le rideau est là, ET on affiche la boîte de connexion
             loginOverlay.classList.remove('hidden');
@@ -616,6 +617,7 @@ async function saveNewOrder() {
         document.body.style.cursor = 'default';
     }
 }
+
 
 
 
