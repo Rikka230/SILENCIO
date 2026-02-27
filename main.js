@@ -421,46 +421,89 @@ async function loadAdminProjects() {
 }
 
 // =========================================
-// 10. DRAG & DROP (Réorganisation et sauvegarde)
+// 10. DRAG & DROP (PC + Tactile Mobile)
 // =========================================
 function setupDragAndDrop() {
     const list = document.getElementById('project-list');
     const items = list.querySelectorAll('.sortable-item');
 
     items.forEach(item => {
-        // Début du glissement
+        const handle = item.querySelector('.drag-handle');
+
+        // --- 1. GESTION SOURIS (ORDINATEUR) ---
+        handle.addEventListener('mousedown', () => item.setAttribute('draggable', 'true'));
+        handle.addEventListener('mouseup', () => item.removeAttribute('draggable'));
+        handle.addEventListener('mouseleave', () => item.removeAttribute('draggable'));
+
         item.addEventListener('dragstart', (e) => {
-            // Sécurité : On empêche le drag si on clique sur un bouton d'action
-            if(e.target.tagName === 'BUTTON') {
-                e.preventDefault();
-                return;
-            }
+            if(e.target.tagName === 'BUTTON') return;
             setTimeout(() => item.classList.add('dragging'), 0);
         });
 
-        // Fin du glissement
         item.addEventListener('dragend', async () => {
+            item.classList.remove('dragging');
+            item.removeAttribute('draggable');
+            await saveNewOrder();
+        });
+
+        // --- 2. GESTION TACTILE (SMARTPHONES) ---
+        handle.addEventListener('touchstart', (e) => {
+            // Empêche l'écran de scroller quand on attrape la poignée
+            document.body.style.overflow = 'hidden'; 
+            item.classList.add('dragging');
+        }, { passive: false });
+
+        handle.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Bloque le rebond de l'écran sur mobile
+            const draggingItem = document.querySelector('.dragging');
+            if (!draggingItem) return;
+
+            const touch = e.touches[0];
+            
+            // Astuce "Ninja" Vanilla JS : on cache la ligne 1 milliseconde 
+            // pour que le navigateur puisse "voir" quel élément se trouve sous le doigt
+            draggingItem.style.display = 'none';
+            const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
+            draggingItem.style.display = ''; // On la réaffiche instantanément
+
+            // Si on survole une autre ligne, on les inverse
+            if (elementUnderFinger) {
+                const sibling = elementUnderFinger.closest('.sortable-item');
+                if (sibling && sibling !== draggingItem) {
+                    const bounding = sibling.getBoundingClientRect();
+                    // Moitié haute ou moitié basse de la ligne visée ?
+                    if (touch.clientY > bounding.top + (bounding.height / 2)) {
+                        sibling.after(draggingItem);
+                    } else {
+                        sibling.before(draggingItem);
+                    }
+                }
+            }
+        }, { passive: false });
+
+        handle.addEventListener('touchend', async () => {
+            // On rend le scroll de l'écran à nouveau possible
+            document.body.style.overflow = ''; 
             item.classList.remove('dragging');
             await saveNewOrder();
         });
     });
 
-    // Gestion du survol pendant le glissement
+    // --- GESTION DU SURVOL SOURIS (PC) ---
     list.addEventListener('dragover', (e) => {
         e.preventDefault(); 
         const draggingItem = document.querySelector('.dragging');
         if (!draggingItem) return;
 
         const siblings = [...list.querySelectorAll('.sortable-item:not(.dragging)')];
-
         let nextSibling = siblings.find(sibling => {
             return e.clientY <= sibling.getBoundingClientRect().top + sibling.offsetHeight / 2;
         });
-
         list.insertBefore(draggingItem, nextSibling);
     });
 }
 
+// Fonction de sauvegarde (Reste inchangée, mais je la remets pour que tu aies le bloc complet)
 async function saveNewOrder() {
     const items = document.querySelectorAll('.sortable-item');
     document.body.style.cursor = 'wait';
