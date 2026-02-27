@@ -285,45 +285,117 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR D'OPTIMISATION ET VISUALISATION BENTO
+// 7. MOTEUR D'OPTIMISATION ET VISUALISATION DIVISÉE
 // =========================================
 
-// --- A. LA FONCTION MAGIQUE DE VISUALISATION (D.A.) ---
-// Cette fonction adapte l'image sous tes yeux en fonction du format choisi
-function syncBentoPreview() {
-    const preview = document.getElementById('image-preview');
+// --- A. LA FONCTION MAGIQUE DE DIVISION ET DE CADRAGE (D.A.) ---
+function syncBentoDA() {
+    // 1. On récupère tous les éléments de D.A.
+    const daContainer = document.getElementById('image-da-container');
+    const previewsGroup = document.getElementById('previews-group');
+    const dropzone = document.getElementById('image-dropzone');
+    const dropText = dropzone ? dropzone.querySelector('.drop-text') : null;
+
+    const previewBloc = document.getElementById('image-preview-bloc');
+    const previewCadrage = document.getElementById('image-preview-cadrage');
+    const blocWrapper = document.getElementById('da-bloc-wrapper');
+    
     const formatSelect = document.getElementById('proj-format');
-    if (!preview || !formatSelect) return;
+    const focusSelect = document.getElementById('proj-focus');
 
-    // On efface les anciennes formes
-    preview.classList.remove('preview-standard', 'preview-big', 'preview-tall');
+    if (!daContainer || !previewsGroup || !previewBloc) return;
 
-    // On applique la nouvelle forme instantanément
-    const val = formatSelect.value;
-    if (val === 'bento-big') preview.classList.add('preview-big'); // Grand
-    else if (val === 'bento-tall') preview.classList.add('preview-tall'); // Haut
-    else preview.classList.add('preview-standard'); // Standard
+    // --- MISE À JOUR VISUELLE EN DIRECT (D.A.) ---
+    function updateLiveView() {
+        if (!previewBloc.src || previewBloc.src === window.location.href) return;
+        
+        // 1. On adapte la forme de la boîte de visualisation du Bloc
+        blocWrapper.className = '';
+        if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
+        
+        // 2. On applique le focus manuellement aux deux images !
+        if (focusSelect) {
+            previewBloc.style.objectPosition = focusSelect.value;
+            previewCadrage.style.objectPosition = focusSelect.value;
+        }
+    }
+
+    // --- ÉCOUTEURS DES CHANGEMENTS DE LISTE ---
+    if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
+    if (focusSelect) focusSelect.addEventListener('change', updateLiveView);
+
+    // --- LE MOTEUR DE DIVISION MAGIQUE ---
+    // Cette partie s'assure que si une image est là, on divise. Sinon, on regroupe.
+    const hasImage = previewBloc.src && previewBloc.src !== window.location.href && !previewBloc.classList.contains('hidden');
+
+    if (hasImage) {
+        // IMAGE DÉTECTÉE -> On lance l'animation de division
+        daContainer.classList.remove('da-container-single');
+        daContainer.classList.add('da-container-split');
+        
+        if(dropText) dropText.style.display = 'none'; // On cache le texte de dépot
+        
+        previewsGroup.classList.remove('previews-hidden');
+        previewsGroup.classList.add('previews-visible');
+        
+        updateLiveView(); // On force le cadrage instantané
+    } else {
+        // PAS D'IMAGE -> On regroupe
+        daContainer.classList.remove('da-container-split');
+        daContainer.classList.add('da-container-single');
+        
+        if(dropText) dropText.style.display = 'block'; // On remontre le texte de dépot
+        
+        previewsGroup.classList.remove('previews-visible');
+        previewsGroup.classList.add('previews-hidden');
+    }
 }
 
+// --- B. MISE À JOUR DE LA FONCTION SETUPDROPZONE (Remplacer l'ancienne) ---
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
     if (!dropzone) return; 
 
     const fileInput = document.getElementById('proj-image');
-    const imagePreview = document.getElementById('image-preview');
-    const dropText = dropzone.querySelector('.drop-text');
     
-    const formatSelect = document.getElementById('proj-format');
-    const focusSelect = document.getElementById('proj-focus');
+    // On cible les DEUX nouvelles images
+    const previewBloc = document.getElementById('image-preview-bloc');
+    const previewCadrage = document.getElementById('image-preview-cadrage');
 
-    // --- MISE À JOUR VISUELLE EN DIRECT (D.A.) ---
-    // Quand on change le format dans la liste -> l'image change de forme !
-    if (formatSelect) formatSelect.addEventListener('change', syncBentoPreview);
-    
-    // Quand on change le focus -> l'image glisse !
-    if (focusSelect) focusSelect.addEventListener('change', () => {
-        imagePreview.style.objectPosition = focusSelect.value;
-    });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+    ['dragenter', 'dragover'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false); });
+    ['dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false); });
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+    fileInput.addEventListener('change', function() { if (this.files.length) handleFile(this.files[0]); });
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide.", "error"); return; }
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image(); img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 1920; let width = img.width, height = img.height;
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob((blob) => {
+                    optimizedImageBlob = blob; 
+                    const compressedUrl = URL.createObjectURL(blob);
+                    
+                    // On injecte l'image dans les DEUX previews
+                    if(previewBloc) previewBloc.src = compressedUrl;
+                    if(previewCadrage) previewCadrage.src = compressedUrl;
+
+                    syncBentoDA(); // On lance la division magique !
+                    UI.showToast("Affiches prêtes pour la D.A. !");
+                }, 'image/webp', 0.8);
+            };
+        };
+    }
+}
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
     function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
@@ -675,6 +747,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
