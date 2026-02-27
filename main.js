@@ -20,10 +20,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
+
 
 // 2. UTILITAIRES UX (Micro-interactions)
 const UI = {
@@ -252,4 +252,5 @@ function setupDropzone() {
         };
     }
 }
+
 
