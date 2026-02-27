@@ -289,14 +289,14 @@ function initAdmin() {
 // =========================================
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
+    if (!dropzone) return; // <-- LA SÉCURITÉ ABSOLUE EST ICI
+
     const fileInput = document.getElementById('proj-image');
     const imagePreview = document.getElementById('image-preview');
     const dropText = dropzone.querySelector('.drop-text');
     
     const formatSelect = document.getElementById('proj-format');
     const focusSelect = document.getElementById('proj-focus');
-
-    if (!dropzone) return;
 
     // --- MISE À JOUR VISUELLE EN DIRECT ---
     function updateLivePreview() {
@@ -640,6 +640,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
