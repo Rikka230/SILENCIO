@@ -317,3 +317,115 @@ input:focus { outline: none; border-color: var(--color-accent); }
     max-width: 250px; /* Plus étroit */
 }
 
+/* =========================================
+   SILENCIO D.A. CONSTRUCTOR (DIVISION ANIMÉE)
+   ========================================= */
+
+/* Le conteneur principal */
+#image-da-container {
+    width: 100%;
+    border-radius: 8px;
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Animation fluide */
+    overflow: hidden;
+    margin-bottom: 1rem;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* --- ÉTAT 1 : Vidéo seule (da-container-single) --- */
+#image-da-container.da-container-single {
+    aspect-ratio: 21 / 9; /* Forme de la zone de dépot */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- ÉTAT 2 : Divisé en 2 (da-container-split) --- */
+#image-da-container.da-container-split {
+    aspect-ratio: auto; /* Laisse le contenu décider */
+    display: flex;
+    flex-direction: column; /* On empile les previews proprement */
+    gap: 0px;
+}
+
+/* --- ÉTATS DES PREVIEWS --- */
+#previews-group {
+    width: 100%;
+    display: flex;
+    flex-direction: row; /* Côte à côte sur PC */
+    gap: 0px;
+    transition: all 0.6s ease;
+}
+
+#previews-group.previews-hidden {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+}
+
+#previews-group.previews-visible {
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+    padding: 0;
+}
+
+/* --- Le Design des boîtes --- */
+.da-preview-box {
+    flex: 1; /* Moitié-moitié */
+    padding: 1.5rem;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.da-preview-box:last-child { border-right: none; }
+
+.da-preview-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-accent); /* Rouge */
+    margin-bottom: 1rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* --- Blindage Anti-Stretch des images d'aperçu --- */
+#da-bloc-wrapper, 
+#da-cadrage-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #050505;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+#image-preview-bloc, 
+#image-preview-cadrage {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: object-position 0.4s ease;
+}
+
+/* --- Visualisation 1 : Le Bloc Bento --- */
+#da-bloc-wrapper {
+    max-width: 300px;
+    aspect-ratio: 1 / 1; /* Standard par défaut */
+    margin: 0 auto;
+}
+#da-bloc-wrapper.preview-big { aspect-ratio: 1 / 1; max-width: 100%; }
+#da-bloc-wrapper.preview-tall { aspect-ratio: 1 / 2; max-width: 250px; }
+
+/* --- Visualisation 2 : Le Cadrage Page Film --- */
+#da-cadrage-wrapper {
+    aspect-ratio: 21 / 9; /* Même ratio que l'en-tête de ta page film */
+    width: 100%;
+    max-width: 100%;
+}
