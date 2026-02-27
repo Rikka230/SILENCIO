@@ -18,20 +18,14 @@ body {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-main);
-    display: flex;
-    min-height: 100vh;
+    display: block; /* <-- C'est ça qui causait le bug (avant c'était flex) */
 }
 
 /* --- LAYOUT --- */
-.admin-layout { display: flex; width: 100%; }
-
-.admin-sidebar {
-    width: 250px;
-    background-color: var(--color-panel);
-    border-right: 1px solid var(--color-border);
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
+.admin-layout { 
+    display: flex; 
+    width: 100%; 
+    min-height: 100vh; /* <-- On déplace la hauteur minimale ici */
 }
 
 .admin-logo {
@@ -150,4 +144,13 @@ input:focus { outline: none; border-color: var(--color-accent); }
 
 .back-link-login:hover {
     color: var(--color-text);
+}
+
+/* --- UTILITAIRES --- */
+.hidden { 
+    display: none !important; 
+}
+.sidebar-footer {
+    margin-top: auto; /* Pousse les boutons d'action tout en bas du menu */
+    padding-top: 2rem;
 }
