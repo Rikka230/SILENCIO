@@ -37,7 +37,7 @@ a:hover { opacity: 0.7; }
     pointer-events: none;
 }
 
-ambient-light::before {
+.ambient-light::before {
     content: ''; position: absolute;
     width: 150vw; height: 150vw;
     top: -50%; left: -50%;
@@ -730,8 +730,6 @@ body.scroll-down .menu-toggle {
         padding-top: 3rem; 
     }
 
-    /* ICI J'AI SUPPRIMÉ LE BLOC QUI BLOQUAIT LE SCROLL */
-
 }
 
 /* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE --- */
@@ -999,7 +997,6 @@ body.not-at-top .logo {
     object-fit: cover !important; 
     object-position: center !important;
     display: block;
-    opacity: 0; /* On cache l'image par défaut */
 }
 
 /* Le fond noir qui tient la place pendant le chargement */
@@ -1008,15 +1005,3 @@ body.not-at-top .logo {
     overflow: hidden !important;
     background-color: #050505 !important;
 }
-
-/* Révélation en douceur une fois chargée */
-.bento-item img {
-    opacity: 0.8; /* Opacité normale de ta grille */
-    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-
-
-
-
-
