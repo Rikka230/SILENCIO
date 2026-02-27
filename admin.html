@@ -82,6 +82,16 @@
                             <input type="text" id="proj-subtitle" placeholder="Ex: Court-métrage" required>
                         </div>
 
+                        <div class="form-group">
+                            <label>Affiche (Image Principale)</label>
+                            <div id="image-dropzone" class="dropzone">
+                                <span class="drop-text">Glissez une image ici ou cliquez pour parcourir</span>
+                                <input type="file" id="proj-image" accept="image/jpeg, image/png, image/webp" hidden>
+                                <img id="image-preview" class="hidden" alt="Aperçu">
+                            </div>
+                            <p class="help-text">Sera auto-optimisée (1920px max, WebP/JPEG compressé).</p>
+                        </div>
+
                         <div class="form-group" style="display: flex; gap: 1rem; margin-top: 1rem;">
                             <div style="flex: 1;">
                                 <label>Format de la Grille</label>
@@ -155,6 +165,7 @@
 </body>
 
 </html>
+
 
 
 
