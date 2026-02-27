@@ -45,11 +45,13 @@ const UI = {
 
 // 3. ROUTEUR INTELLIGENT
 document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
+    // On convertit l'URL en minuscules pour éviter les casses accidentelles
+    const path = window.location.pathname.toLowerCase();
 
-    if (path.includes('admin.html')) {
+    // On cherche juste le mot-clé, avec ou sans ".html"
+    if (path.includes('admin')) {
         initAdmin();
-    } else if (path.includes('projet.html')) {
+    } else if (path.includes('projet')) {
         initProjectPage();
     } else {
         initHomePage();
@@ -238,3 +240,4 @@ function setupDropzone() {
         };
     }
 }
+
