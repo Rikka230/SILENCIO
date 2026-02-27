@@ -285,11 +285,29 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR D'OPTIMISATION & PRÉVISUALISATION
+// 7. MOTEUR D'OPTIMISATION ET VISUALISATION BENTO
 // =========================================
+
+// --- A. LA FONCTION MAGIQUE DE VISUALISATION (D.A.) ---
+// Cette fonction adapte l'image sous tes yeux en fonction du format choisi
+function syncBentoPreview() {
+    const preview = document.getElementById('image-preview');
+    const formatSelect = document.getElementById('proj-format');
+    if (!preview || !formatSelect) return;
+
+    // On efface les anciennes formes
+    preview.classList.remove('preview-standard', 'preview-big', 'preview-tall');
+
+    // On applique la nouvelle forme instantanément
+    const val = formatSelect.value;
+    if (val === 'bento-big') preview.classList.add('preview-big'); // Grand
+    else if (val === 'bento-tall') preview.classList.add('preview-tall'); // Haut
+    else preview.classList.add('preview-standard'); // Standard
+}
+
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
-    if (!dropzone) return; // <-- LA SÉCURITÉ ABSOLUE EST ICI
+    if (!dropzone) return; 
 
     const fileInput = document.getElementById('proj-image');
     const imagePreview = document.getElementById('image-preview');
@@ -298,16 +316,14 @@ function setupDropzone() {
     const formatSelect = document.getElementById('proj-format');
     const focusSelect = document.getElementById('proj-focus');
 
-    // --- MISE À JOUR VISUELLE EN DIRECT ---
-    function updateLivePreview() {
-        if (!imagePreview.src || imagePreview.src === window.location.href) return;
-        imagePreview.className = '';
-        if (formatSelect && formatSelect.value) imagePreview.classList.add(formatSelect.value);
-        if (focusSelect) imagePreview.style.objectPosition = focusSelect.value;
-    }
-
-    if (formatSelect) formatSelect.addEventListener('change', updateLivePreview);
-    if (focusSelect) focusSelect.addEventListener('change', updateLivePreview);
+    // --- MISE À JOUR VISUELLE EN DIRECT (D.A.) ---
+    // Quand on change le format dans la liste -> l'image change de forme !
+    if (formatSelect) formatSelect.addEventListener('change', syncBentoPreview);
+    
+    // Quand on change le focus -> l'image glisse !
+    if (focusSelect) focusSelect.addEventListener('change', () => {
+        imagePreview.style.objectPosition = focusSelect.value;
+    });
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
     function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
@@ -339,9 +355,12 @@ function setupDropzone() {
                 canvas.toBlob((blob) => {
                     optimizedImageBlob = blob; 
                     imagePreview.src = URL.createObjectURL(blob);
-                    dropText.style.display = 'none'; 
-                    updateLivePreview(); // Lance l'aperçu du cadrage
-                    UI.showToast("Image prête. Choisissez le format !");
+                    imagePreview.classList.remove('hidden'); // On montre l'image
+                    dropText.style.display = 'none'; // On cache le texte de dépot
+                    
+                    syncBentoPreview(); // On applique direct le format choisi
+                    
+                    UI.showToast("Affiche prête à être cadrée !");
                 }, 'image/webp', 0.8);
             };
         };
@@ -349,51 +368,61 @@ function setupDropzone() {
 }
 
 // =========================================
-// 8. ENREGISTREMENT DU PROJET
+// 8. ENREGISTREMENT ET NETTOYAGE
 // =========================================
+
+// --- FONCTION DE NETTOYAGE BLINDÉE (CORRECTION IMAGE CASSÉE) ---
+function resetProjectForm() {
+    const form = document.getElementById('project-form');
+    if(!form) return;
+    form.reset();
+    
+    const imagePreview = document.getElementById('image-preview');
+    if (imagePreview) {
+        // CORRECTION : On ne fait pas juste .removeAttribute('src') car ça crée un flash d'image cassée.
+        // On détruit visuellement l'image en lui mettant une source vide (transparent)
+        // et on la cache immédiatement.
+        imagePreview.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // Pixel transparent
+        imagePreview.classList.add('hidden'); 
+        
+        // On retire les styles de prévisualisation Bento
+        imagePreview.classList.remove('preview-standard', 'preview-big', 'preview-tall');
+        imagePreview.style.objectPosition = 'center'; 
+    }
+    
+    document.querySelector('.drop-text').style.display = 'block';
+    document.getElementById('form-title').textContent = "Ajouter un projet";
+    document.getElementById('btn-save').textContent = "Enregistrer le projet";
+    optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null;
+}
+
 function setupProjectForm() {
     const form = document.getElementById('project-form');
     const btnSave = document.getElementById('btn-save');
     const btnCancel = form ? form.querySelector('.btn-secondary') : null; 
-
     if (!form) return;
-
-    function cleanYouTubeLink(rawUrl) {
-        if (!rawUrl) return '';
-        if (rawUrl.includes('youtube.com/embed/')) return rawUrl;
-        const match = rawUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\/shorts\/)([^#\&\?]*).*/);
-        return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : rawUrl;
-    }
-
-    function resetProjectForm() {
-        form.reset();
-        document.getElementById('image-preview').removeAttribute('src');
-        document.getElementById('image-preview').className = '';
-        document.querySelector('.drop-text').style.display = 'block';
-        document.getElementById('form-title').textContent = "Ajouter un projet";
-        btnSave.textContent = "Enregistrer le projet";
-        optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null;
-    }
 
     if (btnCancel) btnCancel.addEventListener('click', resetProjectForm);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault(); 
         const title = document.getElementById('proj-title').value.trim();
-        const subtitle = document.getElementById('proj-subtitle').value.trim();
-        const videoUrl = cleanYouTubeLink(document.getElementById('proj-video').value.trim());
-        const genre = document.getElementById('proj-genre') ? document.getElementById('proj-genre').value.trim() : '';
-        const annee = document.getElementById('proj-annee') ? document.getElementById('proj-annee').value.trim() : '';
-        const realisateur = document.getElementById('proj-realisateur') ? document.getElementById('proj-realisateur').value.trim() : '';
-        const casting = document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '';
-        const synopsis = document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '';
+        const videoUrl = document.getElementById('proj-video').value.trim();
         
-        // TES CHOIX MANUELS
-        const format = document.getElementById('proj-format') ? document.getElementById('proj-format').value : '';
-        const focus = document.getElementById('proj-focus') ? document.getElementById('proj-focus').value : 'center';
+        const projectData = {
+            titre: title, 
+            statut: document.getElementById('proj-subtitle').value.trim(), 
+            videoTrailer: videoUrl,
+            genre: document.getElementById('proj-genre') ? document.getElementById('proj-genre').value.trim() : '',
+            annee: document.getElementById('proj-annee') ? document.getElementById('proj-annee').value.trim() : '',
+            realisateur: document.getElementById('proj-realisateur') ? document.getElementById('proj-realisateur').value.trim() : '',
+            casting: document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '',
+            synopsis: document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '',
+            formatAffichage: document.getElementById('proj-format') ? document.getElementById('proj-format').value : '',
+            imageFocus: document.getElementById('proj-focus') ? document.getElementById('proj-focus').value : 'center'
+        };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
-
         btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
 
         try {
@@ -404,24 +433,23 @@ function setupProjectForm() {
                 await uploadBytes(imageRef, optimizedImageBlob);
                 imageUrl = await getDownloadURL(imageRef);
             }
-
-            const projectData = {
-                titre: title, statut: subtitle, imageAffiche: imageUrl, videoTrailer: videoUrl,
-                genre: genre, annee: annee, realisateur: realisateur, casting: casting, synopsis: synopsis,
-                formatAffichage: format, imageFocus: focus // SAUVEGARDE
-            };
+            projectData.imageAffiche = imageUrl;
 
             if (currentEditId) {
                 await updateDoc(doc(db, "projects", currentEditId), projectData);
-                UI.showToast("Mis à jour !");
+                UI.showToast("Projet mis à jour !");
             } else {
                 projectData.ordreAffichage = Date.now(); 
                 projectData.dateCreation = new Date().toISOString();
                 await addDoc(collection(db, "projects"), projectData);
-                UI.showToast("Publié !");
+                UI.showToast("Projet publié !");
             }
-            resetProjectForm(); loadAdminProjects(); 
-        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
+            
+            // CORRECTION : On nettoie APRES le chargement de la liste pour être sûr
+            loadAdminProjects(); 
+            resetProjectForm(); 
+            
+        } catch (error) { UI.showToast("Erreur d'enregistrement.", "error"); console.error(error);} finally { btnSave.disabled = false; }
     });
 }
 
@@ -442,9 +470,12 @@ async function loadAdminProjects() {
         projects.forEach(project => {
             const li = document.createElement('li');
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
+            
+            // CORRECTION : On blinde la miniature avec une zone noire si l'image est manquante
+            const imageSource = project.imageAffiche;
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                <img src="${project.imageAffiche}" class="item-thumb" style="object-position: ${project.imageFocus || 'center'}; object-fit: cover;">
+                ${imageSource ? `<img src="${imageSource}" class="item-thumb" style="object-position: ${project.imageFocus || 'center'}; object-fit: cover;">` : `<div class="item-thumb placeholder-thumb" style="background:#222; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">IMG</div>`}
                 <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
@@ -456,6 +487,9 @@ async function loadAdminProjects() {
             });
 
             li.querySelector('.edit').addEventListener('click', () => {
+                // CORRECTION IMPORTANTE : On nettoie AVANT de remplir pour éviter les résidus d'image cassée
+                resetProjectForm(); 
+                
                 document.getElementById('proj-title').value = project.titre || '';
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
@@ -465,18 +499,18 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
                 
-                // Chargement de tes choix de format
-                const formatSelect = document.getElementById('proj-format');
-                const focusSelect = document.getElementById('proj-focus');
-                if(formatSelect) formatSelect.value = project.formatAffichage || '';
-                if(focusSelect) focusSelect.value = project.imageFocus || 'center';
+                if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
+                if(document.getElementById('proj-focus')) document.getElementById('proj-focus').value = project.imageFocus || 'center';
 
                 const imagePreview = document.getElementById('image-preview');
-                imagePreview.src = project.imageAffiche;
-                document.querySelector('.drop-text').style.display = 'none';
-
-                // Force le rafraîchissement de l'aperçu
-                if (formatSelect) formatSelect.dispatchEvent(new Event('change'));
+                if (project.imageAffiche) {
+                    imagePreview.src = project.imageAffiche;
+                    imagePreview.classList.remove('hidden'); // On montre l'image
+                    document.querySelector('.drop-text').style.display = 'none'; // On cache le texte
+                    
+                    // On force la D.A. instantanée
+                    syncBentoPreview(); 
+                }
 
                 currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null; 
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
@@ -488,6 +522,7 @@ async function loadAdminProjects() {
         setupDragAndDrop();
     } catch (error) {}
 }
+
 // =========================================
 // 10. DRAG & DROP (PC + Tactile Mobile)
 // =========================================
@@ -640,6 +675,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
