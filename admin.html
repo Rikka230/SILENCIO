@@ -60,15 +60,12 @@
 
             <div class="dashboard-grid">
                 
-               <section class="panel list-panel" data-tab="projets">
-                    <h2>Projets existants</h2>
-                    <p class="help-text">Glissez-déposez pour réorganiser l'ordre d'affichage sur l'accueil.</p>
-                    
+               <section id="view-list" class="panel list-panel" data-tab="projets">
                     <ul id="project-list" class="sortable-list">
                         </ul>
                 </section>
 
-                <section class="panel form-panel" data-tab="projets">
+                <section id="view-form" class="panel form-panel hidden" data-tab="projets">
                     <h2 id="form-title">Ajouter un projet</h2>
                     
                     <form id="project-form">
@@ -83,50 +80,55 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Affiche</label>
-                            
+                            <label>Affiche (Direction Artistique)</label>
                             <div id="image-da-container" class="da-container-single">
-                                
                                 <div id="image-dropzone" class="dropzone">
                                     <span class="drop-text">Glissez une image ici<br>ou cliquez pour parcourir</span>
                                     <input type="file" id="proj-image" accept="image/jpeg, image/png, image/webp" hidden>
                                 </div>
-                                
                                 <div id="previews-group" class="previews-hidden">
-                                    
                                     <div class="da-preview-box">
-                                        <div class="da-preview-label">1. LA FORME BENTO (Dans la Grille)</div>
+                                        <div class="da-preview-label">1. LA FORME BENTO (Grille)</div>
                                         <div id="da-bloc-wrapper">
                                             <img id="image-preview-bloc" alt="Aperçu du Bloc">
                                         </div>
                                     </div>
-                                    
                                     <div class="da-preview-box">
-                                        <div class="da-preview-label">2. LE CADRAGE PROJET (En-tête Film)</div>
+                                        <div class="da-preview-label">2. LE CADRAGE PROJET (En-tête)</div>
                                         <div id="da-cadrage-wrapper">
                                             <img id="image-preview-cadrage" alt="Aperçu du Cadrage">
                                         </div>
                                     </div>
-                                    
                                 </div>
                             </div>
                             <p class="help-text">Sera auto-optimisée (1920px max, WebP compressé).</p>
                         </div>
 
-                        <div class="form-group" style="display: flex; gap: 1rem; margin-top: 1rem;">
-                            <div style="flex: 1;">
-                                <label>Format de la Grille</label>
+                        <div class="form-group" style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label>Format (Grille Bento)</label>
                                 <select id="proj-format" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
                                     <option value="">Standard (Carré 1x1)</option>
-                                    <option value="bento-big">Grand Panoramique (2x2)</option>
-                                    <option value="bento-tall">Vertical Affiche (1x2)</option>
+                                    <option value="bento-wide">Horizontal (2x1)</option>
+                                    <option value="bento-tall">Vertical (1x2)</option>
+                                    <option value="bento-big">Grand Carré (2x2)</option>
                                 </select>
                             </div>
-                            <div style="flex: 1;">
-                                <label>Focus (Cadrage)</label>
-                                <select id="proj-focus" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label>Focus (Grille Bento)</label>
+                                <select id="proj-focus-bento" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
                                     <option value="center">Centré (Défaut)</option>
-                                    <option value="top">Vers le Haut (Visages)</option>
+                                    <option value="top">Vers le Haut</option>
+                                    <option value="bottom">Vers le Bas</option>
+                                    <option value="left">Vers la Gauche</option>
+                                    <option value="right">Vers la Droite</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1; min-width: 200px;">
+                                <label>Focus (En-tête Film)</label>
+                                <select id="proj-focus-header" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
+                                    <option value="center">Centré (Défaut)</option>
+                                    <option value="top">Vers le Haut</option>
                                     <option value="bottom">Vers le Bas</option>
                                     <option value="left">Vers la Gauche</option>
                                     <option value="right">Vers la Droite</option>
@@ -161,7 +163,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary">Annuler</button>
+                            <button type="button" class="btn-secondary">Annuler / Retour</button>
                             <button type="submit" id="btn-save" class="btn-primary">Enregistrer le projet</button>
                         </div>
                     </form>
@@ -186,6 +188,7 @@
 </body>
 
 </html>
+
 
 
 
