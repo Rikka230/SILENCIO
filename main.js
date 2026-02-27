@@ -249,7 +249,9 @@ function setupDropzone() {
 function setupProjectForm() {
     const form = document.getElementById('project-form');
     const btnSave = document.getElementById('btn-save');
-    const btnCancel = document.querySelector('.btn-secondary'); // Le bouton Annuler
+    
+    // CORRECTION ICI : On cherche le bouton Annuler UNIQUEMENT à l'intérieur du formulaire
+    const btnCancel = form ? form.querySelector('.btn-secondary') : null; 
 
     if (!form) return;
 
@@ -277,8 +279,6 @@ function setupProjectForm() {
         const subtitle = document.getElementById('proj-subtitle').value.trim();
         const videoUrl = document.getElementById('proj-video').value.trim();
 
-        // Si on crée un NOUVEAU projet, l'image est obligatoire.
-        // Si on MODIFIE, on peut garder l'ancienne.
         if (!currentEditId && !optimizedImageBlob) {
             UI.showToast("Veuillez ajouter une affiche (image) pour ce projet.", "error");
             return;
@@ -288,9 +288,8 @@ function setupProjectForm() {
         btnSave.disabled = true;
 
         try {
-            let imageUrl = currentEditImageUrl; // Par défaut, on garde l'ancienne image
+            let imageUrl = currentEditImageUrl; 
 
-            // Si le client a glissé une NOUVELLE image, on l'upload
             if (optimizedImageBlob) {
                 const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
                 const fileName = `affiches/${Date.now()}_${safeTitle}.webp`;
@@ -300,7 +299,6 @@ function setupProjectForm() {
             }
 
             if (currentEditId) {
-                // MODE MODIFICATION : On met à jour le document existant
                 const projectRef = doc(db, "projects", currentEditId);
                 await updateDoc(projectRef, {
                     titre: title,
@@ -310,7 +308,6 @@ function setupProjectForm() {
                 });
                 UI.showToast("Projet mis à jour avec succès !");
             } else {
-                // MODE CRÉATION : On crée un nouveau document
                 const projectData = {
                     titre: title,
                     statut: subtitle,
@@ -323,7 +320,6 @@ function setupProjectForm() {
                 UI.showToast("Projet publié avec succès !");
             }
 
-            // Nettoyage et rafraîchissement
             resetProjectForm();
             loadAdminProjects(); 
 
@@ -345,7 +341,6 @@ async function loadAdminProjects() {
     if (!projectList) return;
 
     try {
-        // On récupère tous les projets depuis Firestore
         const querySnapshot = await getDocs(collection(db, "projects"));
         let projects = [];
         
@@ -353,19 +348,17 @@ async function loadAdminProjects() {
             projects.push({ id: doc.id, ...doc.data() });
         });
 
-        // On trie par ordre d'affichage (le plus récent en premier par défaut)
         projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
-
-        // On vide la liste HTML
         projectList.innerHTML = '';
 
-        // On génère le code HTML pour chaque vrai projet
         projects.forEach(project => {
             const li = document.createElement('li');
             li.className = 'sortable-item';
             li.dataset.id = project.id;
             
-            // On intègre BIEN le bouton "Modifier" (edit) ici
+            // CORRECTION ICI : On rend la ligne entière glissable nativement (fini les bugs)
+            li.setAttribute('draggable', 'true');
+            
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
                 <img src="${project.imageAffiche}" class="item-thumb" alt="Miniature">
@@ -386,7 +379,7 @@ async function loadAdminProjects() {
                     try {
                         await deleteDoc(doc(db, "projects", project.id));
                         UI.showToast("Projet supprimé !");
-                        loadAdminProjects(); // On rafraîchit la liste
+                        loadAdminProjects(); 
                     } catch (error) {
                         UI.showToast("Erreur lors de la suppression.", "error");
                     }
@@ -396,34 +389,31 @@ async function loadAdminProjects() {
             // 2. Action de modification
             const editBtn = li.querySelector('.edit');
             editBtn.addEventListener('click', () => {
-                // On remplit les champs texte
                 document.getElementById('proj-title').value = project.titre;
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
 
-                // On affiche la miniature actuelle
                 const imagePreview = document.getElementById('image-preview');
                 const dropText = document.querySelector('.drop-text');
                 imagePreview.src = project.imageAffiche;
                 imagePreview.classList.remove('hidden');
                 dropText.style.display = 'none';
 
-                // On met en mémoire qu'on est en train d'éditer ce projet
                 currentEditId = project.id;
                 currentEditImageUrl = project.imageAffiche;
-                optimizedImageBlob = null; // On vide la mémoire des nouveaux uploads
+                optimizedImageBlob = null; 
                 
-                // On met à jour l'interface visuellement
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
                 
-                // On fait défiler la page en douceur jusqu'au formulaire
                 document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
             });
 
-            // On ajoute la ligne à la liste HTML
             projectList.appendChild(li);
         });
+
+        // Activation du Drag & Drop une fois la liste générée
+        setupDragAndDrop();
 
     } catch (error) {
         console.error("Erreur lors du chargement des projets :", error);
@@ -431,74 +421,60 @@ async function loadAdminProjects() {
 }
 
 // =========================================
-// 10. DRAG & DROP (Réorganisation visuelle et sauvegarde)
+// 10. DRAG & DROP (Réorganisation et sauvegarde)
 // =========================================
 function setupDragAndDrop() {
     const list = document.getElementById('project-list');
     const items = list.querySelectorAll('.sortable-item');
 
     items.forEach(item => {
-        const handle = item.querySelector('.drag-handle');
-
-        // On ne rend la ligne "glissable" que si on attrape la poignée (évite les bugs en cliquant sur le texte)
-        handle.addEventListener('mousedown', () => item.setAttribute('draggable', 'true'));
-        handle.addEventListener('mouseleave', () => item.removeAttribute('draggable'));
-        handle.addEventListener('mouseup', () => item.removeAttribute('draggable'));
-
         // Début du glissement
         item.addEventListener('dragstart', (e) => {
+            // Sécurité : On empêche le drag si on clique sur un bouton d'action
+            if(e.target.tagName === 'BUTTON') {
+                e.preventDefault();
+                return;
+            }
             setTimeout(() => item.classList.add('dragging'), 0);
         });
 
         // Fin du glissement
         item.addEventListener('dragend', async () => {
             item.classList.remove('dragging');
-            item.removeAttribute('draggable');
-            
-            // Une fois relâché, on sauvegarde le nouvel ordre dans Firebase
             await saveNewOrder();
         });
     });
 
-    // Gestion du survol pendant le glissement (déplace les éléments visuellement)
+    // Gestion du survol pendant le glissement
     list.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Nécessaire pour autoriser le "drop"
+        e.preventDefault(); 
         const draggingItem = document.querySelector('.dragging');
         if (!draggingItem) return;
 
         const siblings = [...list.querySelectorAll('.sortable-item:not(.dragging)')];
 
-        // Trouve l'élément juste en dessous de la souris
         let nextSibling = siblings.find(sibling => {
             return e.clientY <= sibling.getBoundingClientRect().top + sibling.offsetHeight / 2;
         });
 
-        // Insère l'élément glissé avant le suivant
         list.insertBefore(draggingItem, nextSibling);
     });
 }
 
-// Fonction pour sauvegarder le nouvel ordre dans la base de données
 async function saveNewOrder() {
     const items = document.querySelectorAll('.sortable-item');
-    
-    // On change silencieusement le curseur et on affiche un petit message
     document.body.style.cursor = 'wait';
     
     try {
         const promises = [];
         
-        // On boucle sur chaque élément selon son nouvel ordre visuel
         items.forEach((item, index) => {
             const id = item.dataset.id;
-            // On calcule un nouveau poids : le 1er de la liste a le chiffre le plus haut
             const newOrder = Date.now() - (index * 1000); 
-            
             const docRef = doc(db, "projects", id);
             promises.push(updateDoc(docRef, { ordreAffichage: newOrder }));
         });
 
-        // On attend que toutes les mises à jour soient terminées
         await Promise.all(promises);
         UI.showToast("Ordre d'affichage sauvegardé !");
         
