@@ -325,6 +325,24 @@ function setupProjectForm() {
 
     if (!form) return;
 
+    // --- LA MOULINETTE MAGIQUE YOUTUBE ---
+    function cleanYouTubeLink(rawUrl) {
+        if (!rawUrl) return '';
+        // Si l'utilisateur a mis le bon lien embed par hasard, on ne touche à rien
+        if (rawUrl.includes('youtube.com/embed/')) return rawUrl;
+        
+        // Regex pour capturer l'ID unique de la vidéo peu importe le format du lien
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\/shorts\/)([^#\&\?]*).*/;
+        const match = rawUrl.match(regExp);
+        
+        // Un ID YouTube fait toujours 11 caractères
+        if (match && match[2].length === 11) {
+            // On reconstruit le lien proprement pour la base de données
+            return `https://www.youtube.com/embed/${match[2]}`;
+        }
+        return rawUrl; // Par sécurité, si ça échoue, on garde ce qui a été tapé
+    }
+
     function resetProjectForm() {
         form.reset();
         document.getElementById('image-preview').classList.add('hidden');
@@ -343,9 +361,12 @@ function setupProjectForm() {
 
         const title = document.getElementById('proj-title').value.trim();
         const subtitle = document.getElementById('proj-subtitle').value.trim();
-        const videoUrl = document.getElementById('proj-video').value.trim();
         
-        // Récupération des nouveaux champs
+        // L'utilisateur colle ce qu'il veut, on nettoie silencieusement ici :
+        const rawVideoUrl = document.getElementById('proj-video').value.trim();
+        const videoUrl = cleanYouTubeLink(rawVideoUrl);
+        
+        // Récupération des autres champs
         const genre = document.getElementById('proj-genre') ? document.getElementById('proj-genre').value.trim() : '';
         const annee = document.getElementById('proj-annee') ? document.getElementById('proj-annee').value.trim() : '';
         const realisateur = document.getElementById('proj-realisateur') ? document.getElementById('proj-realisateur').value.trim() : '';
@@ -396,6 +417,7 @@ function setupProjectForm() {
         }
     });
 }
+
 // =========================================
 // 9. CHARGEMENT DES PROJETS DANS L'ADMIN
 // =========================================
@@ -573,6 +595,7 @@ async function saveNewOrder() {
         document.body.style.cursor = 'default';
     }
 }
+
 
 
 
