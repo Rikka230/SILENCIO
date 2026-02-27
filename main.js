@@ -28,6 +28,7 @@ const auth = getAuth(app);
 let optimizedImageBlob = null; 
 let currentEditId = null;
 let currentEditImageUrl = null;
+let optimizedImageFormat = ''; // <-- NOUVELLE VARIABLE POUR LE FORMAT
 
 // 2. UTILITAIRES UX (Micro-interactions)
 const UI = {
@@ -97,20 +98,20 @@ async function initHomePage(){
         bentoGrid.innerHTML = '';
 
         // 4. On génère le HTML dynamique pour chaque projet
-        projects.forEach((project, index) => {
-            // On reproduit ton design : le 1er est grand, le 2ème est haut
-            let extraClass = '';
-            if (index === 0) extraClass = 'bento-big';
-            else if (index === 1) extraClass = 'bento-tall';
+        projects.forEach((project) => {
+            
+            // On récupère le format calculé par l'IA lors de l'upload
+            const extraClass = project.formatAffichage || '';
 
             const a = document.createElement('a');
-            // Le lien dynamique qui servira pour la page détail
             a.href = `projet.html?id=${project.id}`; 
             a.className = `bento-item ${extraClass}`;
             
-            // On injecte les vraies données (Image, Titre, Sous-titre)
+            // Astuce anti-stretch absolue : le "object-position: top center" pour les portraits
+            const objectPosition = extraClass === 'bento-tall' ? 'top center' : 'center center';
+
             a.innerHTML = `
-                <img src="${project.imageAffiche}" alt="Affiche de ${project.titre}" loading="lazy">
+                <img src="${project.imageAffiche}" alt="Affiche de ${project.titre}" loading="lazy" style="object-position: ${objectPosition} !important;">
                 <div class="bento-overlay">
                     <h3>${project.titre.toUpperCase()}</h3>
                     <p>${project.statut}</p>
@@ -312,7 +313,7 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR D'OPTIMISATION DES IMAGES
+// 7. MOTEUR D'OPTIMISATION ET D'ANALYSE D'IMAGE
 // =========================================
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
@@ -326,9 +327,7 @@ function setupDropzone() {
         dropzone.addEventListener(eventName, preventDefaults, false);
     });
 
-    function preventDefaults(e) {
-        e.preventDefault(); e.stopPropagation();
-    }
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
 
     ['dragenter', 'dragover'].forEach(eventName => {
         dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
@@ -346,8 +345,7 @@ function setupDropzone() {
 
     function handleFile(file) {
         if (!file.type.startsWith('image/')) {
-            UI.showToast("Format invalide. Veuillez uploader une image.", "error");
-            return;
+            UI.showToast("Format invalide. Veuillez uploader une image.", "error"); return;
         }
 
         const reader = new FileReader();
@@ -358,6 +356,16 @@ function setupDropzone() {
             img.src = event.target.result;
             
             img.onload = () => {
+                // --- INTELLIGENCE DE CADRAGE ---
+                const ratio = img.width / img.height;
+                if (ratio > 1.2) {
+                    optimizedImageFormat = 'bento-big'; // Image Paysage = Grand Bloc
+                } else if (ratio < 0.8) {
+                    optimizedImageFormat = 'bento-tall'; // Image Portrait = Bloc Haut
+                } else {
+                    optimizedImageFormat = ''; // Standard / Carré
+                }
+
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 1920;
                 let width = img.width;
@@ -368,21 +376,17 @@ function setupDropzone() {
                     width = MAX_WIDTH;
                 }
 
-                canvas.width = width;
-                canvas.height = height;
+                canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Compression en WebP à 80%
                 canvas.toBlob((blob) => {
                     optimizedImageBlob = blob; 
-                    
                     const compressedUrl = URL.createObjectURL(blob);
                     imagePreview.src = compressedUrl;
                     imagePreview.classList.remove('hidden');
                     dropText.style.display = 'none'; 
-                    
-                    UI.showToast("Image compressée et optimisée !");
+                    UI.showToast(`Image optimisée (Format détecté : ${optimizedImageFormat || 'Standard'})`);
                 }, 'image/webp', 0.8);
             };
         };
@@ -467,7 +471,9 @@ function setupProjectForm() {
 
             const projectData = {
                 titre: title, statut: subtitle, imageAffiche: imageUrl, videoTrailer: videoUrl,
-                genre: genre, annee: annee, realisateur: realisateur, casting: casting, synopsis: synopsis
+                genre: genre, annee: annee, realisateur: realisateur, casting: casting, synopsis: synopsis,
+                // On enregistre le format détecté (ou on garde l'ancien si on ne fait que modifier le texte)
+                formatAffichage: optimizedImageBlob ? optimizedImageFormat : (currentEditId ? undefined : '')
             };
 
             if (currentEditId) {
@@ -713,6 +719,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
