@@ -2,13 +2,13 @@
 // SILENCIO PICTURES - MAIN JS (ES6 MODULES)
 // =========================================
 
-// 1. IMPORTATION FIREBASE (Via CDN pour Vanilla JS)
+// 1. IMPORTATION FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-// Ta configuration officielle
+// Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDQVsBz82xBBLTdV12yrDiGFwqATttZ71I",
     authDomain: "silencio-6f751.firebaseapp.com",
@@ -18,34 +18,28 @@ const firebaseConfig = {
     appId: "1:573153999359:web:4d650208a06b9fa8280fca"
 };
 
-// Initialisation des services
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-// Variable globale pour stocker l'image optimisée avant envoi à la base de données
 let optimizedImageBlob = null; 
 let currentEditId = null;
 let currentEditImageUrl = null;
-let optimizedImageFormat = ''; // <-- NOUVELLE VARIABLE POUR LE FORMAT
 
-// 2. UTILITAIRES UX (Micro-interactions)
+// 2. UTILITAIRES UX
 const UI = {
     showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         if (!toast) return;
-        
         toast.textContent = message;
         toast.style.borderLeftColor = type === 'success' ? 'var(--color-accent)' : '#ff0000'; 
         toast.classList.remove('hidden');
-        
-        // Disparaît après 3 secondes
         setTimeout(() => toast.classList.add('hidden'), 3000); 
     }
 };
 
-// 3. ROUTEUR INTELLIGENT (Exécution immédiate)
+// 3. ROUTEUR INTELLIGENT
 const path = window.location.pathname.toLowerCase();
 
 if (path.includes('admin')) {
@@ -56,9 +50,8 @@ if (path.includes('admin')) {
     initHomePage();
 }
 
-
 // =========================================
-// 4. LOGIQUE : PAGE D'ACCUEIL (index.html)
+// 4. LOGIQUE : PAGE D'ACCUEIL
 // =========================================
 async function initHomePage(){
     try {
@@ -82,7 +75,6 @@ async function initHomePage(){
         bentoGrid.innerHTML = '';
 
         projects.forEach((project) => {
-            // On récupère tes choix manuels
             const extraClass = project.formatAffichage || '';
             const focus = project.imageFocus || 'center';
 
@@ -90,7 +82,6 @@ async function initHomePage(){
             a.href = `projet.html?id=${project.id}`; 
             a.className = `bento-item ${extraClass}`;
             
-            // On injecte le focus directement dans le style de l'image
             a.innerHTML = `
                 <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
                 <div class="bento-overlay">
@@ -108,6 +99,7 @@ async function initHomePage(){
 
     } catch (error) { console.error("Erreur de grille :", error); }
 }
+
 // =========================================
 // 5. LOGIQUE : PAGE PROJET DYNAMIQUE
 // =========================================
@@ -135,13 +127,10 @@ function renderProject(data) {
     const heroImage = document.querySelector('.project-hero img');
     heroImage.src = data.imageAffiche;
     heroImage.alt = `Affiche du film ${data.titre}`;
+    heroImage.style.objectPosition = data.imageFocus || 'center';
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
-    document.title = `${data.titre} - Produit par Silencio Pictures`;
 
-    // --- MISE À JOUR DYNAMIQUE DU RÉFÉRENCEMENT (SEO) ---
-    // On met à jour le texte pour Google, mais on laisse l'image "share.jpg" tranquille !
-    
     const shortSynopsis = data.synopsis ? data.synopsis.substring(0, 150) + '...' : `Découvrez ${data.titre}.`;
     
     const metaDesc = document.querySelector('meta[name="description"]');
@@ -159,8 +148,7 @@ function renderProject(data) {
     const twDesc = document.querySelector('meta[name="twitter:description"]');
     if (twDesc) twDesc.setAttribute('content', shortSynopsis);
 
-    // Injection des nouvelles données
-    document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>'); // Garde les sauts de ligne
+    document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>');
     document.getElementById('dyn-realisateur').textContent = data.realisateur || '-';
     const castingCible = document.getElementById('dyn-casting');
     if (data.casting) {
@@ -171,7 +159,6 @@ function renderProject(data) {
     document.getElementById('dyn-genre').textContent = data.genre || '-';
     document.getElementById('dyn-annee').textContent = data.annee || '-';
 
-    // Gestion Intelligente de la Vidéo
     const videoSection = document.getElementById('dyn-video-section');
     const videoIframe = document.getElementById('dyn-video-iframe');
     if (data.videoTrailer) {
@@ -183,33 +170,27 @@ function renderProject(data) {
 }
 
 // =========================================
-// 6. LOGIQUE : ADMINISTRATION (admin.html)
+// 6. LOGIQUE : ADMINISTRATION
 // =========================================
 function initAdmin() {
-    console.log("Espace Admin initialisé.");
-    
     const loginOverlay = document.getElementById('login-overlay');
-    const loginBox = document.getElementById('login-box'); // <-- La nouvelle variable
+    const loginBox = document.getElementById('login-box');
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    // 1. Écouteur de l'état de connexion (Le Videur)
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Connecté : on enlève le rideau noir en douceur
             loginOverlay.classList.add('hidden');
             setupDropzone();
             setupProjectForm();
             loadAdminProjects();
             setupHomeVideo();
         } else {
-            // Déconnecté : on s'assure que le rideau est là, ET on affiche la boîte de connexion
             loginOverlay.classList.remove('hidden');
             if(loginBox) loginBox.classList.remove('hidden');
         }
     });
 
-    // 2. Traitement du formulaire de connexion
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -231,23 +212,18 @@ function initAdmin() {
                     loginError.classList.remove('hidden');
                     btn.textContent = "Connexion";
                     btn.disabled = false;
-                    console.error("Erreur d'authentification :", error);
                 });
         });
     }
 
-    // 3. Bouton Déconnexion
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            signOut(auth).then(() => {
-                window.location.href = 'index.html'; 
-            });
+            signOut(auth).then(() => { window.location.href = 'index.html'; });
         });
     }
 
-    // 4. GESTION DES ONGLETS (MENU LATÉRAL)
     const navLinks = document.querySelectorAll('.admin-sidebar nav a');
     const allPanels = document.querySelectorAll('[data-tab]');
     const mainTitle = document.querySelector('.content-header h1');
@@ -259,23 +235,18 @@ function initAdmin() {
             if (!target || target.startsWith('http')) return;
             e.preventDefault();
 
-            // 1. Changer l'état visuel du menu (Le trait rouge)
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
 
-            // 2. Cacher tous les panneaux de l'écran
             allPanels.forEach(panel => panel.classList.add('hidden'));
-
-            // 3. Afficher uniquement les panneaux de l'onglet cliqué
             document.querySelectorAll(`[data-tab="${target}"]`).forEach(p => p.classList.remove('hidden'));
 
-            // 4. Adapter le titre de la page et le bouton "+ Nouveau"
             if (target === 'projets') {
                 mainTitle.textContent = "Projets en Production";
                 if (btnAddNew) btnAddNew.style.display = 'block';
             } else if (target === 'accueil') {
                 mainTitle.textContent = "Vidéo d'Accueil";
-                if (btnAddNew) btnAddNew.style.display = 'none'; // On cache le bouton sur cet onglet
+                if (btnAddNew) btnAddNew.style.display = 'none';
             } else if (target === 'equipe') {
                 mainTitle.textContent = "L'Équipe";
                 if (btnAddNew) btnAddNew.style.display = 'block';
@@ -287,7 +258,6 @@ function initAdmin() {
 // =========================================
 // 7. MOTEUR D'OPTIMISATION ET VISUALISATION DIVISÉE
 // =========================================
-
 function syncBentoDA() {
     const daContainer = document.getElementById('image-da-container');
     const previewsGroup = document.getElementById('previews-group');
@@ -303,7 +273,6 @@ function syncBentoDA() {
     if (!daContainer || !previewsGroup || !previewBloc) return;
 
     function updateLiveView() {
-        // Sécurité : évite que le navigateur prenne une URL vide pour une vraie image
         if (!previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
 
         blocWrapper.className = '';
@@ -318,7 +287,6 @@ function syncBentoDA() {
     if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
     if (focusSelect) focusSelect.addEventListener('change', updateLiveView);
 
-    // Vérifie intelligemment si une vraie image est présente
     const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
 
     if (hasImage) {
@@ -379,13 +347,12 @@ function setupDropzone() {
         };
     }
 
-    syncBentoDA(); // Lance la vérification au démarrage
+    syncBentoDA();
 }
 
 // =========================================
 // 8. ENREGISTREMENT ET NETTOYAGE
 // =========================================
-
 function resetProjectForm() {
     const form = document.getElementById('project-form');
     if(!form) return;
@@ -394,7 +361,6 @@ function resetProjectForm() {
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
 
-    // On retire la source pour déclencher le regroupement de la boîte
     if (previewBloc) previewBloc.removeAttribute('src');
     if (previewCadrage) previewCadrage.removeAttribute('src');
 
@@ -514,7 +480,7 @@ async function loadAdminProjects() {
                 if (project.imageAffiche) {
                     if(previewBloc) previewBloc.src = project.imageAffiche;
                     if(previewCadrage) previewCadrage.src = project.imageAffiche;
-                    syncBentoDA(); // Déclenche la division instantanée
+                    syncBentoDA(); 
                 }
 
                 currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null;
@@ -529,7 +495,7 @@ async function loadAdminProjects() {
 }
 
 // =========================================
-// 10. DRAG & DROP (PC + Tactile Mobile)
+// 10. DRAG & DROP (PC + Tactile)
 // =========================================
 function setupDragAndDrop() {
     const list = document.getElementById('project-list');
@@ -538,7 +504,6 @@ function setupDragAndDrop() {
     items.forEach(item => {
         const handle = item.querySelector('.drag-handle');
 
-        // --- 1. GESTION SOURIS (ORDINATEUR) ---
         handle.addEventListener('mousedown', () => item.setAttribute('draggable', 'true'));
         handle.addEventListener('mouseup', () => item.removeAttribute('draggable'));
         handle.addEventListener('mouseleave', () => item.removeAttribute('draggable'));
@@ -554,32 +519,25 @@ function setupDragAndDrop() {
             await saveNewOrder();
         });
 
-        // --- 2. GESTION TACTILE (SMARTPHONES) ---
         handle.addEventListener('touchstart', (e) => {
-            // Empêche l'écran de scroller quand on attrape la poignée
             document.body.style.overflow = 'hidden'; 
             item.classList.add('dragging');
         }, { passive: false });
 
         handle.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Bloque le rebond de l'écran sur mobile
+            e.preventDefault(); 
             const draggingItem = document.querySelector('.dragging');
             if (!draggingItem) return;
 
             const touch = e.touches[0];
-            
-            // Astuce "Ninja" Vanilla JS : on cache la ligne 1 milliseconde 
-            // pour que le navigateur puisse "voir" quel élément se trouve sous le doigt
             draggingItem.style.display = 'none';
             const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
-            draggingItem.style.display = ''; // On la réaffiche instantanément
+            draggingItem.style.display = ''; 
 
-            // Si on survole une autre ligne, on les inverse
             if (elementUnderFinger) {
                 const sibling = elementUnderFinger.closest('.sortable-item');
                 if (sibling && sibling !== draggingItem) {
                     const bounding = sibling.getBoundingClientRect();
-                    // Moitié haute ou moitié basse de la ligne visée ?
                     if (touch.clientY > bounding.top + (bounding.height / 2)) {
                         sibling.after(draggingItem);
                     } else {
@@ -590,14 +548,12 @@ function setupDragAndDrop() {
         }, { passive: false });
 
         handle.addEventListener('touchend', async () => {
-            // On rend le scroll de l'écran à nouveau possible
             document.body.style.overflow = ''; 
             item.classList.remove('dragging');
             await saveNewOrder();
         });
     });
 
-    // --- GESTION DU SURVOL SOURIS (PC) ---
     list.addEventListener('dragover', (e) => {
         e.preventDefault(); 
         const draggingItem = document.querySelector('.dragging');
@@ -611,14 +567,12 @@ function setupDragAndDrop() {
     });
 }
 
-// Fonction de sauvegarde (Reste inchangée, mais je la remets pour que tu aies le bloc complet)
 async function saveNewOrder() {
     const items = document.querySelectorAll('.sortable-item');
     document.body.style.cursor = 'wait';
     
     try {
         const promises = [];
-        
         items.forEach((item, index) => {
             const id = item.dataset.id;
             const newOrder = Date.now() - (index * 1000); 
@@ -628,7 +582,6 @@ async function saveNewOrder() {
 
         await Promise.all(promises);
         UI.showToast("Ordre d'affichage sauvegardé !");
-        
     } catch (error) {
         console.error("Erreur de tri :", error);
         UI.showToast("Erreur lors de la sauvegarde de l'ordre.", "error");
@@ -660,12 +613,10 @@ function setupHomeVideo() {
         btnSave.disabled = true;
 
         try {
-            // 1. On envoie la vidéo dans le Storage
             const videoRef = ref(storage, `site-assets/background.mp4`);
             await uploadBytes(videoRef, file);
             const videoUrl = await getDownloadURL(videoRef);
 
-            // 2. CORRECTION ICI : On utilise setDoc pour créer ou mettre à jour proprement
             await setDoc(doc(db, "settings", "homepage"), { backgroundVideo: videoUrl }, { merge: true });
 
             UI.showToast("Vidéo d'accueil mise à jour !");
@@ -680,22 +631,3 @@ function setupHomeVideo() {
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
