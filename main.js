@@ -117,7 +117,8 @@ function initAdmin() {
         if (user) {
             // Connecté : on lève le rideau
             loginOverlay.classList.add('hidden');
-            setupDropzone(); 
+            setupDropzone();
+            setupProjectForm();
         } else {
             // Déconnecté : on affiche le formulaire
             loginOverlay.classList.remove('hidden');
@@ -313,3 +314,4 @@ function setupProjectForm() {
         }
     });
 }
+
