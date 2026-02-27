@@ -148,6 +148,34 @@ function renderProject(data) {
     heroImage.alt = `Affiche du film ${data.titre}`;
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
+    document.title = `${data.titre} - Produit par Silencio Pictures`;
+
+    // --- MISE À JOUR DYNAMIQUE DU RÉFÉRENCEMENT (SEO) ---
+    
+    // 1. Description classique (Google)
+    const metaDesc = document.querySelector('meta[name="description"]');
+    const shortSynopsis = data.synopsis ? data.synopsis.substring(0, 150) + '...' : `Découvrez ${data.titre}.`;
+    if (metaDesc) metaDesc.setAttribute('content', shortSynopsis);
+
+    // 2. Open Graph (Facebook, LinkedIn, iMessage...)
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', data.titre);
+
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', shortSynopsis);
+
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage) ogImage.setAttribute('content', data.imageAffiche);
+
+    // 3. Twitter
+    const twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twTitle) twTitle.setAttribute('content', data.titre);
+
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute('content', shortSynopsis);
+
+    const twImage = document.querySelector('meta[name="twitter:image"]');
+    if (twImage) twImage.setAttribute('content', data.imageAffiche);
 
     // Injection des nouvelles données
     document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>'); // Garde les sauts de ligne
@@ -595,6 +623,7 @@ async function saveNewOrder() {
         document.body.style.cursor = 'default';
     }
 }
+
 
 
 
