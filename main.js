@@ -241,3 +241,75 @@ function setupDropzone() {
     }
 }
 
+// =========================================
+// 8. ENREGISTREMENT DU PROJET (Storage + Firestore)
+// =========================================
+function setupProjectForm() {
+    const form = document.getElementById('project-form');
+    const btnSave = document.getElementById('btn-save');
+
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Empêche le rechargement brutal de la page
+
+        // 1. Récupération des valeurs du formulaire
+        const title = document.getElementById('proj-title').value.trim();
+        const subtitle = document.getElementById('proj-subtitle').value.trim();
+        const videoUrl = document.getElementById('proj-video').value.trim();
+
+        // 2. Anti-Erreur : Vérifier si l'image est bien là
+        if (!optimizedImageBlob) {
+            UI.showToast("Veuillez ajouter une affiche (image) pour ce projet.", "error");
+            return;
+        }
+
+        // 3. Feedback UX : On désactive le bouton pour éviter les doubles clics
+        const originalBtnText = btnSave.textContent;
+        btnSave.textContent = "Enregistrement en cours...";
+        btnSave.disabled = true;
+
+        try {
+            // ÉTAPE A : Upload de l'image compressée dans Firebase Storage
+            // On crée un nom de fichier unique basé sur la date et le titre
+            const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
+            const fileName = `affiches/${Date.now()}_${safeTitle}.webp`;
+            
+            // "storage" est déjà initialisé en haut de ton fichier
+            const imageRef = ref(storage, fileName); 
+            await uploadBytes(imageRef, optimizedImageBlob);
+            
+            // On récupère le lien public de l'image fraîchement uploadée
+            const imageUrl = await getDownloadURL(imageRef);
+
+            // ÉTAPE B : Sauvegarde des textes dans Firestore
+            const projectData = {
+                titre: title,
+                statut: subtitle,
+                imageAffiche: imageUrl,
+                videoTrailer: videoUrl,
+                ordreAffichage: Date.now(), // Utile pour le Drag & Drop plus tard
+                dateCreation: new Date().toISOString()
+            };
+
+            // "db" est déjà initialisé en haut de ton fichier
+            await addDoc(collection(db, "projects"), projectData);
+
+            // 4. Succès ! On nettoie le formulaire pour le prochain projet
+            form.reset();
+            document.getElementById('image-preview').classList.add('hidden');
+            document.querySelector('.drop-text').style.display = 'block';
+            optimizedImageBlob = null; // On vide la mémoire de l'image
+
+            UI.showToast("Projet publié avec succès !");
+
+        } catch (error) {
+            console.error("Erreur lors de l'enregistrement :", error);
+            UI.showToast("Erreur lors de l'enregistrement.", "error");
+        } finally {
+            // Quoi qu'il arrive (succès ou échec), on remet le bouton à son état normal
+            btnSave.textContent = originalBtnText;
+            btnSave.disabled = false;
+        }
+    });
+}
