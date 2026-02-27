@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Tales of Taipei - Produit par Silencio Pictures</title>
+    <title>Projet - Silencio Pictures</title>
     
-    <meta name="description" content="Découvrez Tales of Taipei, un film produit par Silencio Pictures. Réalisé par Joseph Hsu. Drame, Thriller.">
+    <meta name="description" content="Découvrez ce film produit par Silencio Pictures.">
     
-    <meta property="og:type" content="video.movie">
-    <meta property="og:title" content="Tales of Taipei (2025)">
-    <meta property="og:description" content="Dans la moiteur des nuits de Taipei, plusieurs destins s'entrecroisent...">
-    <meta property="og:image" content="https://www.silenciopictures.com/images/tales-of-taipei-poster.jpg">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,22 +69,20 @@
     <footer style="text-align: center; padding: 2rem; border-top: 1px solid #222;">
         <p style="font-size: 0.8rem; color: #666;">© 2026 Silencio Pictures. Powered by NOCX WEB. All rights reserved.</p>
     </footer>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // --- SÉCURITÉ ET ANIMATION D'OUVERTURE ---
-window.addEventListener('pageshow', function(event) {
-    const transitionOverlay = document.querySelector('.page-transition');
-    
-    if (transitionOverlay) {
-        // On s'assure que le rideau est là au départ
-        transitionOverlay.classList.add('active');
-        
-        // On lance l'effacement progressif (l'animation) après un micro-délai
-        setTimeout(() => {
-            transitionOverlay.classList.remove('active');
-        }, 50); 
-    }
-});
+            window.addEventListener('pageshow', function(event) {
+                const transitionOverlay = document.querySelector('.page-transition');
+                
+                if (transitionOverlay) {
+                    transitionOverlay.classList.add('active');
+                    setTimeout(() => {
+                        transitionOverlay.classList.remove('active');
+                    }, 50); 
+                }
+            });
             
             // --- 1. VARIABLES ---
             const menuToggle = document.querySelector('#mobile-menu');
@@ -149,24 +143,9 @@ window.addEventListener('pageshow', function(event) {
                     }
                 });
             });
-        });
-        }
+        }); // <-- L'accolade en trop qui cassait tout a été supprimée ici !
     </script>
-    <script type="module" src="main.js?v=1.0"></script>
+    
+    <script type="module" src="main.js?v=5.0"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
