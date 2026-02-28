@@ -21,9 +21,17 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
+// --- VARIABLES GLOBALES ---
 let optimizedImageBlob = null; 
 let currentEditId = null;
 let currentEditImageUrl = null;
+
+let teamOptimizedImageBlob = null;
+let currentTeamEditId = null;
+let currentTeamImageUrl = null;
+
+// L'AVATAR PAR DÉFAUT (Base64 SVG - Garanti sans lien mort)
+const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='512' height='512'%3E%3Crect width='24' height='24' fill='%23111'/%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' fill='%23444'/%3E%3C/svg%3E";
 
 const UI = {
     showToast(message, type = 'success') {
@@ -36,7 +44,6 @@ const UI = {
     }
 };
 
-// --- HELPER : Traducteur de position (Compatibilité avec les anciens films) ---
 function parsePosition(posString) {
     if (!posString) return { x: 50, y: 50 };
     if (posString === 'top') return { x: 50, y: 0 };
@@ -44,24 +51,18 @@ function parsePosition(posString) {
     if (posString === 'left') return { x: 0, y: 50 };
     if (posString === 'right') return { x: 100, y: 50 };
     if (posString === 'center') return { x: 50, y: 50 };
-    
     const match = posString.match(/(\d+)%\s+(\d+)%/);
     if (match) return { x: parseInt(match[1]), y: parseInt(match[2]) };
     return { x: 50, y: 50 };
 }
 
 const path = window.location.pathname.toLowerCase();
-
-if (path.includes('admin')) {
-    initAdmin();
-} else if (path.includes('projet')) {
-    initProjectPage();
-} else {
-    initHomePage();
-}
+if (path.includes('admin')) { initAdmin(); } 
+else if (path.includes('projet')) { initProjectPage(); } 
+else { initHomePage(); }
 
 // =========================================
-// 4. LOGIQUE : PAGE D'ACCUEIL (SCROLL INFINI INTELLIGENT)
+// 4. LOGIQUE : PAGE D'ACCUEIL (FILMS + ÉQUIPE)
 // =========================================
 async function initHomePage(){
     try {
@@ -71,113 +72,118 @@ async function initHomePage(){
             const heroVideo = document.querySelector('.hero-video');
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
-    } catch (error) { console.log("Erreur vidéo"); }
+    } catch (error) {}
     
+    // --- 1. CHARGEMENT DES PROJETS ---
     const bentoContainer = document.querySelector('.bento-container');
-    if (!bentoContainer) return;
-
-    try {
-        const querySnapshot = await getDocs(collection(db, "projects"));
-        let projects = [];
-        querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
-        projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
-        
-        const titleElement = bentoContainer.querySelector('.section-title');
-        bentoContainer.innerHTML = '';
-        if (titleElement) bentoContainer.appendChild(titleElement);
-
-        let itemsHTML = '';
-        projects.forEach((project) => {
-            const extraClass = project.formatAffichage || '';
-            const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-
-            itemsHTML += `
-                <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
-                    <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
-                    <div class="bento-overlay">
-                        <h3>${project.titre.toUpperCase()}</h3>
-                        <p>${project.statut}</p>
-                    </div>
-                </a>
-            `;
-        });
-
-        const wrapper = document.createElement('div');
-        const grid = document.createElement('div');
-
-        // --- L'INTELLIGENCE DU SYSTÈME ---
-        // S'il y a 6 projets ou moins, on utilise le visuel de départ (Grille Fixe)
-        if (projects.length <= 6) {
-            wrapper.className = 'bento-wrapper is-static';
-            grid.className = 'bento-grid is-static';
-            grid.innerHTML = itemsHTML;
-            wrapper.appendChild(grid);
-            bentoContainer.appendChild(wrapper);
-        } 
-        // S'il y en a plus de 6, on active le Scroll Infini
-        else {
-            wrapper.className = 'bento-wrapper is-scrollable';
-            grid.className = 'bento-grid is-scrollable';
+    if (bentoContainer) {
+        try {
+            const querySnapshot = await getDocs(collection(db, "projects"));
+            let projects = [];
+            querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
+            projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
             
-            // On clone tes projets 3 fois pour que la boucle ne finisse jamais
-            grid.innerHTML = itemsHTML + itemsHTML + itemsHTML;
-            wrapper.appendChild(grid);
-            bentoContainer.appendChild(wrapper);
+            const titleElement = bentoContainer.querySelector('.section-title');
+            bentoContainer.innerHTML = '';
+            if (titleElement) bentoContainer.appendChild(titleElement);
 
-            // 1. Placement initial silencieux au milieu (au début du 2e clone)
-            setTimeout(() => {
-                const setWidth = grid.scrollWidth / 3;
-                wrapper.scrollLeft = setWidth;
-            }, 100);
-
-            // 2. Écouteur de boucle magique
-            let isLooping = false;
-            wrapper.addEventListener('scroll', () => {
-                if (isLooping) return;
-                const setWidth = grid.scrollWidth / 3;
-                
-                // Si on a trop scrollé à gauche, on le renvoie à droite incognito
-                if (wrapper.scrollLeft < setWidth / 2) {
-                    isLooping = true;
-                    wrapper.scrollLeft += setWidth;
-                    requestAnimationFrame(() => isLooping = false);
-                } 
-                // Si on a trop scrollé à droite, on le renvoie à gauche incognito
-                else if (wrapper.scrollLeft > setWidth * 1.5) {
-                    isLooping = true;
-                    wrapper.scrollLeft -= setWidth;
-                    requestAnimationFrame(() => isLooping = false);
-                }
+            let itemsHTML = '';
+            projects.forEach((project) => {
+                const extraClass = project.formatAffichage || '';
+                const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+                itemsHTML += `
+                    <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
+                        <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
+                        <div class="bento-overlay">
+                            <h3>${project.titre.toUpperCase()}</h3>
+                            <p>${project.statut}</p>
+                        </div>
+                    </a>
+                `;
             });
 
-            // 3. Transformation de la molette PC (Vertical -> Horizontal)
-            wrapper.addEventListener('wheel', (evt) => {
-                if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return; 
-                evt.preventDefault();
-                wrapper.scrollLeft += evt.deltaY;
-            }, { passive: false });
-        }
+            const wrapper = document.createElement('div');
+            const grid = document.createElement('div');
 
-    } catch (error) { console.error("Erreur de grille :", error); }
+            if (projects.length <= 6) {
+                wrapper.className = 'bento-wrapper is-static';
+                grid.className = 'bento-grid is-static';
+                grid.innerHTML = itemsHTML;
+                wrapper.appendChild(grid);
+                bentoContainer.appendChild(wrapper);
+            } else {
+                wrapper.className = 'bento-wrapper is-scrollable';
+                grid.className = 'bento-grid is-scrollable';
+                grid.innerHTML = itemsHTML + itemsHTML + itemsHTML;
+                wrapper.appendChild(grid);
+                bentoContainer.appendChild(wrapper);
+
+                setTimeout(() => { wrapper.scrollLeft = grid.scrollWidth / 3; }, 100);
+                let isLooping = false;
+                wrapper.addEventListener('scroll', () => {
+                    if (isLooping) return;
+                    const setWidth = grid.scrollWidth / 3;
+                    if (wrapper.scrollLeft < setWidth / 2) {
+                        isLooping = true; wrapper.scrollLeft += setWidth; requestAnimationFrame(() => isLooping = false);
+                    } else if (wrapper.scrollLeft > setWidth * 1.5) {
+                        isLooping = true; wrapper.scrollLeft -= setWidth; requestAnimationFrame(() => isLooping = false);
+                    }
+                });
+                wrapper.addEventListener('wheel', (evt) => {
+                    if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return; 
+                    evt.preventDefault(); wrapper.scrollLeft += evt.deltaY;
+                }, { passive: false });
+            }
+        } catch (error) { console.error("Erreur projets :", error); }
+    }
+
+    // --- 2. CHARGEMENT DE L'ÉQUIPE ---
+    const teamGrid = document.querySelector('.team-grid');
+    if (teamGrid) {
+        try {
+            const querySnapshot = await getDocs(collection(db, "team"));
+            let members = [];
+            querySnapshot.forEach((doc) => { members.push({ id: doc.id, ...doc.data() }); });
+            members.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
+            
+            let teamHTML = '';
+            members.forEach((member) => {
+                const avatar = member.photo || DEFAULT_AVATAR; // AVATAR PAR DÉFAUT SI VIDE
+                teamHTML += `
+                    <div class="team-card">
+                        <img src="${avatar}" alt="${member.nom}" loading="lazy">
+                        <div class="team-overlay">
+                            <h3>${member.nom}</h3>
+                            <p>${member.role}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            teamGrid.innerHTML = teamHTML;
+        } catch (error) { console.error("Erreur équipe :", error); }
+    }
+
+    // --- 3. ANIMATIONS D'APPARITION ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.bento-item, .team-card').forEach(i => observer.observe(i));
 }
+
 // =========================================
 // 5. LOGIQUE : PAGE PROJET DYNAMIQUE
 // =========================================
 async function initProjectPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = urlParams.get('id');
-
     if (!projectId) { window.location.href = 'index.html'; return; }
 
     try {
         const docRef = doc(db, "projects", projectId);
         const docSnap = await getDoc(docRef);
-
         if (docSnap.exists()) renderProject(docSnap.data());
         else window.location.href = 'index.html';
-    } catch (error) {
-        console.error("Erreur :", error);
-    }
+    } catch (error) {}
 }
 
 function renderProject(data) {
@@ -186,52 +192,31 @@ function renderProject(data) {
     
     const heroImage = document.querySelector('.project-hero img');
     heroImage.src = data.imageAffiche;
-    heroImage.alt = `Affiche du film ${data.titre}`;
     heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || '50% 50%';
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
-
-    const shortSynopsis = data.synopsis ? data.synopsis.substring(0, 150) + '...' : `Découvrez ${data.titre}.`;
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', shortSynopsis);
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', data.titre);
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', shortSynopsis);
-    const twTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twTitle) twTitle.setAttribute('content', data.titre);
-    const twDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twDesc) twDesc.setAttribute('content', shortSynopsis);
-
     document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>');
     document.getElementById('dyn-realisateur').textContent = data.realisateur || '-';
     const castingCible = document.getElementById('dyn-casting');
-    if (data.casting) {
-        castingCible.innerHTML = data.casting.split(',').map(nom => nom.trim()).join('<br>');
-    } else {
-        castingCible.textContent = '-';
-    }
+    if (data.casting) castingCible.innerHTML = data.casting.split(',').map(nom => nom.trim()).join('<br>');
+    else castingCible.textContent = '-';
+    
     document.getElementById('dyn-genre').textContent = data.genre || '-';
     document.getElementById('dyn-annee').textContent = data.annee || '-';
 
     const videoSection = document.getElementById('dyn-video-section');
     const videoIframe = document.getElementById('dyn-video-iframe');
-    if (data.videoTrailer) {
-        videoIframe.src = data.videoTrailer;
-        videoSection.style.display = 'block';
-    } else {
-        videoSection.style.display = 'none';
-    }
+    if (data.videoTrailer) { videoIframe.src = data.videoTrailer; videoSection.style.display = 'block'; } 
+    else { videoSection.style.display = 'none'; }
 }
 
 // =========================================
-// 6. LOGIQUE : ADMINISTRATION
+// 6. LOGIQUE : ADMINISTRATION (ROUTAGE INTELLIGENT)
 // =========================================
 function initAdmin() {
     const loginOverlay = document.getElementById('login-overlay');
-    const loginBox = document.getElementById('login-box');
     const loginForm = document.getElementById('login-form');
-    const loginError = document.getElementById('login-error');
+    let currentTab = 'projets';
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -239,10 +224,15 @@ function initAdmin() {
             setupDropzone();
             setupProjectForm();
             loadAdminProjects();
+            
+            setupTeamDropzone();
+            setupTeamForm();
+            loadAdminTeam();
+            
             setupHomeVideo();
         } else {
             loginOverlay.classList.remove('hidden');
-            if(loginBox) loginBox.classList.remove('hidden');
+            document.getElementById('login-box').classList.remove('hidden');
         }
     });
 
@@ -254,60 +244,32 @@ function initAdmin() {
             const btn = loginForm.querySelector('button');
 
             btn.textContent = "Vérification..."; btn.disabled = true;
-
             signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    loginError.classList.add('hidden');
-                    UI.showToast("Connexion réussie");
-                    btn.textContent = "Connexion"; btn.disabled = false;
-                })
-                .catch((error) => {
-                    loginError.classList.remove('hidden');
-                    btn.textContent = "Connexion"; btn.disabled = false;
-                });
+                .then(() => { UI.showToast("Connexion réussie"); btn.textContent = "Connexion"; btn.disabled = false; })
+                .catch(() => { document.getElementById('login-error').classList.remove('hidden'); btn.textContent = "Connexion"; btn.disabled = false; });
         });
     }
 
     const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            signOut(auth).then(() => { window.location.href = 'index.html'; });
-        });
-    }
+    if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(auth).then(() => { window.location.href = 'index.html'; }); });
 
     const btnAddNew = document.getElementById('btn-add-new');
     if (btnAddNew) {
         btnAddNew.addEventListener('click', () => {
-            document.getElementById('view-list').classList.add('hidden');
-            document.getElementById('view-form').classList.remove('hidden');
+            if (currentTab === 'projets') {
+                document.getElementById('view-list').classList.add('hidden');
+                document.getElementById('view-form').classList.remove('hidden');
+                resetProjectForm();
+            } else if (currentTab === 'equipe') {
+                document.getElementById('view-team-list').classList.add('hidden');
+                document.getElementById('view-team-form').classList.remove('hidden');
+                resetTeamForm();
+            }
             btnAddNew.style.display = 'none';
-            resetProjectForm();
         });
     }
 
     const navLinks = document.querySelectorAll('.admin-sidebar nav a');
-    // --- GESTION DE LA RECHERCHE (FILTRE INSTANTANÉ) ---
-    const searchInput = document.getElementById('search-project');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.sortable-item');
-            
-            items.forEach(item => {
-                const titleElement = item.querySelector('.item-info strong');
-                if (titleElement) {
-                    const title = titleElement.textContent.toLowerCase();
-                    // Si le titre contient la recherche, on affiche. Sinon, on cache.
-                    if (title.includes(term)) {
-                        item.style.display = 'flex';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
-            });
-        });
-    }
     const allPanels = document.querySelectorAll('[data-tab]');
     const mainTitle = document.querySelector('.content-header h1');
 
@@ -316,7 +278,8 @@ function initAdmin() {
             const target = link.getAttribute('href').replace('#', ''); 
             if (!target || target.startsWith('http')) return;
             e.preventDefault();
-
+            
+            currentTab = target;
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
 
@@ -325,7 +288,6 @@ function initAdmin() {
             if (target === 'projets') {
                 mainTitle.textContent = "Projets en Production";
                 document.getElementById('view-list').classList.remove('hidden');
-                document.getElementById('view-form').classList.add('hidden');
                 if (btnAddNew) btnAddNew.style.display = 'block';
             } else if (target === 'accueil') {
                 document.getElementById('panel-accueil').classList.remove('hidden');
@@ -333,14 +295,39 @@ function initAdmin() {
                 if (btnAddNew) btnAddNew.style.display = 'none';
             } else if (target === 'equipe') {
                 mainTitle.textContent = "L'Équipe";
+                document.getElementById('view-team-list').classList.remove('hidden');
                 if (btnAddNew) btnAddNew.style.display = 'block';
             }
         });
     });
+
+    // --- RECHERCHE PROJETS ---
+    const searchInput = document.getElementById('search-project');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#project-list .sortable-item').forEach(item => {
+                const titleElement = item.querySelector('.item-info strong');
+                if (titleElement) item.style.display = titleElement.textContent.toLowerCase().includes(term) ? 'flex' : 'none';
+            });
+        });
+    }
+
+    // --- RECHERCHE ÉQUIPE ---
+    const searchTeam = document.getElementById('search-team');
+    if (searchTeam) {
+        searchTeam.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#team-list .sortable-item').forEach(item => {
+                const nameElement = item.querySelector('.item-info strong');
+                if (nameElement) item.style.display = nameElement.textContent.toLowerCase().includes(term) ? 'flex' : 'none';
+            });
+        });
+    }
 }
 
 // =========================================
-// 7. MOTEUR DE VISUALISATION (AVEC SLIDERS EN TEMPS RÉEL)
+// 7. MOTEUR DE PROJETS (D&D, UPLOAD, CRUD)
 // =========================================
 function syncBentoDA() {
     const daContainer = document.getElementById('image-da-container');
@@ -361,22 +348,13 @@ function syncBentoDA() {
 
     function updateLiveView() {
         if (!previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
-
-        // Met à jour la forme du bloc
         blocWrapper.className = '';
         if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
-
-        // Met à jour la position de l'image (X% Y%) en direct !
-        if (focusBentoX && focusBentoY) {
-            previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
-        }
-        if (focusHeaderX && focusHeaderY && previewCadrage) {
-            previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
-        }
+        if (focusBentoX && focusBentoY) previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
+        if (focusHeaderX && focusHeaderY && previewCadrage) previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
     }
 
     if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
-    // On utilise 'input' pour que l'image glisse EN TEMPS RÉEL pendant qu'on bouge le curseur !
     if (focusBentoX) focusBentoX.addEventListener('input', updateLiveView);
     if (focusBentoY) focusBentoY.addEventListener('input', updateLiveView);
     if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView);
@@ -385,32 +363,26 @@ function syncBentoDA() {
     const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
 
     if (hasImage) {
-        daContainer.classList.remove('da-container-single');
-        daContainer.classList.add('da-container-split');
+        daContainer.classList.remove('da-container-single'); daContainer.classList.add('da-container-split');
         if(dropText) dropText.style.display = 'none';
-        previewsGroup.classList.remove('previews-hidden');
-        previewsGroup.classList.add('previews-visible');
+        previewsGroup.classList.remove('previews-hidden'); previewsGroup.classList.add('previews-visible');
         updateLiveView();
     } else {
-        daContainer.classList.remove('da-container-split');
-        daContainer.classList.add('da-container-single');
+        daContainer.classList.remove('da-container-split'); daContainer.classList.add('da-container-single');
         if(dropText) dropText.style.display = 'block';
-        previewsGroup.classList.remove('previews-visible');
-        previewsGroup.classList.add('previews-hidden');
+        previewsGroup.classList.remove('previews-visible'); previewsGroup.classList.add('previews-hidden');
     }
 }
 
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
     if (!dropzone) return;
-
     const fileInput = document.getElementById('proj-image');
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
     function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-
     ['dragenter', 'dragover'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false); });
     ['dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false); });
 
@@ -427,27 +399,19 @@ function setupDropzone() {
                 const canvas = document.createElement('canvas'); const MAX_WIDTH = 1920; let width = img.width, height = img.height;
                 if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-
                 canvas.toBlob((blob) => {
                     optimizedImageBlob = blob;
                     const compressedUrl = URL.createObjectURL(blob);
-
                     if(previewBloc) previewBloc.src = compressedUrl;
                     if(previewCadrage) previewCadrage.src = compressedUrl;
-
                     syncBentoDA();
-                    UI.showToast("Affiches prêtes pour la D.A. !");
                 }, 'image/webp', 0.8);
             };
         };
     }
-
     syncBentoDA();
 }
 
-// =========================================
-// 8. ENREGISTREMENT ET INTERFACE FORMAULAIRE
-// =========================================
 function returnToListView() {
     document.getElementById('view-list').classList.remove('hidden');
     document.getElementById('view-form').classList.add('hidden');
@@ -460,8 +424,6 @@ function resetProjectForm() {
     const form = document.getElementById('project-form');
     if(!form) return;
     form.reset();
-
-    // On réinitialise les sliders à 50%
     if(document.getElementById('proj-focus-bento-x')) document.getElementById('proj-focus-bento-x').value = 50;
     if(document.getElementById('proj-focus-bento-y')) document.getElementById('proj-focus-bento-y').value = 50;
     if(document.getElementById('proj-focus-header-x')) document.getElementById('proj-focus-header-x').value = 50;
@@ -469,10 +431,8 @@ function resetProjectForm() {
 
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
-
     if (previewBloc) previewBloc.removeAttribute('src');
     if (previewCadrage) previewCadrage.removeAttribute('src');
-
     syncBentoDA(); 
 
     document.getElementById('form-title').textContent = "Ajouter un projet";
@@ -482,33 +442,25 @@ function resetProjectForm() {
 
 function setupProjectForm() {
     const form = document.getElementById('project-form');
-    const btnSave = document.getElementById('btn-save');
-    const btnCancelBottom = form ? form.querySelector('.btn-cancel-bottom') : null;
-    const btnCancelTop = document.querySelector('.btn-cancel-top');
-
     if (!form) return;
 
-    // Les deux boutons annuler ramènent à la liste
-    if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
-    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView);
+    form.querySelectorAll('.btn-cancel-bottom, .btn-cancel-top').forEach(btn => btn.addEventListener('click', returnToListView));
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('proj-title').value.trim();
-        const videoUrl = document.getElementById('proj-video').value.trim();
+        const btnSave = document.getElementById('btn-save');
 
         const projectData = {
             titre: title,
             statut: document.getElementById('proj-subtitle').value.trim(),
-            videoTrailer: videoUrl,
+            videoTrailer: document.getElementById('proj-video').value.trim(),
             genre: document.getElementById('proj-genre') ? document.getElementById('proj-genre').value.trim() : '',
             annee: document.getElementById('proj-annee') ? document.getElementById('proj-annee').value.trim() : '',
             realisateur: document.getElementById('proj-realisateur') ? document.getElementById('proj-realisateur').value.trim() : '',
             casting: document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '',
             synopsis: document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '',
             formatAffichage: document.getElementById('proj-format') ? document.getElementById('proj-format').value : '',
-            
-            // On sauvegarde la position sous forme de pourcentages ex: "50% 20%"
             imageFocusBento: `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`,
             imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`
         };
@@ -531,21 +483,14 @@ function setupProjectForm() {
                 UI.showToast("Projet mis à jour !");
             } else {
                 projectData.ordreAffichage = Date.now();
-                projectData.dateCreation = new Date().toISOString();
                 await addDoc(collection(db, "projects"), projectData);
                 UI.showToast("Projet publié !");
             }
-
-            loadAdminProjects();
-            returnToListView(); 
-
-        } catch (error) { UI.showToast("Erreur.", "error"); console.error(error);} finally { btnSave.disabled = false; }
+            loadAdminProjects(); returnToListView(); 
+        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
     });
 }
 
-// =========================================
-// 9. CHARGEMENT DES PROJETS DANS L'ADMIN
-// =========================================
 async function loadAdminProjects() {
     const projectList = document.getElementById('project-list');
     if (!projectList) return;
@@ -561,12 +506,10 @@ async function loadAdminProjects() {
             const li = document.createElement('li');
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
 
-            const imageSource = project.imageAffiche;
             const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-            
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                ${imageSource ? `<img src="${imageSource}" class="item-thumb" style="object-position: ${focus}; object-fit: cover;">` : `<div class="item-thumb placeholder-thumb" style="background:#222; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">IMG</div>`}
+                <img src="${project.imageAffiche}" class="item-thumb" style="object-position: ${focus}; object-fit: cover;">
                 <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
@@ -579,7 +522,6 @@ async function loadAdminProjects() {
 
             li.querySelector('.edit').addEventListener('click', () => {
                 resetProjectForm();
-
                 document.getElementById('view-list').classList.add('hidden');
                 document.getElementById('view-form').classList.remove('hidden');
                 const btnAddNew = document.getElementById('btn-add-new');
@@ -593,10 +535,8 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
                 if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
-
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
 
-                // On traduit l'ancienne position (ou la nouvelle) pour positionner le slider
                 const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
                 document.getElementById('proj-focus-bento-x').value = bentoPos.x;
                 document.getElementById('proj-focus-bento-y').value = bentoPos.y;
@@ -605,34 +545,196 @@ async function loadAdminProjects() {
                 document.getElementById('proj-focus-header-x').value = headerPos.x;
                 document.getElementById('proj-focus-header-y').value = headerPos.y;
 
-                const previewBloc = document.getElementById('image-preview-bloc');
-                const previewCadrage = document.getElementById('image-preview-cadrage');
-
                 if (project.imageAffiche) {
-                    if(previewBloc) previewBloc.src = project.imageAffiche;
-                    if(previewCadrage) previewCadrage.src = project.imageAffiche;
+                    document.getElementById('image-preview-bloc').src = project.imageAffiche;
+                    document.getElementById('image-preview-cadrage').src = project.imageAffiche;
                     syncBentoDA(); 
                 }
 
                 currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null;
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
-                
-                // On remonte tout en haut du formulaire de manière fluide
                 document.querySelector('#view-form').scrollIntoView({ behavior: 'smooth' });
             });
             projectList.appendChild(li);
         });
-        setupDragAndDrop();
+        setupDragAndDrop('project-list', 'projects');
     } catch (error) {}
 }
 
+
 // =========================================
-// 10. DRAG & DROP (PC + Tactile)
+// 8. MOTEUR D'ÉQUIPE (D&D, UPLOAD, CRUD)
 // =========================================
-function setupDragAndDrop() {
-    const list = document.getElementById('project-list');
+function setupTeamDropzone() {
+    const dropzone = document.getElementById('team-dropzone');
+    if (!dropzone) return;
+    const fileInput = document.getElementById('team-image');
+    const preview = document.getElementById('team-preview');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+    fileInput.addEventListener('change', function() { if (this.files.length) handleFile(this.files[0]); });
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide.", "error"); return; }
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image(); img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; let width = img.width, height = img.height;
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                canvas.toBlob((blob) => {
+                    teamOptimizedImageBlob = blob;
+                    preview.src = URL.createObjectURL(blob);
+                }, 'image/webp', 0.8);
+            };
+        };
+    }
+}
+
+function returnToTeamList() {
+    document.getElementById('view-team-list').classList.remove('hidden');
+    document.getElementById('view-team-form').classList.add('hidden');
+    const btnAddNew = document.getElementById('btn-add-new');
+    if (btnAddNew) btnAddNew.style.display = 'block';
+    resetTeamForm();
+}
+
+function resetTeamForm() {
+    const form = document.getElementById('team-form');
+    if(!form) return;
+    form.reset();
+    document.getElementById('team-preview').src = DEFAULT_AVATAR; // Retour à l'avatar par défaut
+    document.getElementById('team-form-title').textContent = "Ajouter un membre";
+    document.getElementById('btn-save-team').textContent = "Enregistrer le membre";
+    teamOptimizedImageBlob = null; currentTeamEditId = null; currentTeamImageUrl = null;
+}
+
+function setupTeamForm() {
+    const form = document.getElementById('team-form');
+    if (!form) return;
+
+    form.querySelectorAll('.btn-cancel-team-bottom, .btn-cancel-team-top').forEach(btn => btn.addEventListener('click', returnToTeamList));
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nom = document.getElementById('team-name').value.trim();
+        const btnSave = document.getElementById('btn-save-team');
+
+        const teamData = {
+            nom: nom,
+            role: document.getElementById('team-role').value.trim(),
+        };
+
+        btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
+
+        try {
+            // Si pas d'image choisie et aucune image existante, on met l'Avatar par défaut
+            let imageUrl = currentTeamImageUrl || DEFAULT_AVATAR; 
+            if (teamOptimizedImageBlob) {
+                const safeName = nom.replace(/\s+/g, '-').toLowerCase();
+                const imageRef = ref(storage, `equipe/${Date.now()}_${safeName}.webp`);
+                await uploadBytes(imageRef, teamOptimizedImageBlob);
+                imageUrl = await getDownloadURL(imageRef);
+            }
+            teamData.photo = imageUrl;
+
+            if (currentTeamEditId) {
+                await updateDoc(doc(db, "team", currentTeamEditId), teamData);
+                UI.showToast("Membre mis à jour !");
+            } else {
+                teamData.ordreAffichage = Date.now();
+                await addDoc(collection(db, "team"), teamData);
+                UI.showToast("Membre ajouté !");
+            }
+            loadAdminTeam(); returnToTeamList(); 
+        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
+    });
+}
+
+async function loadAdminTeam() {
+    const teamList = document.getElementById('team-list');
+    if (!teamList) return;
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "team"));
+        let members = [];
+        querySnapshot.forEach((doc) => { members.push({ id: doc.id, ...doc.data() }); });
+        members.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
+        teamList.innerHTML = '';
+
+        members.forEach(member => {
+            const li = document.createElement('li');
+            li.className = 'sortable-item'; li.dataset.id = member.id; li.setAttribute('draggable', 'true');
+
+            // On utilise la photo ou l'avatar par défaut
+            const avatar = member.photo || DEFAULT_AVATAR; 
+
+            li.innerHTML = `
+                <div class="drag-handle">☰</div>
+                <img src="${avatar}" class="item-thumb" style="border-radius: 50%; object-fit: cover;">
+                <div class="item-info"><strong>${member.nom}</strong><span>${member.role}</span></div>
+                <div class="item-actions">
+                    <button class="btn-icon edit" title="Modifier">✎</button>
+                    <button class="btn-icon delete" title="Supprimer">✕</button>
+                </div>`;
+
+            li.querySelector('.delete').addEventListener('click', async () => {
+                if(confirm(`Supprimer "${member.nom}" de l'équipe ?`)) { await deleteDoc(doc(db, "team", member.id)); loadAdminTeam(); }
+            });
+
+            li.querySelector('.edit').addEventListener('click', () => {
+                resetTeamForm();
+                document.getElementById('view-team-list').classList.add('hidden');
+                document.getElementById('view-team-form').classList.remove('hidden');
+                const btnAddNew = document.getElementById('btn-add-new');
+                if (btnAddNew) btnAddNew.style.display = 'none';
+
+                document.getElementById('team-name').value = member.nom || '';
+                document.getElementById('team-role').value = member.role || '';
+                document.getElementById('team-preview').src = avatar;
+
+                currentTeamEditId = member.id; currentTeamImageUrl = member.photo; teamOptimizedImageBlob = null;
+                document.getElementById('team-form-title').textContent = `Modifier : ${member.nom}`;
+                document.getElementById('btn-save-team').textContent = "Mettre à jour";
+                document.querySelector('#view-team-form').scrollIntoView({ behavior: 'smooth' });
+            });
+            teamList.appendChild(li);
+        });
+        setupDragAndDrop('team-list', 'team'); // Active le drag & drop pour l'équipe
+    } catch (error) {}
+}
+
+
+// =========================================
+// 9. DRAG & DROP GÉNÉRIQUE (PC + Tactile)
+// =========================================
+function setupDragAndDrop(listId, collectionName) {
+    const list = document.getElementById(listId);
+    if (!list) return;
     const items = list.querySelectorAll('.sortable-item');
+
+    async function saveOrder() {
+        const currentItems = list.querySelectorAll('.sortable-item');
+        document.body.style.cursor = 'wait';
+        try {
+            const promises = [];
+            currentItems.forEach((item, index) => {
+                const id = item.dataset.id;
+                const newOrder = Date.now() - (index * 1000); 
+                const docRef = doc(db, collectionName, id);
+                promises.push(updateDoc(docRef, { ordreAffichage: newOrder }));
+            });
+            await Promise.all(promises);
+            UI.showToast("Ordre sauvegardé !");
+        } catch (error) { UI.showToast("Erreur de sauvegarde.", "error"); } 
+        finally { document.body.style.cursor = 'default'; }
+    }
 
     items.forEach(item => {
         const handle = item.querySelector('.drag-handle');
@@ -647,21 +749,16 @@ function setupDragAndDrop() {
         });
 
         item.addEventListener('dragend', async () => {
-            item.classList.remove('dragging');
-            item.removeAttribute('draggable');
-            await saveNewOrder();
+            item.classList.remove('dragging'); item.removeAttribute('draggable');
+            await saveOrder();
         });
 
-        handle.addEventListener('touchstart', (e) => {
-            document.body.style.overflow = 'hidden'; 
-            item.classList.add('dragging');
-        }, { passive: false });
+        handle.addEventListener('touchstart', (e) => { document.body.style.overflow = 'hidden'; item.classList.add('dragging'); }, { passive: false });
 
         handle.addEventListener('touchmove', (e) => {
             e.preventDefault(); 
-            const draggingItem = document.querySelector('.dragging');
+            const draggingItem = list.querySelector('.dragging');
             if (!draggingItem) return;
-
             const touch = e.touches[0];
             draggingItem.style.display = 'none';
             const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -669,103 +766,48 @@ function setupDragAndDrop() {
 
             if (elementUnderFinger) {
                 const sibling = elementUnderFinger.closest('.sortable-item');
-                if (sibling && sibling !== draggingItem) {
+                if (sibling && sibling !== draggingItem && sibling.parentElement === list) {
                     const bounding = sibling.getBoundingClientRect();
-                    if (touch.clientY > bounding.top + (bounding.height / 2)) {
-                        sibling.after(draggingItem);
-                    } else {
-                        sibling.before(draggingItem);
-                    }
+                    if (touch.clientY > bounding.top + (bounding.height / 2)) sibling.after(draggingItem);
+                    else sibling.before(draggingItem);
                 }
             }
         }, { passive: false });
 
-        handle.addEventListener('touchend', async () => {
-            document.body.style.overflow = ''; 
-            item.classList.remove('dragging');
-            await saveNewOrder();
-        });
+        handle.addEventListener('touchend', async () => { document.body.style.overflow = ''; item.classList.remove('dragging'); await saveOrder(); });
     });
 
     list.addEventListener('dragover', (e) => {
         e.preventDefault(); 
-        const draggingItem = document.querySelector('.dragging');
+        const draggingItem = list.querySelector('.dragging');
         if (!draggingItem) return;
-
         const siblings = [...list.querySelectorAll('.sortable-item:not(.dragging)')];
-        let nextSibling = siblings.find(sibling => {
-            return e.clientY <= sibling.getBoundingClientRect().top + sibling.offsetHeight / 2;
-        });
+        let nextSibling = siblings.find(sibling => e.clientY <= sibling.getBoundingClientRect().top + sibling.offsetHeight / 2);
         list.insertBefore(draggingItem, nextSibling);
     });
 }
 
-async function saveNewOrder() {
-    const items = document.querySelectorAll('.sortable-item');
-    document.body.style.cursor = 'wait';
-    
-    try {
-        const promises = [];
-        items.forEach((item, index) => {
-            const id = item.dataset.id;
-            const newOrder = Date.now() - (index * 1000); 
-            const docRef = doc(db, "projects", id);
-            promises.push(updateDoc(docRef, { ordreAffichage: newOrder }));
-        });
-
-        await Promise.all(promises);
-        UI.showToast("Ordre d'affichage sauvegardé !");
-    } catch (error) {
-        console.error("Erreur de tri :", error);
-        UI.showToast("Erreur lors de la sauvegarde de l'ordre.", "error");
-    } finally {
-        document.body.style.cursor = 'default';
-    }
-}
-
 // =========================================
-// 11. GESTION DE LA VIDÉO D'ACCUEIL
+// 10. GESTION DE LA VIDÉO D'ACCUEIL
 // =========================================
 function setupHomeVideo() {
     const form = document.getElementById('home-video-form');
     const btnSave = document.getElementById('btn-save-video');
     const fileInput = document.getElementById('home-video-file');
-
     if (!form) return;
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const file = fileInput.files[0];
-        if (!file) {
-            UI.showToast("Veuillez sélectionner une vidéo MP4.", "error");
-            return;
-        }
-
-        btnSave.textContent = "Upload en cours... Patientez.";
-        btnSave.disabled = true;
+        if (!file) { UI.showToast("Sélectionnez une vidéo.", "error"); return; }
+        btnSave.textContent = "Upload en cours..."; btnSave.disabled = true;
 
         try {
             const videoRef = ref(storage, `site-assets/background.mp4`);
             await uploadBytes(videoRef, file);
             const videoUrl = await getDownloadURL(videoRef);
-
             await setDoc(doc(db, "settings", "homepage"), { backgroundVideo: videoUrl }, { merge: true });
-
-            UI.showToast("Vidéo d'accueil mise à jour !");
-            form.reset();
-
-        } catch (error) {
-            console.error(error);
-            UI.showToast("Erreur lors de l'envoi de la vidéo.", "error");
-        } finally {
-            btnSave.textContent = "Mettre à jour la vidéo";
-            btnSave.disabled = false;
-        }
+            UI.showToast("Vidéo mise à jour !"); form.reset();
+        } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
-
-
-
-
-
