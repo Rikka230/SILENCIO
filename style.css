@@ -1029,64 +1029,65 @@ body.not-at-top .logo {
 }
 
 /* =========================================================
-   SCROLL HORIZONTAL MANUEL ET GRILLE STRICTE (3 LIGNES)
+   SCROLL HORIZONTAL INFINI ET MODE STATIQUE (INTELLIGENT)
    ========================================================= */
 
-/* 1. Le conteneur de scroll (Masque les barres de défilement) */
-.bento-wrapper {
+/* --- MODE 1 : SCROLL INFINI (S'active s'il y a beaucoup de projets) --- */
+.bento-wrapper.is-scrollable {
     width: 100%;
-    overflow-x: auto; /* Active le scroll manuel horizontal */
+    overflow-x: auto;
     overflow-y: hidden;
-    -webkit-overflow-scrolling: touch; /* Fluidité maximale sur smartphone */
-    
-    /* Le fondu magique aux bords */
+    -webkit-overflow-scrolling: touch;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    padding: 20px 5%; /* Marge pour laisser respirer le fondu */
-    
-    /* Cache la scrollbar inesthétique sur PC et Mac */
+    padding: 20px 5%;
     scrollbar-width: none; 
     -ms-overflow-style: none; 
 }
-.bento-wrapper::-webkit-scrollbar { display: none; }
+.bento-wrapper.is-scrollable::-webkit-scrollbar { display: none; }
 
-/* 2. La grille Mathématique Stricte (Anti-Déformation) */
-.bento-grid {
+.bento-grid.is-scrollable {
     display: grid;
-    /* Variables de taille pour un contrôle absolu */
     --cell-size: 250px; 
     --gap: 20px;
-    
-    /* LA CORRECTION CRUCIALE : On annule l'ancienne limite des 4 colonnes PC */
     grid-template-columns: none !important; 
-    
-    /* On force 3 lignes exactes de 250px */
     grid-template-rows: repeat(3, var(--cell-size)) !important;
-    /* Chaque nouvelle colonne générée fera exactement 250px */
     grid-auto-columns: var(--cell-size) !important;
-    /* Remplissage de haut en bas, puis de gauche à droite */
     grid-auto-flow: column dense !important;
     gap: var(--gap) !important;
-    
-    width: max-content !important; /* Laisse la grille s'étendre à l'infini */
-    padding-right: 10vw; /* Espace vide agréable à la fin du scroll */
+    width: max-content !important; 
+    padding-right: 0 !important; /* Pas de marge pour un loop parfait */
 }
 
-/* 3. Définition des blocs (S'adapte parfaitement à la cellule de base) */
-.bento-item { grid-row: span 1 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
-.bento-tall { grid-row: span 2 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
-.bento-wide { grid-row: span 1 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
-.bento-big  { grid-row: span 2 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
+/* Redimensionnement strict pour le mode scroll */
+.is-scrollable .bento-item { grid-row: span 1 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
+.is-scrollable .bento-tall { grid-row: span 2 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
+.is-scrollable .bento-wide { grid-row: span 1 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
+.is-scrollable .bento-big  { grid-row: span 2 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
 
-/* 4. Adaptation pour petits écrans (Téléphones) */
 @media (max-width: 768px) {
-    .bento-grid {
-        --cell-size: 150px; /* Les blocs sont plus petits sur mobile */
-        --gap: 10px;
-    }
-    .bento-wrapper {
-        padding: 10px 5%;
-    }
+    .bento-grid.is-scrollable { --cell-size: 150px; --gap: 10px; }
+    .bento-wrapper.is-scrollable { padding: 10px 5%; }
+}
+
+/* --- MODE 2 : GRILLE FIXE (Visuel de départ, s'il y a peu de projets) --- */
+.bento-wrapper.is-static {
+    width: 100%;
+    overflow: visible;
+    padding: 20px 0;
+}
+.bento-grid.is-static {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) !important; /* La grille PC de base */
+    grid-auto-rows: auto;
+    gap: 20px !important;
+    width: 100% !important;
+}
+@media (max-width: 1024px) {
+    .bento-grid.is-static { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 768px) {
+    .bento-grid.is-static { grid-template-columns: 1fr !important; gap: 15px !important; }
 }
 
 
