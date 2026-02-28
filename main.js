@@ -61,7 +61,7 @@ if (path.includes('admin')) {
 }
 
 // =========================================
-// 4. LOGIQUE : PAGE D'ACCUEIL (SCROLL INFINI)
+// 4. LOGIQUE : PAGE D'ACCUEIL (SCROLL HORIZONTAL MANUEL)
 // =========================================
 async function initHomePage(){
     try {
@@ -82,12 +82,10 @@ async function initHomePage(){
         querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
         projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
         
-        // On nettoie le conteneur en gardant uniquement ton grand titre "En Production"
         const titleElement = bentoContainer.querySelector('.section-title');
         bentoContainer.innerHTML = '';
         if (titleElement) bentoContainer.appendChild(titleElement);
 
-        // On génère le code HTML de tous tes projets
         let itemsHTML = '';
         projects.forEach((project) => {
             const extraClass = project.formatAffichage || '';
@@ -104,24 +102,34 @@ async function initHomePage(){
             `;
         });
 
-        // --- CONSTRUCTION DU CARROUSEL INFINI ---
+        // Construction du nouveau conteneur
         const wrapper = document.createElement('div');
         wrapper.className = 'bento-wrapper';
 
-        const scroller = document.createElement('div');
-        scroller.className = 'bento-scroller';
+        const grid = document.createElement('div');
+        grid.className = 'bento-grid';
+        grid.innerHTML = itemsHTML; // Uniquement les vrais projets, sans clones !
 
-        // On clone la grille 6 fois (Défini par la variable --clones dans le CSS).
-        // Cela garantit une boucle infinie parfaitement fluide sans aucun espace vide !
-        for (let i = 0; i < 6; i++) {
-            const grid = document.createElement('div');
-            grid.className = 'bento-grid';
-            grid.innerHTML = itemsHTML;
-            scroller.appendChild(grid);
-        }
-
-        wrapper.appendChild(scroller);
+        wrapper.appendChild(grid);
         bentoContainer.appendChild(wrapper);
+
+        // --- INTELLIGENCE DE SCROLL SOURIS (PC/MAC) ---
+        wrapper.addEventListener('wheel', (evt) => {
+            // On ignore si c'est un scroll naturel sur Trackpad (MacBook)
+            if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return;
+
+            const maxScrollLeft = wrapper.scrollWidth - wrapper.clientWidth;
+            
+            // Si on scrolle vers le HAUT et qu'on est au DÉBUT de la grille -> On laisse la page monter
+            if (evt.deltaY < 0 && wrapper.scrollLeft <= 0) return;
+            
+            // Si on scrolle vers le BAS et qu'on est à la FIN de la grille -> On laisse la page descendre
+            if (evt.deltaY > 0 && wrapper.scrollLeft >= maxScrollLeft - 1) return;
+
+            // SINON : On intercepte la molette et on fait glisser la grille à l'horizontale
+            evt.preventDefault();
+            wrapper.scrollLeft += evt.deltaY; 
+        }, { passive: false });
 
     } catch (error) { console.error("Erreur de grille :", error); }
 }
@@ -730,5 +738,6 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
