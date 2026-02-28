@@ -1268,3 +1268,17 @@ body.not-at-top .logo {
     }
 }
 
+/* =========================================================
+   LA PISTE DE DÉFILEMENT (SÉPARATION DES CLONES BENTO)
+   ========================================================= */
+.bento-track {
+    display: flex;
+    gap: 20px; /* L'espace entre le groupe 1, 2 et 3 */
+    width: max-content;
+}
+
+@media (max-width: 768px) {
+    .bento-track {
+        gap: 10px; /* On réduit l'espace sur mobile */
+    }
+}
