@@ -1258,11 +1258,21 @@ body.not-at-top .logo {
 /* =========================================================
    CENTRAGE DU BENTO (S'IL N'Y A QU'UN SEUL PROJET)
    ========================================================= */
-.bento-grid.is-static.is-single-item {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
+.bento-grid.is-static {
+    display: grid;
+    --cell-size: 250px; 
+    --gap: 20px;
+    
+    /* LE BLINDAGE DU CENTRAGE ABSOLU */
+    margin: 0 auto !important; 
+    
+    /* L'ADN BENTO */
+    grid-template-rows: repeat(3, var(--cell-size)) !important;
+    grid-auto-columns: var(--cell-size) !important;
+    grid-auto-flow: column dense !important;
+    gap: var(--gap) !important;
+    
+    width: max-content !important; 
 }
 
 /* On donne une taille "Premium" à l'affiche unique pour qu'elle ne soit pas minuscule */
@@ -1300,4 +1310,5 @@ body.not-at-top .logo {
         gap: 10px; /* On réduit l'espace sur mobile */
     }
 }
+
 
