@@ -195,6 +195,54 @@
                     </form>
                 </section>
 
+                <section id="view-team-list" class="panel hidden" data-tab="equipe">
+                    <div class="search-container" style="margin-bottom: 1.5rem; position: relative;">
+                        <input type="text" id="search-team" placeholder="Rechercher un membre par nom..." style="width: 100%; padding: 12px 12px 12px 40px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px; font-family: inherit;">
+                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5;">🔍</span>
+                    </div>
+                    <div class="list-scroll-container">
+                        <ul id="team-list" class="sortable-list">
+                            </ul>
+                    </div>
+                </section>
+
+                <section id="view-team-form" class="panel hidden" data-tab="equipe">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+                        <h2 id="team-form-title" style="margin-bottom: 0;">Ajouter un membre</h2>
+                        <button type="button" class="btn-secondary btn-cancel-team-top" style="padding: 5px 15px; font-size: 0.8rem;">✕ Annuler</button>
+                    </div>
+                    
+                    <form id="team-form">
+                        <div style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 2rem;">
+                            
+                            <div style="flex: 0 0 150px; text-align: center; margin: 0 auto;">
+                                <label style="display:block; margin-bottom: 10px;">Photo (Avatar)</label>
+                                <div id="team-dropzone" class="dropzone" style="width: 150px; height: 150px; min-height: 150px; border-radius: 50%; padding: 5px; background: #050505; position: relative; overflow: hidden; border: 2px dashed rgba(255,255,255,0.2);">
+                                    <img id="team-preview" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+                                    <input type="file" id="team-image" accept="image/jpeg, image/png, image/webp" hidden>
+                                    <div class="team-hover-text" style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; opacity:0; transition:0.3s; border-radius: 50%; font-size: 0.8rem; color:#fff;">Modifier</div>
+                                </div>
+                            </div>
+                            
+                            <div style="flex: 1; min-width: 250px;">
+                                <div class="form-group">
+                                    <label>Nom Complet</label>
+                                    <input type="text" id="team-name" placeholder="Ex: Christophe Mongai" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Rôle / Fonction</label>
+                                    <input type="text" id="team-role" placeholder="Ex: Réalisateur & Producteur" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary btn-cancel-team-bottom">Annuler / Retour</button>
+                            <button type="submit" id="btn-save-team" class="btn-primary">Enregistrer le membre</button>
+                        </div>
+                    </form>
+                </section>
+
             </div>
         </main>
     </div>
@@ -202,6 +250,7 @@
 </body>
 
 </html>
+
 
 
 
