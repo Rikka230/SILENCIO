@@ -609,3 +609,70 @@ input:focus { outline: none; border-color: var(--color-accent); }
     }
 }
 
+/* =========================================================
+   SCROLL INFINI HORIZONTAL (BENTO GRID - 3 LIGNES MAX)
+   ========================================================= */
+
+/* 1. La fenêtre de visualisation avec le fondu aux extrémités */
+.bento-wrapper {
+    width: 100%;
+    overflow: hidden;
+    /* Le fondu magique : noir à 5% et 95%, transparent aux bords (0% et 100%) */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    padding: 20px 0; 
+}
+
+/* 2. Le tapis roulant (Scroller) */
+.bento-scroller {
+    /* Variables intelligentes pour un calcul parfait de la boucle infinie */
+    --clones: 6;
+    --gap: 20px;
+    
+    display: flex;
+    gap: var(--gap);
+    width: max-content;
+    /* L'animation lente (40s). Tu peux baisser ce chiffre pour accélérer ! */
+    animation: scrollBento 40s linear infinite;
+}
+
+/* 3. L'interactivité : Arrêt sur image au survol de la souris */
+.bento-scroller:hover {
+    animation-play-state: paused;
+}
+
+/* 4. La Grille reconfigurée pour couler à l'horizontale */
+.bento-grid {
+    display: grid;
+    grid-template-rows: repeat(3, 250px) !important; /* 3 LIGNES STRICTES DE 250px */
+    grid-auto-columns: 250px; /* Largeur de base des blocs */
+    grid-auto-flow: column dense !important; /* Remplissage du haut vers le bas, puis de gauche à droite */
+    gap: var(--gap) !important;
+    width: max-content !important; 
+}
+
+/* 5. On écrase l'ancien système de ratios pour qu'ils respectent parfaitement la nouvelle grille */
+.bento-item, .bento-big, .bento-tall, .bento-wide {
+    aspect-ratio: auto !important; 
+    width: 100% !important; 
+    height: 100% !important;
+}
+
+/* 6. Le Calcul Mathématique Absolu du Loop */
+/* On décale l'ensemble d'exactement 1 grille complète (100% / nombre de clones) */
+@keyframes scrollBento {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc( -100% / var(--clones) - (var(--gap) / var(--clones)) )); }
+}
+
+/* --- OPTIMISATION TÉLÉPHONES (BLOCS PLUS PETITS) --- */
+@media (max-width: 768px) {
+    .bento-scroller {
+        --gap: 10px;
+        animation-duration: 25s; /* Défile un peu plus vite sur mobile */
+    }
+    .bento-grid {
+        grid-template-rows: repeat(3, 130px) !important; /* 3 Lignes adaptées aux petits écrans */
+        grid-auto-columns: 130px;
+    }
+}
