@@ -572,22 +572,47 @@ async function loadAdminProjects() {
 
             const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
             
-            // Le badge "Masqué" si le projet n'est pas public
-            const hiddenBadge = project.visible === false ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555;">MASQUÉ</span>' : '';
+            // --- GESTION DU VISUEL DE L'ŒIL ET DU BADGE ---
+            const isHidden = project.visible === false;
+            const hiddenBadge = isHidden ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555; vertical-align: middle;">MASQUÉ</span>' : '';
+            
+            // Icônes SVG stylisées (Œil ouvert ou Œil barré)
+            const eyeSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            const eyeOffSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+            
+            const iconToUse = isHidden ? eyeOffSvg : eyeSvg;
+            const titleStatus = isHidden ? 'Afficher sur le site' : 'Masquer du site';
+            const iconOpacity = isHidden ? 'opacity: 0.5;' : ''; // L'œil barré sera un peu plus transparent
 
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
                 <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
                 <div class="item-info"><strong>${project.titre} ${hiddenBadge}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
+                    <button class="btn-icon toggle-visibility" style="${iconOpacity}" title="${titleStatus}">${iconToUse}</button>
                     <button class="btn-icon edit" title="Modifier">✎</button>
                     <button class="btn-icon delete" title="Supprimer">✕</button>
                 </div>`;
 
+            // ACTION 1 : Le bouton Œil (Mise en ligne / Hors ligne express)
+            li.querySelector('.toggle-visibility').addEventListener('click', async () => {
+                const newVisibility = isHidden ? true : false;
+                try {
+                    // On met à jour unqiuement la visibilité dans la base de données
+                    await updateDoc(doc(db, "projects", project.id), { visible: newVisibility });
+                    UI.showToast(newVisibility ? "Le projet est en ligne !" : "Le projet est masqué !");
+                    loadAdminProjects(); // On recharge la liste pour mettre à jour l'icône
+                } catch (error) {
+                    UI.showToast("Erreur de mise à jour.", "error");
+                }
+            });
+
+            // ACTION 2 : Le bouton Supprimer
             li.querySelector('.delete').addEventListener('click', async () => {
                 if(confirm(`Supprimer "${project.titre}" ?`)) { await deleteDoc(doc(db, "projects", project.id)); loadAdminProjects(); }
             });
 
+            // ACTION 3 : Le bouton Éditer
             li.querySelector('.edit').addEventListener('click', () => {
                 resetProjectForm();
                 document.getElementById('view-list').classList.add('hidden');
@@ -605,12 +630,11 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
                 
-                // On remet la case à cocher dans le bon état
+                // On met à jour l'état de la case à cocher dans le formulaire selon l'état actuel
                 if(document.getElementById('proj-visible')) {
                     document.getElementById('proj-visible').checked = project.visible !== false; 
                 }
 
-                // ... (La suite du code reste identique) ...
                 const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
                 document.getElementById('proj-focus-bento-x').value = bentoPos.x;
                 document.getElementById('proj-focus-bento-y').value = bentoPos.y;
@@ -645,7 +669,6 @@ async function loadAdminProjects() {
         
     } catch (error) {}
 }
-
 
 // =========================================
 // 8. MOTEUR D'ÉQUIPE (D&D, UPLOAD, CRUD)
@@ -911,6 +934,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
