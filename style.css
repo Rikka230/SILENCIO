@@ -1147,3 +1147,35 @@ body.not-at-top .logo {
     display: none !important;
 }
 
+/* =========================================================
+   BLINDAGE ANTI-STRETCH (SÉCURITÉ CHARGEMENT)
+   ========================================================= */
+.bento-item img, 
+.project-hero img, 
+.team-card img {
+    /* 1. L'image ne gère plus sa taille, elle obéit au conteneur */
+    position: absolute !important; 
+    top: 0; 
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    
+    /* 2. Empêche toute déformation, quitte à couper l'image */
+    object-fit: cover !important; 
+    
+    /* 3. Masque l'image par défaut (elle sera affichée par l'animation) */
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* L'animation qui affiche l'image doucement une fois qu'elle est prête */
+.image-loaded {
+    opacity: 1 !important;
+}
+
+/* On s'assure que les conteneurs sont bien relatifs pour bloquer les images absolues */
+.bento-item, .project-hero, .team-card {
+    position: relative !important;
+    background-color: #050505; /* Un fond sombre élégant pendant le chargement */
+    overflow: hidden;
+}
