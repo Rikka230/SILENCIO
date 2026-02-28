@@ -91,15 +91,15 @@ async function initHomePage(){
             projects.forEach((project) => {
                 const extraClass = project.formatAffichage || '';
                 const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-                itemsHTML += `
-                    <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
-                        <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
-                        <div class="bento-overlay">
-                            <h3>${project.titre.toUpperCase()}</h3>
-                            <p>${project.statut}</p>
-                        </div>
-                    </a>
-                `;
+            itemsHTML += `
+                <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
+                    <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;" onload="this.classList.add('image-loaded')">
+                    <div class="bento-overlay">
+                        <h3>${project.titre.toUpperCase()}</h3>
+                        <p>${project.statut}</p>
+                    </div>
+                </a>
+            `;
             });
 
             const wrapper = document.createElement('div');
@@ -850,6 +850,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
