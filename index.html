@@ -147,26 +147,37 @@
             window.addEventListener('pageshow', function(event) {
                 const transitionOverlay = document.querySelector('.page-transition');
                 
+                // Si la page sort du cache (Bouton Précédent)
                 if (event.persisted) {
-                    // SÉCURITÉ ANTI-STRETCH : Le navigateur ressort la page de sa mémoire (Bouton retour)
-                    // On force la grille à cligner des yeux (Reflow) pour s'afficher parfaitement instantanément.
-                    const grid = document.querySelector('.bento-grid');
-                    if (grid) {
-                        grid.style.display = 'none';
-                        grid.offsetHeight; /* La ligne magique qui force le recalcul */
-                        grid.style.display = '';
-                    }
-                    
                     if (transitionOverlay) {
-                        transitionOverlay.classList.remove('active');
-                        transitionOverlay.style.opacity = '0';
+                        // 1. On remet l'écran noir instantanément sans animation
+                        transitionOverlay.style.transition = 'none';
+                        transitionOverlay.style.opacity = '1';
+                        transitionOverlay.classList.add('active');
+                        
+                        // 2. On attend 150ms (le temps que le navigateur décompresse la grille)
+                        setTimeout(() => {
+                            // On force le recalcul de la grille
+                            const grid = document.querySelector('.bento-grid');
+                            if (grid) {
+                                grid.style.display = 'none';
+                                grid.offsetHeight; // Force reflow
+                                grid.style.display = '';
+                            }
+                            
+                            // 3. On enlève l'écran noir en douceur
+                            transitionOverlay.style.transition = 'opacity 0.5s ease-in-out';
+                            transitionOverlay.classList.remove('active');
+                            transitionOverlay.style.opacity = '0';
+                        }, 150);
                     }
                 } else {
-                    // Chargement classique
+                    // Chargement classique (Premier accès)
                     if (transitionOverlay) {
                         transitionOverlay.classList.add('active');
                         setTimeout(() => {
                             transitionOverlay.classList.remove('active');
+                            transitionOverlay.style.opacity = '0';
                         }, 50); 
                     }
                 }
@@ -311,6 +322,7 @@
     <script type="module" src="main.js?v=2.0"></script>
 </body>
 </html>
+
 
 
 
