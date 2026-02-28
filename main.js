@@ -93,7 +93,7 @@ async function initHomePage(){
                 const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
             itemsHTML += `
                 <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
-                    <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;" onload="this.classList.add('image-loaded')">
+                    <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')">
                     <div class="bento-overlay">
                         <h3>${project.titre.toUpperCase()}</h3>
                         <p>${project.statut}</p>
@@ -151,7 +151,7 @@ async function initHomePage(){
                 const avatar = member.photo || DEFAULT_AVATAR; 
                 teamHTML += `
                     <div class="team-card">
-                        <img src="${avatar}" alt="${member.nom}" loading="lazy" onload="this.classList.add('image-loaded')">
+                        <img src="${avatar}" alt="${member.nom}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important;" onload="this.classList.add('loaded')">
                         <div class="team-overlay">
                             <h3>${member.nom}</h3>
                             <p>${member.role}</p>
@@ -191,10 +191,15 @@ function renderProject(data) {
     document.querySelector('.project-hero p').innerHTML = `${data.genre || ''} &bull; ${data.statut}`;
     
     const heroImage = document.querySelector('.project-hero img');
-        heroImage.onload = () => {
-        heroImage.classList.add('image-loaded');
-    };
     
+    // 1. On applique la classe et les styles de force brute AVANT de charger l'image
+    heroImage.className = 'anti-stretch-img';
+    heroImage.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important;';
+    
+    // 2. L'image ne s'affiche que lorsqu'elle est prête
+    heroImage.onload = () => { heroImage.classList.add('loaded'); };
+    
+    // 3. On insère la source et le cadrage
     heroImage.src = data.imageAffiche;
     heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || '50% 50%';
 
@@ -854,6 +859,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
