@@ -484,3 +484,70 @@ input:focus { outline: none; border-color: var(--color-accent); }
     }
 }
 
+/* =========================================================
+   SÉCURITÉ ANTI-DÉBORDEMENT MOBILE (LE BLINDAGE ABSOLU)
+   ========================================================= */
+@media (max-width: 768px) {
+    /* 1. On interdit physiquement à la page de déborder à l'horizontal */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+    }
+
+    /* 2. On contraint tous les conteneurs du formulaire à la taille de l'écran */
+    .admin-layout, .admin-content, .dashboard-grid, .panel, #view-form {
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 3. LE CORRECTIF CLÉ : On casse les "min-width: 200px" des listes déroulantes */
+    .form-group {
+        display: flex !important;
+        flex-direction: column !important; /* Force l'empilement vertical pur */
+        gap: 15px !important;
+        width: 100% !important;
+    }
+    .form-group > div {
+        width: 100% !important;
+        min-width: 100% !important; /* Annule les 200px du HTML */
+        flex: none !important;
+        margin: 0 !important;
+    }
+
+    /* 4. On force les champs de texte et sélecteurs à rester dans leurs boîtes */
+    input, select, textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 5. On empile proprement les deux boîtes de Direction Artistique */
+    #previews-group {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+    .da-preview-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 1rem 0 !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .da-preview-box:last-child {
+        border-bottom: none !important;
+    }
+
+    /* 6. On s'assure que l'image Bento rétrécit pour rentrer sur l'écran */
+    #da-bloc-wrapper {
+        max-width: 200px !important; 
+    }
+}
+
+
