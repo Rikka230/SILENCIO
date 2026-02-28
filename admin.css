@@ -623,3 +623,26 @@ input:focus { outline: none; border-color: var(--color-accent); }
     opacity: 1 !important;
 }
 
+/* =========================================================
+   BLINDAGE ANTI-STRETCH (ADMIN)
+   ========================================================= */
+.anti-stretch-img {
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.anti-stretch-img.loaded {
+    opacity: 1;
+}
+
+/* Verrouillage strict des petites vignettes de liste */
+.item-thumb.anti-stretch-img {
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    display: block;
+}
