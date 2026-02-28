@@ -102,18 +102,17 @@ async function initHomePage(){
             `;
         });
 
-        // Construction du nouveau conteneur
         const wrapper = document.createElement('div');
         wrapper.className = 'bento-wrapper';
 
         const grid = document.createElement('div');
         grid.className = 'bento-grid';
-        grid.innerHTML = itemsHTML; // Uniquement les vrais projets, sans clones !
+        grid.innerHTML = itemsHTML; 
 
         wrapper.appendChild(grid);
         bentoContainer.appendChild(wrapper);
 
-        // --- INTELLIGENCE DE SCROLL SOURIS (PC/MAC) ---
+        // --- INTELLIGENCE DE SCROLL SOURIS (PC/MAC) SÉCURISÉE ---
         wrapper.addEventListener('wheel', (evt) => {
             // On ignore si c'est un scroll naturel sur Trackpad (MacBook)
             if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return;
@@ -124,7 +123,8 @@ async function initHomePage(){
             if (evt.deltaY < 0 && wrapper.scrollLeft <= 0) return;
             
             // Si on scrolle vers le BAS et qu'on est à la FIN de la grille -> On laisse la page descendre
-            if (evt.deltaY > 0 && wrapper.scrollLeft >= maxScrollLeft - 1) return;
+            // Le Math.ceil() protège contre les bugs de pixels décimaux des écrans 4K/Retina
+            if (evt.deltaY > 0 && Math.ceil(wrapper.scrollLeft) >= maxScrollLeft - 1) return;
 
             // SINON : On intercepte la molette et on fait glisser la grille à l'horizontale
             evt.preventDefault();
@@ -738,6 +738,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
