@@ -1237,4 +1237,34 @@ body.not-at-top .logo {
     aspect-ratio: 1 / 1 !important; 
 }
 
+/* =========================================================
+   CENTRAGE DU BENTO (S'IL N'Y A QU'UN SEUL PROJET)
+   ========================================================= */
+.bento-grid.is-static.is-single-item {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* On donne une taille "Premium" à l'affiche unique pour qu'elle ne soit pas minuscule */
+.bento-grid.is-static.is-single-item .bento-item {
+    width: 400px !important; 
+    max-width: 100%;
+}
+
+/* S'adapte intelligemment si tu choisis un format différent pour ton projet unique */
+.bento-grid.is-static.is-single-item .bento-wide { width: 600px !important; }
+.bento-grid.is-static.is-single-item .bento-tall { width: 350px !important; }
+.bento-grid.is-static.is-single-item .bento-big  { width: 500px !important; }
+
+/* Sur mobile, il reprend naturellement 100% de la largeur */
+@media (max-width: 768px) {
+    .bento-grid.is-static.is-single-item .bento-item,
+    .bento-grid.is-static.is-single-item .bento-wide,
+    .bento-grid.is-static.is-single-item .bento-tall,
+    .bento-grid.is-static.is-single-item .bento-big {
+        width: 100% !important;
+    }
+}
 
