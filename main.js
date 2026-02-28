@@ -73,7 +73,6 @@ async function initHomePage(){
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
         // --- SÉCURITÉ ANTI-CACHE (BFCache) ---
-        // Si les images viennent du cache (Bouton retour), on force leur apparition
         setTimeout(() => {
             document.querySelectorAll('.anti-stretch-img').forEach(img => {
                 if (img.complete) img.classList.add('loaded');
@@ -149,7 +148,6 @@ async function initHomePage(){
                 // 3. Le calcul absolu du saut de boucle
                 let jumpDistance = 0;
                 setTimeout(() => { 
-                    // On mesure l'écart au pixel près entre le début de la grille 1 et la grille 2
                     jumpDistance = grid2.offsetLeft - grid1.offsetLeft;
                     wrapper.scrollLeft = jumpDistance; 
                 }, 100);
@@ -158,7 +156,6 @@ async function initHomePage(){
                 wrapper.addEventListener('scroll', () => {
                     if (isLooping || jumpDistance === 0) return;
                     
-                    // On utilise maintenant la jumpDistance calculée mathématiquement
                     if (wrapper.scrollLeft < jumpDistance / 2) {
                         isLooping = true; 
                         wrapper.scrollLeft += jumpDistance; 
@@ -175,6 +172,9 @@ async function initHomePage(){
                     evt.preventDefault(); wrapper.scrollLeft += evt.deltaY;
                 }, { passive: false });
             }
+        // LES ACCOLADES MANQUANTES ÉTAIENT ICI :
+        } catch (error) { console.error("Erreur projets :", error); }
+    }
 
     // --- 2. CHARGEMENT DE L'ÉQUIPE ---
     const teamGrid = document.querySelector('.team-grid');
@@ -961,6 +961,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
