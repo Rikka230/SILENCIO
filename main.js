@@ -120,6 +120,10 @@ async function initHomePage(){
             if (projects.length <= 6) {
                 wrapper.className = 'bento-wrapper is-static';
                 grid.className = 'bento-grid is-static';
+                if (projects.length === 1) {
+                    grid.classList.add('is-single-item');
+                }
+
                 grid.innerHTML = itemsHTML;
                 wrapper.appendChild(grid);
                 bentoContainer.appendChild(wrapper);
@@ -934,6 +938,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
