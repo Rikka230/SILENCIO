@@ -61,7 +61,7 @@ if (path.includes('admin')) {
 }
 
 // =========================================
-// 4. LOGIQUE : PAGE D'ACCUEIL
+// 4. LOGIQUE : PAGE D'ACCUEIL (SCROLL INFINI)
 // =========================================
 async function initHomePage(){
     try {
@@ -73,8 +73,8 @@ async function initHomePage(){
         }
     } catch (error) { console.log("Erreur vidéo"); }
     
-    const bentoGrid = document.querySelector('.bento-grid');
-    if (!bentoGrid) return;
+    const bentoContainer = document.querySelector('.bento-container');
+    if (!bentoContainer) return;
 
     try {
         const querySnapshot = await getDocs(collection(db, "projects"));
@@ -82,30 +82,46 @@ async function initHomePage(){
         querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
         projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
         
-        bentoGrid.innerHTML = '';
+        // On nettoie le conteneur en gardant uniquement ton grand titre "En Production"
+        const titleElement = bentoContainer.querySelector('.section-title');
+        bentoContainer.innerHTML = '';
+        if (titleElement) bentoContainer.appendChild(titleElement);
 
+        // On génère le code HTML de tous tes projets
+        let itemsHTML = '';
         projects.forEach((project) => {
             const extraClass = project.formatAffichage || '';
             const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
 
-            const a = document.createElement('a');
-            a.href = `projet.html?id=${project.id}`; 
-            a.className = `bento-item ${extraClass}`;
-            
-            a.innerHTML = `
-                <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
-                <div class="bento-overlay">
-                    <h3>${project.titre.toUpperCase()}</h3>
-                    <p>${project.statut}</p>
-                </div>
+            itemsHTML += `
+                <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
+                    <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" style="object-position: ${focus} !important;">
+                    <div class="bento-overlay">
+                        <h3>${project.titre.toUpperCase()}</h3>
+                        <p>${project.statut}</p>
+                    </div>
+                </a>
             `;
-            bentoGrid.appendChild(a);
         });
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.bento-item').forEach(i => observer.observe(i));
+        // --- CONSTRUCTION DU CARROUSEL INFINI ---
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bento-wrapper';
+
+        const scroller = document.createElement('div');
+        scroller.className = 'bento-scroller';
+
+        // On clone la grille 6 fois (Défini par la variable --clones dans le CSS).
+        // Cela garantit une boucle infinie parfaitement fluide sans aucun espace vide !
+        for (let i = 0; i < 6; i++) {
+            const grid = document.createElement('div');
+            grid.className = 'bento-grid';
+            grid.innerHTML = itemsHTML;
+            scroller.appendChild(grid);
+        }
+
+        wrapper.appendChild(scroller);
+        bentoContainer.appendChild(wrapper);
 
     } catch (error) { console.error("Erreur de grille :", error); }
 }
@@ -714,4 +730,5 @@ function setupHomeVideo() {
         }
     });
 }
+
 
