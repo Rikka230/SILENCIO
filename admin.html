@@ -66,7 +66,11 @@
                 </section>
 
                 <section id="view-form" class="panel form-panel hidden" data-tab="projets">
-                    <h2 id="form-title">Ajouter un projet</h2>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+                        <h2 id="form-title" style="margin-bottom: 0;">Ajouter un projet</h2>
+                        <button type="button" class="btn-secondary btn-cancel-top" style="padding: 5px 15px; font-size: 0.8rem;">✕ Annuler</button>
+                    </div>
                     
                     <form id="project-form">
                         <div class="form-group">
@@ -114,25 +118,27 @@
                                     <option value="bento-big">Grand Carré (2x2)</option>
                                 </select>
                             </div>
-                            <div style="flex: 1; min-width: 200px;">
-                                <label>Focus (Grille Bento)</label>
-                                <select id="proj-focus-bento" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
-                                    <option value="center">Centré (Défaut)</option>
-                                    <option value="top">Vers le Haut</option>
-                                    <option value="bottom">Vers le Bas</option>
-                                    <option value="left">Vers la Gauche</option>
-                                    <option value="right">Vers la Droite</option>
-                                </select>
+                            <div style="flex: 1; min-width: 250px;">
+                                <label>Cadrage Grille Bento (X / Y)</label>
+                                <div style="display: flex; gap: 15px; align-items: center; margin-top: 5px;">
+                                    <input type="range" id="proj-focus-bento-x" class="da-slider" min="0" max="100" value="50" title="Gauche / Droite">
+                                    <input type="range" id="proj-focus-bento-y" class="da-slider" min="0" max="100" value="50" title="Haut / Bas">
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.65rem; color: #888; text-transform: uppercase;">
+                                    <span style="flex:1; text-align:center;">↔ X (Horiz.)</span>
+                                    <span style="flex:1; text-align:center;">↕ Y (Vertic.)</span>
+                                </div>
                             </div>
-                            <div style="flex: 1; min-width: 200px;">
-                                <label>Focus (En-tête Film)</label>
-                                <select id="proj-focus-header" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px;">
-                                    <option value="center">Centré (Défaut)</option>
-                                    <option value="top">Vers le Haut</option>
-                                    <option value="bottom">Vers le Bas</option>
-                                    <option value="left">Vers la Gauche</option>
-                                    <option value="right">Vers la Droite</option>
-                                </select>
+                            <div style="flex: 1; min-width: 250px;">
+                                <label>Cadrage En-tête Film (X / Y)</label>
+                                <div style="display: flex; gap: 15px; align-items: center; margin-top: 5px;">
+                                    <input type="range" id="proj-focus-header-x" class="da-slider" min="0" max="100" value="50" title="Gauche / Droite">
+                                    <input type="range" id="proj-focus-header-y" class="da-slider" min="0" max="100" value="50" title="Haut / Bas">
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.65rem; color: #888; text-transform: uppercase;">
+                                    <span style="flex:1; text-align:center;">↔ X (Horiz.)</span>
+                                    <span style="flex:1; text-align:center;">↕ Y (Vertic.)</span>
+                                </div>
                             </div>
                         </div>
 
@@ -163,7 +169,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary">Annuler / Retour</button>
+                            <button type="button" class="btn-secondary btn-cancel-bottom">Annuler / Retour</button>
                             <button type="submit" id="btn-save" class="btn-primary">Enregistrer le projet</button>
                         </div>
                     </form>
@@ -188,6 +194,7 @@
 </body>
 
 </html>
+
 
 
 
