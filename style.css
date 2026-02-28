@@ -1070,24 +1070,42 @@ body.not-at-top .logo {
     .bento-wrapper.is-scrollable { padding: 10px 5%; }
 }
 
-/* --- MODE 2 : GRILLE FIXE (Visuel de départ, s'il y a peu de projets) --- */
+/* --- MODE 2 : GRILLE FIXE (Visuel de départ, de 2 à 6 projets) --- */
 .bento-wrapper.is-static {
     width: 100%;
     overflow: visible;
     padding: 20px 0;
+    /* On centre la grille au milieu de la page */
+    display: flex;
+    justify-content: center;
 }
+
 .bento-grid.is-static {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) !important; /* La grille PC de base */
-    grid-auto-rows: auto;
-    gap: 20px !important;
-    width: 100% !important;
+    --cell-size: 250px; 
+    --gap: 20px;
+    
+    /* L'ADN BENTO : 3 lignes strictes, remplissage dense */
+    grid-template-rows: repeat(3, var(--cell-size)) !important;
+    grid-auto-columns: var(--cell-size) !important;
+    grid-auto-flow: column dense !important;
+    gap: var(--gap) !important;
+    
+    /* La grille ne prend que la taille de son contenu pour pouvoir être centrée */
+    width: max-content !important; 
 }
-@media (max-width: 1024px) {
-    .bento-grid.is-static { grid-template-columns: repeat(2, 1fr) !important; }
-}
+
+/* On applique les mêmes verrous de pixels bruts que pour le mode scroll */
+.bento-grid.is-static .bento-item { width: var(--cell-size) !important; height: var(--cell-size) !important; }
+.bento-grid.is-static .bento-tall { height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-static .bento-wide { width: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-static .bento-big  { width: calc((var(--cell-size) * 2) + var(--gap)) !important; height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+
 @media (max-width: 768px) {
-    .bento-grid.is-static { grid-template-columns: 1fr !important; gap: 15px !important; }
+    .bento-grid.is-static {
+        --cell-size: 150px; 
+        --gap: 10px;
+    }
 }
 
 /* =========================================================
@@ -1282,3 +1300,4 @@ body.not-at-top .logo {
         gap: 10px; /* On réduit l'espace sur mobile */
     }
 }
+
