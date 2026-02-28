@@ -1057,6 +1057,9 @@ body.not-at-top .logo {
     --cell-size: 250px; 
     --gap: 20px;
     
+    /* LA CORRECTION CRUCIALE : On annule l'ancienne limite des 4 colonnes PC */
+    grid-template-columns: none !important; 
+    
     /* On force 3 lignes exactes de 250px */
     grid-template-rows: repeat(3, var(--cell-size)) !important;
     /* Chaque nouvelle colonne générée fera exactement 250px */
