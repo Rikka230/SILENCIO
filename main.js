@@ -36,6 +36,20 @@ const UI = {
     }
 };
 
+// --- HELPER : Traducteur de position (Compatibilité avec les anciens films) ---
+function parsePosition(posString) {
+    if (!posString) return { x: 50, y: 50 };
+    if (posString === 'top') return { x: 50, y: 0 };
+    if (posString === 'bottom') return { x: 50, y: 100 };
+    if (posString === 'left') return { x: 0, y: 50 };
+    if (posString === 'right') return { x: 100, y: 50 };
+    if (posString === 'center') return { x: 50, y: 50 };
+    
+    const match = posString.match(/(\d+)%\s+(\d+)%/);
+    if (match) return { x: parseInt(match[1]), y: parseInt(match[2]) };
+    return { x: 50, y: 50 };
+}
+
 const path = window.location.pathname.toLowerCase();
 
 if (path.includes('admin')) {
@@ -72,8 +86,7 @@ async function initHomePage(){
 
         projects.forEach((project) => {
             const extraClass = project.formatAffichage || '';
-            // On utilise le focus spécifique Bento, ou l'ancien focus global, ou center par défaut
-            const focus = project.imageFocusBento || project.imageFocus || 'center';
+            const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
 
             const a = document.createElement('a');
             a.href = `projet.html?id=${project.id}`; 
@@ -124,8 +137,7 @@ function renderProject(data) {
     const heroImage = document.querySelector('.project-hero img');
     heroImage.src = data.imageAffiche;
     heroImage.alt = `Affiche du film ${data.titre}`;
-    // Focus spécifique à l'en-tête (Header)
-    heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || 'center';
+    heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || '50% 50%';
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
 
@@ -214,13 +226,12 @@ function initAdmin() {
         });
     }
 
-    // GESTION DU BOUTON "+ NOUVEAU"
     const btnAddNew = document.getElementById('btn-add-new');
     if (btnAddNew) {
         btnAddNew.addEventListener('click', () => {
             document.getElementById('view-list').classList.add('hidden');
             document.getElementById('view-form').classList.remove('hidden');
-            btnAddNew.style.display = 'none'; // On cache le bouton
+            btnAddNew.style.display = 'none';
             resetProjectForm();
         });
     }
@@ -240,7 +251,6 @@ function initAdmin() {
 
             allPanels.forEach(panel => panel.classList.add('hidden'));
             
-            // Si on clique sur Projets, on remet l'affichage de base (Liste seule)
             if (target === 'projets') {
                 mainTitle.textContent = "Projets en Production";
                 document.getElementById('view-list').classList.remove('hidden');
@@ -259,7 +269,7 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR DE VISUALISATION DOUBLE CADRAGE
+// 7. MOTEUR DE VISUALISATION (AVEC SLIDERS EN TEMPS RÉEL)
 // =========================================
 function syncBentoDA() {
     const daContainer = document.getElementById('image-da-container');
@@ -271,25 +281,35 @@ function syncBentoDA() {
     const blocWrapper = document.getElementById('da-bloc-wrapper');
 
     const formatSelect = document.getElementById('proj-format');
-    const focusSelectBento = document.getElementById('proj-focus-bento');
-    const focusSelectHeader = document.getElementById('proj-focus-header');
+    const focusBentoX = document.getElementById('proj-focus-bento-x');
+    const focusBentoY = document.getElementById('proj-focus-bento-y');
+    const focusHeaderX = document.getElementById('proj-focus-header-x');
+    const focusHeaderY = document.getElementById('proj-focus-header-y');
 
     if (!daContainer || !previewsGroup || !previewBloc) return;
 
     function updateLiveView() {
         if (!previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
 
+        // Met à jour la forme du bloc
         blocWrapper.className = '';
         if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
 
-        // Application des DEUX focus distincts
-        if (focusSelectBento) previewBloc.style.objectPosition = focusSelectBento.value;
-        if (focusSelectHeader && previewCadrage) previewCadrage.style.objectPosition = focusSelectHeader.value;
+        // Met à jour la position de l'image (X% Y%) en direct !
+        if (focusBentoX && focusBentoY) {
+            previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
+        }
+        if (focusHeaderX && focusHeaderY && previewCadrage) {
+            previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
+        }
     }
 
     if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
-    if (focusSelectBento) focusSelectBento.addEventListener('change', updateLiveView);
-    if (focusSelectHeader) focusSelectHeader.addEventListener('change', updateLiveView);
+    // On utilise 'input' pour que l'image glisse EN TEMPS RÉEL pendant qu'on bouge le curseur !
+    if (focusBentoX) focusBentoX.addEventListener('input', updateLiveView);
+    if (focusBentoY) focusBentoY.addEventListener('input', updateLiveView);
+    if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView);
+    if (focusHeaderY) focusHeaderY.addEventListener('input', updateLiveView);
 
     const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
 
@@ -370,6 +390,12 @@ function resetProjectForm() {
     if(!form) return;
     form.reset();
 
+    // On réinitialise les sliders à 50%
+    if(document.getElementById('proj-focus-bento-x')) document.getElementById('proj-focus-bento-x').value = 50;
+    if(document.getElementById('proj-focus-bento-y')) document.getElementById('proj-focus-bento-y').value = 50;
+    if(document.getElementById('proj-focus-header-x')) document.getElementById('proj-focus-header-x').value = 50;
+    if(document.getElementById('proj-focus-header-y')) document.getElementById('proj-focus-header-y').value = 50;
+
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
 
@@ -386,10 +412,14 @@ function resetProjectForm() {
 function setupProjectForm() {
     const form = document.getElementById('project-form');
     const btnSave = document.getElementById('btn-save');
-    const btnCancel = form ? form.querySelector('.btn-secondary') : null;
+    const btnCancelBottom = form ? form.querySelector('.btn-cancel-bottom') : null;
+    const btnCancelTop = document.querySelector('.btn-cancel-top');
+
     if (!form) return;
 
-    if (btnCancel) btnCancel.addEventListener('click', returnToListView);
+    // Les deux boutons annuler ramènent à la liste
+    if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
+    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -406,8 +436,10 @@ function setupProjectForm() {
             casting: document.getElementById('proj-casting') ? document.getElementById('proj-casting').value.trim() : '',
             synopsis: document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '',
             formatAffichage: document.getElementById('proj-format') ? document.getElementById('proj-format').value : '',
-            imageFocusBento: document.getElementById('proj-focus-bento') ? document.getElementById('proj-focus-bento').value : 'center',
-            imageFocusHeader: document.getElementById('proj-focus-header') ? document.getElementById('proj-focus-header').value : 'center'
+            
+            // On sauvegarde la position sous forme de pourcentages ex: "50% 20%"
+            imageFocusBento: `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`,
+            imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`
         };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
@@ -434,9 +466,9 @@ function setupProjectForm() {
             }
 
             loadAdminProjects();
-            returnToListView(); // On retourne sur la liste auto !
+            returnToListView(); 
 
-        } catch (error) { UI.showToast("Erreur d'enregistrement.", "error"); console.error(error);} finally { btnSave.disabled = false; }
+        } catch (error) { UI.showToast("Erreur.", "error"); console.error(error);} finally { btnSave.disabled = false; }
     });
 }
 
@@ -459,7 +491,7 @@ async function loadAdminProjects() {
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
 
             const imageSource = project.imageAffiche;
-            const focus = project.imageFocusBento || project.imageFocus || 'center';
+            const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
             
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
@@ -477,7 +509,6 @@ async function loadAdminProjects() {
             li.querySelector('.edit').addEventListener('click', () => {
                 resetProjectForm();
 
-                // On bascule la vue vers le formulaire
                 document.getElementById('view-list').classList.add('hidden');
                 document.getElementById('view-form').classList.remove('hidden');
                 const btnAddNew = document.getElementById('btn-add-new');
@@ -493,8 +524,15 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
 
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
-                if(document.getElementById('proj-focus-bento')) document.getElementById('proj-focus-bento').value = project.imageFocusBento || project.imageFocus || 'center';
-                if(document.getElementById('proj-focus-header')) document.getElementById('proj-focus-header').value = project.imageFocusHeader || project.imageFocus || 'center';
+
+                // On traduit l'ancienne position (ou la nouvelle) pour positionner le slider
+                const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
+                document.getElementById('proj-focus-bento-x').value = bentoPos.x;
+                document.getElementById('proj-focus-bento-y').value = bentoPos.y;
+
+                const headerPos = parsePosition(project.imageFocusHeader || project.imageFocus);
+                document.getElementById('proj-focus-header-x').value = headerPos.x;
+                document.getElementById('proj-focus-header-y').value = headerPos.y;
 
                 const previewBloc = document.getElementById('image-preview-bloc');
                 const previewCadrage = document.getElementById('image-preview-cadrage');
@@ -508,7 +546,9 @@ async function loadAdminProjects() {
                 currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null;
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
-                document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
+                
+                // On remonte tout en haut du formulaire de manière fluide
+                document.querySelector('#view-form').scrollIntoView({ behavior: 'smooth' });
             });
             projectList.appendChild(li);
         });
