@@ -609,4 +609,17 @@ input:focus { outline: none; border-color: var(--color-accent); }
     }
 }
 
+/* =========================================================
+   STYLE AVATAR ÉQUIPE (ADMIN)
+   ========================================================= */
+#team-dropzone {
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+#team-dropzone:hover {
+    border-color: var(--color-accent) !important;
+}
+#team-dropzone:hover .team-hover-text {
+    opacity: 1 !important;
+}
 
