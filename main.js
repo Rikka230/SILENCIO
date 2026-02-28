@@ -191,6 +191,10 @@ function renderProject(data) {
     document.querySelector('.project-hero p').innerHTML = `${data.genre || ''} &bull; ${data.statut}`;
     
     const heroImage = document.querySelector('.project-hero img');
+        heroImage.onload = () => {
+        heroImage.classList.add('image-loaded');
+    };
+    
     heroImage.src = data.imageAffiche;
     heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || '50% 50%';
 
@@ -850,6 +854,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
