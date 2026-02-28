@@ -1029,70 +1029,60 @@ body.not-at-top .logo {
 }
 
 /* =========================================================
-   SCROLL INFINI HORIZONTAL (BENTO GRID - 3 LIGNES MAX)
+   SCROLL HORIZONTAL MANUEL ET GRILLE STRICTE (3 LIGNES)
    ========================================================= */
 
-/* 1. La fenêtre de visualisation avec le fondu aux extrémités */
+/* 1. Le conteneur de scroll (Masque les barres de défilement) */
 .bento-wrapper {
     width: 100%;
-    overflow: hidden;
-    /* Le fondu magique : noir à 5% et 95%, transparent aux bords (0% et 100%) */
+    overflow-x: auto; /* Active le scroll manuel horizontal */
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; /* Fluidité maximale sur smartphone */
+    
+    /* Le fondu magique aux bords */
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    padding: 20px 0; 
-}
-
-/* 2. Le tapis roulant (Scroller) */
-.bento-scroller {
-    /* Variables intelligentes pour un calcul parfait de la boucle infinie */
-    --clones: 6;
-    --gap: 20px;
+    padding: 20px 5%; /* Marge pour laisser respirer le fondu */
     
-    display: flex;
-    gap: var(--gap);
-    width: max-content;
-    /* L'animation lente (40s). Tu peux baisser ce chiffre pour accélérer ! */
-    animation: scrollBento 40s linear infinite;
+    /* Cache la scrollbar inesthétique sur PC et Mac */
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
 }
+.bento-wrapper::-webkit-scrollbar { display: none; }
 
-/* 3. L'interactivité : Arrêt sur image au survol de la souris */
-.bento-scroller:hover {
-    animation-play-state: paused;
-}
-
-/* 4. La Grille reconfigurée pour couler à l'horizontale */
+/* 2. La grille Mathématique Stricte (Anti-Déformation) */
 .bento-grid {
     display: grid;
-    grid-template-rows: repeat(3, 250px) !important; /* 3 LIGNES STRICTES DE 250px */
-    grid-auto-columns: 250px; /* Largeur de base des blocs */
-    grid-auto-flow: column dense !important; /* Remplissage du haut vers le bas, puis de gauche à droite */
+    /* Variables de taille pour un contrôle absolu */
+    --cell-size: 250px; 
+    --gap: 20px;
+    
+    /* On force 3 lignes exactes de 250px */
+    grid-template-rows: repeat(3, var(--cell-size)) !important;
+    /* Chaque nouvelle colonne générée fera exactement 250px */
+    grid-auto-columns: var(--cell-size) !important;
+    /* Remplissage de haut en bas, puis de gauche à droite */
+    grid-auto-flow: column dense !important;
     gap: var(--gap) !important;
-    width: max-content !important; 
+    
+    width: max-content !important; /* Laisse la grille s'étendre à l'infini */
+    padding-right: 10vw; /* Espace vide agréable à la fin du scroll */
 }
 
-/* 5. On écrase l'ancien système de ratios pour qu'ils respectent parfaitement la nouvelle grille */
-.bento-item, .bento-big, .bento-tall, .bento-wide {
-    aspect-ratio: auto !important; 
-    width: 100% !important; 
-    height: 100% !important;
-}
+/* 3. Définition des blocs (S'adapte parfaitement à la cellule de base) */
+.bento-item { grid-row: span 1 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
+.bento-tall { grid-row: span 2 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
+.bento-wide { grid-row: span 1 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
+.bento-big  { grid-row: span 2 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
 
-/* 6. Le Calcul Mathématique Absolu du Loop */
-/* On décale l'ensemble d'exactement 1 grille complète (100% / nombre de clones) */
-@keyframes scrollBento {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc( -100% / var(--clones) - (var(--gap) / var(--clones)) )); }
-}
-
-/* --- OPTIMISATION TÉLÉPHONES (BLOCS PLUS PETITS) --- */
+/* 4. Adaptation pour petits écrans (Téléphones) */
 @media (max-width: 768px) {
-    .bento-scroller {
-        --gap: 10px;
-        animation-duration: 25s; /* Défile un peu plus vite sur mobile */
-    }
     .bento-grid {
-        grid-template-rows: repeat(3, 130px) !important; /* 3 Lignes adaptées aux petits écrans */
-        grid-auto-columns: 130px;
+        --cell-size: 150px; /* Les blocs sont plus petits sur mobile */
+        --gap: 10px;
+    }
+    .bento-wrapper {
+        padding: 10px 5%;
     }
 }
 
