@@ -78,7 +78,7 @@ async function initHomePage(){
                 if (img.complete) img.classList.add('loaded');
             });
         }, 50);
-    } catch (error) {}
+    } catch (error) { console.log("Erreur vidéo", error); }
     
     // --- 1. CHARGEMENT DES PROJETS ---
     const bentoContainer = document.querySelector('.bento-container');
@@ -86,6 +86,8 @@ async function initHomePage(){
         try {
             const querySnapshot = await getDocs(collection(db, "projects"));
             let projects = [];
+            
+            // On filtre les projets pour ne garder que ceux qui sont visibles
             querySnapshot.forEach((doc) => { 
                 const data = doc.data();
                 if (data.visible !== false) {
@@ -116,32 +118,35 @@ async function initHomePage(){
             // =========================================================
             // L'INTELLIGENCE : LE BOUCHE-TROU AUTOMATIQUE (MULTIPLE DE 3)
             // =========================================================
-            let totalCells = 0;
-            projects.forEach(p => {
-                if (p.formatAffichage === 'bento-big') totalCells += 4;
-                else if (p.formatAffichage === 'bento-tall' || p.formatAffichage === 'bento-wide') totalCells += 2;
-                else totalCells += 1; // bento-item standard
-            });
+            if (projects.length > 1) {
+                let totalCells = 0;
+                projects.forEach(p => {
+                    if (p.formatAffichage === 'bento-big') totalCells += 4;
+                    else if (p.formatAffichage === 'bento-tall' || p.formatAffichage === 'bento-wide') totalCells += 2;
+                    else totalCells += 1;
+                });
 
-            // Combien manque-t-il de cases pour faire un multiple de 3 ?
-            const missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
-            
-            // On injecte des blocs noirs élégants pour boucher les trous
-            for (let i = 0; i < missingCells; i++) {
-                itemsHTML += `
-                    <div class="bento-item" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
-                        <span style="color: var(--color-accent); opacity: 0.1; font-size: 1.5rem; font-weight: 200; letter-spacing: 4px;">SILENCIO</span>
-                    </div>
-                `;
+                const missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
+                
+                for (let i = 0; i < missingCells; i++) {
+                    itemsHTML += `
+                        <div class="bento-item" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
+                            <span style="color: var(--color-accent); opacity: 0.1; font-size: 1.5rem; font-weight: 200; letter-spacing: 4px;">SILENCIO</span>
+                        </div>
+                    `;
+                }
             }
             // =========================================================
 
             const wrapper = document.createElement('div');
             const grid = document.createElement('div');
 
+            // --- MODE 1 : GRILLE STATIQUE (De 1 à 6 projets) ---
             if (projects.length <= 6) {
                 wrapper.className = 'bento-wrapper is-static';
                 grid.className = 'bento-grid is-static';
+                
+                // Centrage absolu s'il n'y a qu'un seul projet
                 if (projects.length === 1) {
                     grid.classList.add('is-single-item');
                 }
@@ -149,14 +154,14 @@ async function initHomePage(){
                 grid.innerHTML = itemsHTML;
                 wrapper.appendChild(grid);
                 bentoContainer.appendChild(wrapper);
-            } else {
+            } 
+            // --- MODE 2 : CARROUSEL INFINI (7 projets ou plus) ---
+            else {
                 wrapper.className = 'bento-wrapper is-scrollable';
                 
-                // 1. Création de la "Piste" Flexbox
                 const track = document.createElement('div');
                 track.className = 'bento-track';
 
-                // 2. On crée 3 grilles STRICTEMENT SÉPARÉES pour empêcher le puzzle de se mélanger
                 const grid1 = document.createElement('div'); grid1.className = 'bento-grid is-scrollable'; grid1.innerHTML = itemsHTML;
                 const grid2 = document.createElement('div'); grid2.className = 'bento-grid is-scrollable'; grid2.innerHTML = itemsHTML;
                 const grid3 = document.createElement('div'); grid3.className = 'bento-grid is-scrollable'; grid3.innerHTML = itemsHTML;
@@ -168,7 +173,6 @@ async function initHomePage(){
                 wrapper.appendChild(track);
                 bentoContainer.appendChild(wrapper);
 
-                // 3. Le calcul absolu du saut de boucle
                 let jumpDistance = 0;
                 setTimeout(() => { 
                     jumpDistance = grid2.offsetLeft - grid1.offsetLeft;
@@ -195,7 +199,6 @@ async function initHomePage(){
                     evt.preventDefault(); wrapper.scrollLeft += evt.deltaY;
                 }, { passive: false });
             }
-        // LES ACCOLADES MANQUANTES ÉTAIENT ICI :
         } catch (error) { console.error("Erreur projets :", error); }
     }
 
@@ -984,6 +987,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
