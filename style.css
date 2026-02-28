@@ -1,12 +1,14 @@
-/* =========================================
-   SILENCIO PICTURES - STYLE MASTER (FINAL CLEAN V3)
-   ========================================= */
+/* =========================================================
+   SILENCIO PICTURES - STYLE MASTER (V5 - COMPLÈTEMENT RANGÉ)
+   ========================================================= */
 
-/* --- 1. VARIABLES & RESET --- */
+/* -----------------------------------------
+   1. VARIABLES & RESET
+   ----------------------------------------- */
 :root {
     --color-bg: #000000;
     --color-text: #ffffff;
-    --color-accent: #D72725; /* Rouge Silencio */
+    --color-accent: #D72725;
     --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -26,491 +28,258 @@ body {
 a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
 a:hover { opacity: 0.7; }
 
-/* --- 2. AMBIENT LIGHT (VERSION DOUCE) --- */
+/* -----------------------------------------
+   2. AMBIENT LIGHT & GLOW (ORIGINAL)
+   ----------------------------------------- */
 .ambient-light {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    overflow: hidden;
-    z-index: -2;
-    background: #000;
-    pointer-events: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    overflow: hidden; z-index: -2; background: #000; pointer-events: none;
 }
-
 .ambient-light::before {
-    content: ''; position: absolute;
-    width: 150vw; height: 150vw;
-    top: -50%; left: -50%;
+    content: ''; position: absolute; width: 150vw; height: 150vw; top: -50%; left: -50%;
     background: radial-gradient(circle, rgba(215, 39, 37, 0.25) 0%, rgba(0,0,0,0) 60%);
-    filter: blur(80px);
-    animation: drift1 12s infinite alternate ease-in-out;
+    filter: blur(80px); animation: drift1 12s infinite alternate ease-in-out;
 }
-
 .ambient-light::after {
-    content: ''; position: absolute;
-    width: 120vw; height: 120vw;
-    bottom: -20%; right: -20%;
+    content: ''; position: absolute; width: 120vw; height: 120vw; bottom: -20%; right: -20%;
     background: radial-gradient(circle, rgba(180, 20, 20, 0.2) 0%, rgba(0,0,0,0) 60%);
-    filter: blur(60px);
-    animation: drift2 15s infinite alternate-reverse ease-in-out;
+    filter: blur(60px); animation: drift2 15s infinite alternate-reverse ease-in-out;
 }
 
-/* --- 3. CORNER GLOW (LUMIÈRES COINS DOUCES) --- */
 .corner-glow {
-    position: fixed;
-    bottom: 0; left: 0;
-    width: 100%; height: 100%; 
-    pointer-events: none;
-    z-index: 10;
-    mix-blend-mode: screen;
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+    z-index: 10; mix-blend-mode: screen;
     background: 
         radial-gradient(circle at bottom left, rgba(215, 39, 37, 0.5) 0%, transparent 40%),
         radial-gradient(circle at bottom right, rgba(215, 39, 37, 0.5) 0%, transparent 40%);
     animation: breathe 5s infinite alternate ease-in-out;
 }
 
-@keyframes breathe {
-    0% { opacity: 0.5; transform: scale(1); }
-    100% { opacity: 0.8; transform: scale(1.05); }
-}
-
-/* --- 4. LOADER / INTRO --- */
+/* -----------------------------------------
+   3. LOADER / INTRO (ORIGINAL)
+   ----------------------------------------- */
 #loader {
-    position: fixed;
-    top: 0; left: 0; 
-    width: 100%; height: 100%;
-    background: var(--color-bg);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 9999;
-    animation: fadeOut 1s ease-out 3.5s forwards;
-    pointer-events: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--color-bg); display: flex; justify-content: center; align-items: center;
+    z-index: 9999; animation: fadeOut 1s ease-out 3.5s forwards; pointer-events: none;
 }
-
 .loader-logo {
-    font-size: clamp(2rem, 5vw, 4rem);
-    font-weight: bold;
-    color: var(--color-accent);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    animation: blurPulse 3s infinite alternate;
+    font-size: clamp(2rem, 5vw, 4rem); font-weight: bold; color: var(--color-accent);
+    text-transform: uppercase; letter-spacing: 2px; animation: blurPulse 3s infinite alternate;
 }
 
-/* --- 5. HEADER (DESKTOP) --- */
+/* -----------------------------------------
+   4. HEADER & MENU (DESKTOP)
+   ----------------------------------------- */
 header {
-    position: fixed;
-    top: 0; width: 100%;
-    padding: 2rem;
+    position: fixed; top: 0; width: 100%; padding: 2rem;
     display: flex; justify-content: space-between; align-items: center;
-    z-index: 100;
-    mix-blend-mode: exclusion;
+    z-index: 100; mix-blend-mode: exclusion;
 }
-
-/* Logo Image */
-a.logo {
-    display: flex; align-items: center;
-    height: auto; width: auto;
-    text-decoration: none;
-    z-index: 1001;
-}
-
-.logo img {
-    height: 120px; /* Taille Desktop préservée */
-    width: auto;
-    display: block;
-    transition: opacity 0.3s;
-}
-
+a.logo { display: flex; align-items: center; height: auto; width: auto; z-index: 1001; }
+.logo img { height: 120px; width: auto; display: block; transition: opacity 0.3s; }
 .logo:hover img { opacity: 0.8; }
+.logo { transition: all 0.4s ease-in-out; opacity: 1; transform: translateY(0); }
+body.not-at-top .logo { opacity: 0 !important; pointer-events: none; transform: translateY(-20px); }
 
-/* Menu Desktop */
 nav ul { display: flex; gap: 2rem; list-style: none; }
 nav a { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
-
-/* Bouton Burger (Caché sur Desktop) */
 .menu-toggle { display: none; }
 
+nav, .menu-toggle { transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); opacity: 1; transform: translateY(0); }
+body.scroll-down nav, body.scroll-down .menu-toggle { opacity: 0; transform: translateY(-20px); pointer-events: none; }
 
-/* --- 6. SECTIONS GÉNÉRALES (MODE CINÉMA) --- */
+/* -----------------------------------------
+   5. TYPOGRAPHIE & SECTIONS GÉNÉRALES
+   ----------------------------------------- */
 section {
-    min-height: 100vh !important; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-    overflow: hidden; 
+    min-height: 100vh !important; display: flex; flex-direction: column; 
+    justify-content: center; position: relative; z-index: 1; overflow: hidden; 
 }
-
 h1 {
-    font-size: clamp(3rem, 10vw, 8rem);
-    text-transform: uppercase;
-    letter-spacing: -3px;
-    line-height: 0.9;
-    margin-bottom: 1rem;
+    font-size: clamp(3rem, 10vw, 8rem); text-transform: uppercase;
+    letter-spacing: -3px; line-height: 0.9; margin-bottom: 1rem;
     text-shadow: 0 0 30px rgba(215, 39, 37, 0.4);
 }
+.subtitle { font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8; }
 
-.subtitle {
-    font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;
+.section-title {
+    display: flex; align-items: center; justify-content: center; width: 100%; margin: 0 auto 3rem auto;
+    font-family: 'Montserrat', sans-serif; font-weight: 200; font-size: clamp(1.8rem, 4vw, 2.5rem);
+    text-transform: uppercase; letter-spacing: 0.3em; color: #ffffff; text-align: center;
+}
+.section-title::before, .section-title::after {
+    content: ''; display: block; height: 1px; background-color: var(--color-accent);
+    flex-grow: 1; max-width: 150px; margin: 0 30px; opacity: 0.8;
 }
 
-/* Page Accueil */
 #production { align-items: center; text-align: center; }
-
-/* Page À Propos */
-.about-text {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 200; 
-    font-size: clamp(1.1rem, 2vw, 1.5rem); 
-    line-height: 1.6;
-    opacity: 0.9;
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.about-text p {
-    font-weight: 200;
-}
-
-/* Page Contact */
-#contact { text-align: center; border-top: none; }
-.contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
-footer { 
-    margin-top: 0; 
-    padding-bottom: 2rem; 
-    font-size: 0.8rem; 
-    opacity: 0.5; 
-    border: none !important;
-    text-align: center; 
-    width: 100%;
-}
-
-/* --- LE LOGO GÉANT (ACCUEIL) --- */
+#production .subtitle { position: relative; z-index: 2; margin-top: 0; }
 .hero-logo-main {
-    display: block;
-    margin: 0 auto 2rem auto;
-    width: clamp(300px, 60vw, 900px);
-    height: auto;
-    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
-    opacity: 0;
+    display: block; margin: 0 auto 2rem auto; width: clamp(300px, 60vw, 900px); height: auto;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8)); opacity: 0;
     animation: fadeInLogo 1.5s ease-out forwards 0.5s;
 }
 
-@keyframes fadeInLogo {
-    to { opacity: 1; transform: translateY(0); }
-    from { opacity: 0; transform: translateY(20px); }
+.about-text {
+    font-family: 'Montserrat', sans-serif; font-weight: 200; font-size: clamp(1.1rem, 2vw, 1.5rem); 
+    line-height: 1.6; opacity: 0.9; max-width: 800px; margin: 0 auto; text-align: center;
 }
+.about-text p { font-weight: 200; }
 
-#production .subtitle {
-    position: relative;
-    z-index: 2;
-    margin-top: 0;
+#contact { text-align: center; border-top: none; }
+.contact-info { padding-top: 1rem; }
+.contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
+.contact-info a[href^="mailto:"] {
+    font-family: 'Montserrat', sans-serif !important; font-weight: 200 !important;       
+    letter-spacing: 2px !important; color: #cccccc !important;         
+    font-size: clamp(1rem, 1.5vw, 1.4rem) !important; white-space: nowrap !important;    
+    text-decoration: none !important; border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
+    padding-bottom: 8px; display: inline-block; transition: all 0.3s ease;
 }
+.contact-info a[href^="mailto:"]:hover { color: #ffffff !important; border-bottom-color: #D72725; transform: translateY(-2px); }
 
-/* --- 7. VIDÉO D'ARRIÈRE-PLAN (HOME) --- */
-.hero-video-container {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: -1; overflow: hidden;
-}
+.insta-link { display: inline-block; color: #fff; transition: all 0.3s ease; margin-top: 1rem; opacity: 0.7; }
+.insta-link svg { width: 40px; height: 40px; }
+.insta-link:hover { color: var(--color-accent); opacity: 1; transform: scale(1.1); }
 
-.hero-video {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    opacity: 0.5;
-}
+footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; border: none !important; text-align: center; width: 100%; }
 
-.video-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
-    pointer-events: none;
-}
+/* -----------------------------------------
+   6. ACCUEIL : VIDÉO ARRIÈRE-PLAN
+   ----------------------------------------- */
+.hero-video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+.hero-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+.video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8)); pointer-events: none; }
 
-/* --- TITRES SECTIONS --- */
-.section-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto 3rem auto;
-    font-family: 'Montserrat', sans-serif; 
-    font-weight: 200;  
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    color: #ffffff;
-    text-align: center;
-}
+/* -----------------------------------------
+   7. ACCUEIL : NOUVEAU MOTEUR BENTO GRID
+   ----------------------------------------- */
+#projects { padding: 0 2rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+.bento-container { max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 2;}
 
-.section-title::before,
-.section-title::after {
-    content: '';
-    display: block;
-    height: 1px;
-    background-color: var(--color-accent);
-    flex-grow: 1;
-    max-width: 150px;
-    margin: 0 30px;
-    opacity: 0.8;
-}
+.bento-wrapper { width: 100%; position: relative; }
+.bento-track { display: flex; gap: 20px; width: max-content; }
 
-@media (max-width: 768px) {
-    .section-title {
-        font-size: 1.1rem; 
-        letter-spacing: 2px; 
-        white-space: nowrap; 
-    }
-    .section-title::before,
-    .section-title::after {
-        max-width: 40px;       
-        min-width: 20px;       
-        margin: 0 10px;
-    }
-}
-
-
-/* --- 8. BENTO GRID --- */
-#projects { 
-    padding: 0 2rem; 
-    min-height: 100vh; 
-    display: flex; flex-direction: column; justify-content: center;
-}
-
-.bento-container { 
-    max-width: 1100px; 
-    margin: 0 auto; 
-    width: 100%; 
-}
-
-.bento-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr) !important; 
-    grid-auto-rows: auto; 
-    gap: 20px;
-    grid-auto-flow: dense; 
-}
-
+/* ADN BENTO : ITEM DE BASE */
 .bento-item {
-    position: relative;
-    display: block;
-    border-radius: 12px; 
-    border: 1px solid rgba(255,255,255,0.1);
-    overflow: hidden; 
-    background: #000;
-    transition: all 0.4s ease;
-    cursor: pointer;
-    width: 100%;
-    aspect-ratio: 1 / 1 !important; 
-    grid-column: span 1;
-    grid-row: span 1;
+    position: relative !important; background-color: #050505; overflow: hidden; 
+    display: block; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.4s ease; cursor: pointer;
 }
-
-.bento-big { 
-    grid-column: span 2 !important; 
-    grid-row: span 2 !important; 
-    aspect-ratio: 1 / 1 !important; 
-}
-.bento-tall { 
-    grid-column: span 1 !important; 
-    grid-row: span 2 !important; 
-    aspect-ratio: 1 / 2 !important; 
-}
-
-.bento-wide { grid-column: span 2 !important; grid-row: span 1 !important; aspect-ratio: 2 / 1 !important; }
-
 .bento-item img {
-    width: 100%; height: 100%; 
-    object-fit: cover; 
-    object-position: center center;
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    opacity: 0.8;
+    position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important;
+    object-fit: cover !important; display: block;
 }
-
-.bento-tall img { object-position: top center !important; }
-
 .bento-overlay {
-    position: absolute; 
-    bottom: 0; left: 0; width: 100%; 
-    padding: 2rem;
+    position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    opacity: 0; 
-    transform: translateY(20px);
-    transition: all 0.4s ease;
-    z-index: 10;
+    opacity: 0; transform: translateY(20px); transition: all 0.4s ease; z-index: 10;
 }
-
-.bento-overlay h3 { 
-    font-size: 1.4rem; 
-    text-transform: uppercase; 
-    margin-bottom: 0.3rem; 
-    color: #fff; 
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-.bento-overlay p { 
-    color: var(--color-accent); 
-    font-size: 0.8rem; 
-    font-weight: bold; 
-    letter-spacing: 2px; 
-    text-transform: uppercase;
-}
-
-.bento-item:hover { 
-    border-color: var(--color-accent); 
-    box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2);
-}
-.bento-item:hover img { transform: scale(1.1); opacity: 1; }
+.bento-overlay h3 { font-size: 1.4rem; text-transform: uppercase; margin-bottom: 0.3rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.bento-overlay p { color: var(--color-accent); font-size: 0.8rem; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+.bento-item:hover { border-color: var(--color-accent); box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2); }
+.bento-item:hover .anti-stretch-img.loaded { opacity: 1; transform: scale(1.05); }
 .bento-item:hover .bento-overlay { opacity: 1; transform: translateY(0); }
 
-@media (max-width: 1024px) {
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; }
-    
-    .bento-item, .bento-big, .bento-tall { 
-        grid-column: span 1 !important; 
-        grid-row: span 1 !important; 
-        aspect-ratio: 16/9 !important; 
-    }
-    .bento-overlay { opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+/* MODE 1 : GRILLE STATIQUE (2 à 6) */
+.bento-wrapper.is-static { width: 100%; overflow: visible; padding: 20px 0; display: flex; justify-content: center; }
+.bento-grid.is-static {
+    display: grid; --cell-size: 250px; --gap: 20px; margin: 0 auto !important; 
+    grid-template-rows: repeat(3, var(--cell-size)) !important; grid-auto-columns: var(--cell-size) !important;
+    grid-auto-flow: column dense !important; gap: var(--gap) !important; width: max-content !important; 
+}
+.bento-grid.is-static .bento-item { width: var(--cell-size) !important; height: var(--cell-size) !important; }
+.bento-grid.is-static .bento-tall { height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-static .bento-wide { width: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-static .bento-big  { width: calc((var(--cell-size) * 2) + var(--gap)) !important; height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+
+/* MODE 2 : UNIQUE (1 seul film) */
+.bento-grid.is-static.is-single-item { display: flex !important; justify-content: center !important; align-items: center !important; width: 100% !important; }
+.bento-grid.is-static.is-single-item .bento-item { width: 400px !important; max-width: 100%; }
+.bento-grid.is-static.is-single-item .bento-wide { width: 600px !important; }
+.bento-grid.is-static.is-single-item .bento-tall { width: 350px !important; }
+.bento-grid.is-static.is-single-item .bento-big  { width: 500px !important; }
+
+/* MODE 3 : SCROLL INFINI (7 et +) */
+.bento-wrapper.is-scrollable {
+    width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    padding: 20px 5%; scrollbar-width: none; -ms-overflow-style: none; cursor: grab;
+}
+.bento-wrapper.is-scrollable::-webkit-scrollbar { display: none; }
+.bento-wrapper.is-scrollable:active { cursor: grabbing; }
+
+.bento-grid.is-scrollable {
+    display: grid; --cell-size: 250px; --gap: 20px; grid-template-columns: none !important; 
+    grid-template-rows: repeat(3, var(--cell-size)) !important; grid-auto-columns: var(--cell-size) !important;
+    grid-auto-flow: column dense !important; gap: var(--gap) !important; width: max-content !important; padding-right: 0 !important; 
+}
+.bento-grid.is-scrollable .bento-item { width: var(--cell-size) !important; height: var(--cell-size) !important; }
+.bento-grid.is-scrollable .bento-tall { height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-scrollable .bento-wide { width: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-scrollable .bento-big  { width: calc((var(--cell-size) * 2) + var(--gap)) !important; height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+
+/* -----------------------------------------
+   8. ACCUEIL : SECTION ÉQUIPE
+   ----------------------------------------- */
+.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1100px; margin: 3rem auto 0 auto; padding: 0 2rem; width: 100%; }
+.team-card { position: relative !important; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #050505; }
+.team-card img { filter: grayscale(100%) contrast(1.1) brightness(0.9); transition: all 0.5s ease; opacity: 0; }
+.team-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent); text-align: center; z-index: 2; }
+.team-overlay h3 { color: #fff; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; font-weight: 400; }
+.team-overlay p { color: var(--color-accent); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+
+@media (hover: hover) {
+    .team-card:hover { border-color: var(--color-accent); }
+    .team-card:hover .anti-stretch-img.loaded { filter: grayscale(0%) contrast(1) brightness(1); transform: scale(1.05); opacity: 1; }
 }
 
-/* --- 9. PAGE DÉTAIL PROJET --- */
-.project-hero {
-    height: 70vh;
-    min-height: 70vh; 
-    position: relative;
-    overflow: hidden;
-    display: block;
-    background-color: #000;
+/* -----------------------------------------
+   9. PAGE DÉTAIL PROJET
+   ----------------------------------------- */
+.project-hero { height: 70vh; min-height: 70vh; position: relative; overflow: hidden; display: block; background-color: #050505; }
+.project-hero img { 
+    position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; object-fit: cover !important;
+    animation: none !important; opacity: 0; transition: opacity 0.5s ease;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%), linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%); 
+    -webkit-mask-composite: source-in; mask-composite: intersect; 
 }
+.project-header-content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 4rem 2rem; z-index: 2; background: linear-gradient(to top, var(--color-bg), transparent); }
+.project-title { font-size: clamp(3rem, 6vw, 5rem); text-transform: uppercase; line-height: 1; margin-bottom: 1rem; color: #fff; text-shadow: 0 0 30px rgba(215, 39, 37, 0.6); }
 
-.project-hero img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    opacity: 0; 
-    animation: fadeInImage 0.5s ease forwards;
-    -webkit-mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%), 
-        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%); 
-    -webkit-mask-composite: source-in;
-    mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%),
-        linear-gradient(to right,  transparent 0%, black 20%, black 80%, transparent 100%);
-    mask-composite: intersect;
-    transition: all 0.5s ease;
-}
-
-@keyframes fadeInImage {
-    to { opacity: 0.8; }
-}
-
-.project-header-content {
-    position: absolute; 
-    bottom: 0; left: 0; width: 100%;
-    padding: 4rem 2rem;
-    z-index: 2;
-    background: linear-gradient(to top, var(--color-bg), transparent);
-}
-
-.project-title {
-    font-size: clamp(3rem, 6vw, 5rem);
-    text-transform: uppercase;
-    line-height: 1; margin-bottom: 1rem; color: #fff;
-    text-shadow: 0 0 30px rgba(215, 39, 37, 0.6);
-}
-
-.back-btn {
-    position: fixed; top: 2rem; left: 2rem;
-    z-index: 1001;
-    color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
-    mix-blend-mode: exclusion;
-    display: flex; align-items: center; gap: 10px; cursor: pointer;
-    padding: 10px 15px; border-radius: 30px;
-    background: rgba(0,0,0,0.2); backdrop-filter: blur(5px);
-}
+.back-btn { position: fixed; top: 2rem; left: 2rem; z-index: 1001; color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; mix-blend-mode: exclusion; display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 15px; border-radius: 30px; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); }
 .back-btn:hover::before { transform: translateX(-5px); }
 .back-btn::before { content: '←'; font-size: 1.2rem; transition: transform 0.3s; }
 
-.project-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 4rem 2rem 2rem 2rem; 
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 4rem;
-    position: relative;
-    z-index: 5;
-}
-.synopsis { 
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 200 !important; 
-    font-size: 1.2rem; 
-    line-height: 1.8; 
-    color: #ddd; 
-}
+.project-content { max-width: 1000px; margin: 0 auto; padding: 4rem 2rem 2rem 2rem; display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; position: relative; z-index: 5; }
+
+/* Synopsis Extensible */
+.synopsis { font-family: 'Montserrat', sans-serif !important; font-weight: 200 !important; font-size: 1.2rem; line-height: 1.8; color: #ddd; }
+.synopsis-wrapper { position: relative; max-height: 140px; overflow: hidden; transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+.synopsis-wrapper.is-expanded { max-height: 2000px; }
+.synopsis-fade { position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, rgba(5,5,5,0), rgba(0,0,0,1)); transition: opacity 0.4s ease; pointer-events: none; }
+.synopsis-wrapper.is-expanded .synopsis-fade { opacity: 0; }
+.btn-read-more { background: transparent; color: var(--color-accent); border: none; padding: 10px 0; font-family: inherit; font-weight: 600; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-top: 5px; transition: color 0.3s; }
+.btn-read-more:hover { color: #fff; }
+.btn-read-more.hidden { display: none !important; }
+
 .tech-specs h4 { color: var(--color-accent); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 0.9rem; letter-spacing: 1px; margin-top: 1.5rem; }
 .tech-specs h4:first-child { margin-top: 0; }
 .tech-specs p { color: #888; margin-bottom: 0.5rem; }
 
-/* --- 9.5. TRAILER --- */
-.full-width-video {
-    width: 100%;
-    background: transparent;
-    margin-top: 0rem; 
-    padding: 0; 
-    text-align: center;
-    border: none !important;
-    position: relative;
-    z-index: 10;
-}
+/* TRAILER */
+.full-width-video { width: 100%; background: transparent; margin-top: 0rem; padding: 0; text-align: center; border: none !important; position: relative; z-index: 10; }
+.video-label { color: var(--color-text); text-transform: uppercase; letter-spacing: 4px; font-size: 0.9rem; margin-bottom: 1rem; opacity: 0.7; display: inline-block; background: transparent; padding: 0; }
+.video-wrapper { position: relative; width: 100%; max-width: none; aspect-ratio: 16 / 9; margin: 0; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); -webkit-mask-composite: source-in; mask-composite: intersect; }
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
 
-.video-label {
-    color: var(--color-text);
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    opacity: 0.7;
-    display: inline-block;
-    background: transparent; 
-    padding: 0;
-}
-
-.video-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: none;
-    aspect-ratio: 16 / 9;
-    margin: 0;
-    -webkit-mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
-        linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image: 
-        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%),
-        linear-gradient(to right,  transparent 0%, black 5%, black 95%, transparent 100%);
-    mask-composite: intersect;
-}
-
-.video-wrapper iframe {
-    position: absolute; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%;
-    border: none;
-    display: block;
-}
-
-/* --- 10. MENTIONS LÉGALES --- */
-.legal-section {
-    padding: 8rem 2rem 4rem; max-width: 800px; margin: 0 auto; color: #ccc;
-}
-.legal-section h1 {
-    color: #fff; text-transform: uppercase; text-align: center; margin-bottom: 4rem;
-    font-size: clamp(2rem, 4vw, 3rem); text-shadow: 0 0 20px rgba(215, 39, 37, 0.4);
-}
+/* -----------------------------------------
+   10. MENTIONS LÉGALES (ORIGINALES)
+   ----------------------------------------- */
+.legal-section { padding: 8rem 2rem 4rem; max-width: 800px; margin: 0 auto; color: #ccc; }
+.legal-section h1 { color: #fff; text-transform: uppercase; text-align: center; margin-bottom: 4rem; font-size: clamp(2rem, 4vw, 3rem); text-shadow: 0 0 20px rgba(215, 39, 37, 0.4); }
 .legal-block { margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; }
 .legal-block:last-child { border-bottom: none; }
 .legal-block h2 { color: var(--color-accent); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
@@ -519,796 +288,83 @@ footer {
 .legal-block a { text-decoration: underline; text-decoration-color: var(--color-accent); }
 .legal-block a:hover { color: var(--color-accent); }
 
-/* --- 11. ANIMATIONS KEYFRAMES --- */
-@keyframes drift1 {
-    0% { transform: translate(10%, 10%) scale(1); }
-    50% { transform: translate(40%, 20%) scale(1.1); }
-    100% { transform: translate(20%, 50%) scale(0.9); }
-}
-@keyframes drift2 {
-    0% { transform: translate(-10%, -10%) scale(0.9); }
-    50% { transform: translate(-30%, -40%) scale(1.2); }
-    100% { transform: translate(-10%, -60%) scale(1); }
-}
-@keyframes blurPulse {
-    0% { filter: blur(15px); opacity: 0.4; }
-    50% { filter: blur(0px); opacity: 1; }
-    100% { filter: blur(8px); opacity: 0.7; }
-}
-@keyframes fadeOut {
-    to { opacity: 0; visibility: hidden; }
-}
+/* -----------------------------------------
+   11. ANIMATIONS, TRANSITIONS & SÉCURITÉS
+   ----------------------------------------- */
+/* Animations Globales */
+@keyframes drift1 { 0% { transform: translate(10%, 10%) scale(1); } 50% { transform: translate(40%, 20%) scale(1.1); } 100% { transform: translate(20%, 50%) scale(0.9); } }
+@keyframes drift2 { 0% { transform: translate(-10%, -10%) scale(0.9); } 50% { transform: translate(-30%, -40%) scale(1.2); } 100% { transform: translate(-10%, -60%) scale(1); } }
+@keyframes blurPulse { 0% { filter: blur(15px); opacity: 0.4; } 50% { filter: blur(0px); opacity: 1; } 100% { filter: blur(8px); opacity: 0.7; } }
+@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+@keyframes breathe { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 0.8; transform: scale(1.05); } }
+@keyframes fadeInLogo { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(20px); } }
 
-/* --- TRANSITIONS --- */
-.page-transition {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: #000;
-    z-index: 99999;
-    pointer-events: none; 
-    opacity: 0; 
-    transition: opacity 0.5s ease-in-out;
-}
+/* Fondu de Navigation */
+.page-transition { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 99999; pointer-events: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
 .page-transition.active { opacity: 1; pointer-events: all; }
 
-/* --- BOUTON INSTAGRAM --- */
-.insta-link {
-    display: inline-block;
-    color: #fff;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-    opacity: 0.7;
-}
-.insta-link svg { width: 40px; height: 40px; }
-.insta-link:hover {
-    color: var(--color-accent); opacity: 1; transform: scale(1.1);
-}
+/* Blindage Absolu Images & BFCache */
+.anti-stretch-img { opacity: 0; transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); -webkit-transform: translateZ(0); transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.bento-item .anti-stretch-img.loaded, .team-card .anti-stretch-img.loaded, .project-hero .anti-stretch-img.loaded { opacity: 0.8; }
 
-.auto-height-section {
-    min-height: auto !important; 
-    justify-content: flex-start !important; 
-    padding-bottom: 4 !important; 
-    padding-top: 4rem; 
-}
+/* Image Preview Admin */
+#image-preview { width: 100%; max-width: 400px; object-fit: cover; border-radius: 8px; margin: 1rem auto; display: block; transition: aspect-ratio 0.4s ease, object-position 0.4s ease, max-width 0.4s ease; aspect-ratio: 1 / 1; }
+#image-preview.bento-tall { aspect-ratio: 1 / 2; max-width: 250px; }
+#image-preview.bento-big { aspect-ratio: 1 / 1; max-width: 100%; }
 
-/* --- SMART NAVIGATION (SCROLL) --- */
-nav, .menu-toggle {
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    opacity: 1;
-    transform: translateY(0);
-}
-
-body.scroll-down nav,
-body.scroll-down .menu-toggle {
-    opacity: 0; 
-    transform: translateY(-20px); 
-    pointer-events: none; 
-}
-
-.logo {
-    transition: opacity 0.3s;
-    z-index: 1002; 
-}
-
-
-/* =========================================================
-   12. RESPONSIVE MOBILE & TABLETTE (MAX 1024px)
-   ========================================================= */
+/* -----------------------------------------
+   12. RESPONSIVE MOBILE & TABLETTE
+   ----------------------------------------- */
 @media (max-width: 1024px) {
-
-    /* 1. RESET SÉCURISÉ */
-    header:not(.project-hero), 
-    nav, 
-    .nav-container {
-        position: static !important;
-        transform: none !important;
-        mix-blend-mode: normal !important;
-        filter: none !important;
-        perspective: none !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: auto !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* 2. LE HEADER PRINCIPAL */
-    header:not(.project-hero) {
-        position: fixed !important;
-        top: 0; left: 0;
-        z-index: 1200;
-        padding: 1.5rem 1rem !important;
-        pointer-events: none; 
-        
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 20px !important;
-    }
-
-    /* 3. LOGO & BURGER */
-    .logo {
-        pointer-events: auto;
-        position: relative;
-        z-index: 1300;
-        display: block !important;
-    }
+    /* Header & Navigation Menu Fixes */
+    header:not(.project-hero), nav, .nav-container { position: static !important; transform: none !important; mix-blend-mode: normal !important; filter: none !important; perspective: none !important; width: 100% !important; padding: 0 !important; margin: 0 !important; height: auto !important; background: transparent !important; border: none !important; box-shadow: none !important; }
+    header:not(.project-hero) { position: fixed !important; top: 0; left: 0; z-index: 1200; padding: 1.5rem 1rem !important; pointer-events: none; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 20px !important; }
+    
+    .logo { pointer-events: auto; position: relative; z-index: 1300; display: block !important; }
     .logo img { height: 100px !important; width: auto !important; }
 
-    .menu-toggle {
-        display: block !important;
-        pointer-events: auto;
-        cursor: pointer;
-        width: 35px; height: 30px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 1300;
-    }
-    
-    .menu-toggle .bar {
-        width: 30px; height: 2px; margin: 6px auto;
-        background-color: #ffffff !important;
-        display: block; transition: 0.3s;
-        border-radius: 2px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.8);
-    }
-    
+    .menu-toggle { display: block !important; pointer-events: auto; cursor: pointer; width: 35px; height: 30px; margin: 0 auto; position: relative; z-index: 1300; }
+    .menu-toggle .bar { width: 30px; height: 2px; margin: 6px auto; background-color: #ffffff !important; display: block; transition: 0.3s; border-radius: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.8); }
     .menu-toggle.is-active .bar:nth-child(2) { opacity: 0; }
     .menu-toggle.is-active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .menu-toggle.is-active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
+    .nav-menu { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: #000000 !important; isolation: isolate !important; display: flex !important; flex-direction: column; justify-content: center; align-items: center; gap: 2rem; padding: 0 !important; margin: 0 !important; list-style: none !important; visibility: hidden !important; opacity: 0 !important; transition: opacity 0.3s ease-in-out; z-index: 1250 !important; }
+    .nav-menu.active { visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
+    .nav-menu li { display: block !important; width: 100%; text-align: center; padding: 0; margin: 0; }
+    .nav-link { font-size: 2rem !important; color: #ffffff !important; text-transform: uppercase; letter-spacing: 4px; text-decoration: none !important; display: block; text-shadow: none !important; }
 
-    /* 4. LE MENU NOIR (PLEIN ÉCRAN) */
-    .nav-menu {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        
-        background-color: #000000 !important;
-        background: #000000 !important;
-        isolation: isolate !important;
-        
-        display: flex !important;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 2rem;
-        
-        padding: 0 !important;
-        margin: 0 !important;
-        list-style: none !important;
-        
-        visibility: hidden !important;
-        opacity: 0 !important;
-        transition: opacity 0.3s ease-in-out;
-        
-        z-index: 1250 !important;
-    }
-
-    .nav-menu.active {
-        visibility: visible !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
-
-    .nav-menu li {
-        display: block !important;
-        width: 100%;
-        text-align: center;
-        padding: 0; margin: 0;
-    }
-
-    .nav-link {
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        text-decoration: none !important;
-        display: block;
-        text-shadow: none !important;
-    }
-
-    /* 5. GESTION DES ESPACES */
-    section:not(.project-hero) { 
-        padding-top: 160px !important; 
-    }
-    
+    section:not(.project-hero) { padding-top: 160px !important; }
     #production { padding-top: 0 !important; }
     
-    .bento-grid { grid-template-columns: 1fr !important; gap: 15px; padding: 0 15px; }
-    .bento-item, .bento-big, .bento-tall { 
-        grid-column: span 1 !important; grid-row: span 1 !important; 
-        width: 100% !important; height: auto !important; aspect-ratio: 16 / 9 !important; 
-    }
+    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
 
-    /* --- G. CORRECTION VIDÉO MOBILE --- */
-    .full-width-video {
-        margin-top: 0 !important; 
-        padding-top: 3rem; 
-    }
-
+    .project-content { display: flex !important; flex-direction: column !important; padding-bottom: 0 !important; min-height: auto !important; gap: 2rem !important; padding: 1rem 1.5rem !important; }
+    .synopsis { width: 100% !important; margin-bottom: 1rem !important; font-size: 1.1rem !important; }
+    .tech-specs { width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 1.5rem 1rem !important; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-bottom: 0 !important; padding-bottom: 0 !important; }
+    .project-hero { height: 45vh !important; min-height: 280px !important; }
+    .full-width-video { min-height: auto !important; height: auto !important; display: block !important; margin-top: -2rem !important; padding-top: 0 !important; padding-bottom: 2rem !important; position: relative; z-index: 10; }
+    .video-label { display: block !important; margin-top: 1rem !important; margin-bottom: 1rem !important; position: relative; z-index: 20; }
 }
 
-/* --- RÉAGENCEMENT EXCLUSIF PAGE PROJET MOBILE --- */
-@media (max-width: 1024px) {
-
-    section:not(.project-hero) { 
-        padding-top: 20px !important; 
-    }
-
-    .project-content {
-        display: flex !important;
-        flex-direction: column !important;
-        padding-bottom: 0 !important;
-        min-height: auto !important;
-        gap: 2rem !important;
-        padding: 1rem 1.5rem !important;
-    }
-
-    .synopsis {
-        width: 100% !important;
-        margin-bottom: 1rem !important;
-        font-size: 1.1rem !important;
-    }
-
-    .tech-specs {
-        width: 100% !important;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 1.5rem 1rem !important;
-        border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 1.5rem;
-        margin-bottom: 0 !important;
-        padding-bottom: 0 !important;
-    }
-
-    .project-hero {
-        height: 45vh !important;
-        min-height: 280px !important;
-    }
-
-    /* --- FIX VIDÉO ESPACE --- */
-    .full-width-video {
-        min-height: auto !important;
-        height: auto !important;
-        display: block !important;
-        margin-top: -2rem !important;
-        padding-top: 0 !important;
-        padding-bottom: 2rem !important;
-        position: relative;
-        z-index: 10;
-    }
-
-    .video-label {
-        display: block !important;
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-        position: relative;
-        z-index: 20;
-    }
-}
-
-/* =========================================================
-   STYLE MAIL LUXE (PC & MOBILE UNIFIÉS)
-   ========================================================= */
-
-.contact-info a[href^="mailto:"] {
-    font-family: 'Montserrat', sans-serif !important; 
-    font-weight: 200 !important;       
-    letter-spacing: 2px !important;    
-    color: #cccccc !important;         
-    font-size: clamp(1rem, 1.5vw, 1.4rem) !important; 
-    white-space: nowrap !important;    
-    text-decoration: none !important;  
-    border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
-    padding-bottom: 8px;               
-    display: inline-block;
-    transition: all 0.3s ease;
-}
-
-.contact-info a[href^="mailto:"]:hover {
-    color: #ffffff !important;         
-    border-bottom-color: #D72725;      
-    transform: translateY(-2px);       
-}
-
-/* =========================================================
-   GESTION LOGO (VISIBLE UNIQUEMENT EN HAUT)
-   ========================================================= */
-
-/* Par défaut le logo est visible */
-.logo {
-    transition: all 0.4s ease-in-out;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Dès qu'on quitte le haut de page, le logo part */
-body.not-at-top .logo {
-    opacity: 0 !important;
-    pointer-events: none;
-    transform: translateY(-20px);
-}
-
-/* =========================================================
-   CORRECTIF TAILLE NOM CONTACT (MOBILE)
-   ========================================================= */
 @media (max-width: 768px) {
+    .section-title { font-size: 1.1rem; letter-spacing: 2px; white-space: nowrap; }
+    .section-title::before, .section-title::after { max-width: 40px; min-width: 20px; margin: 0 10px; }
+
+    .bento-grid.is-scrollable { --cell-size: 150px; --gap: 10px; }
+    .bento-wrapper.is-scrollable { padding: 10px 5%; }
+    .bento-grid.is-static { --cell-size: 150px; --gap: 10px; }
+    .bento-grid.is-static.is-single-item .bento-item, .bento-grid.is-static.is-single-item .bento-wide, .bento-grid.is-static.is-single-item .bento-tall, .bento-grid.is-static.is-single-item .bento-big { width: 100% !important; }
+    .bento-track { gap: 10px; }
     
-    /* On cible le premier paragraphe de contact (Le Nom) */
-    .contact-info p:first-child {
-        /* On le passe à 1rem (16px) pour qu'il soit plus petit que le titre (1.1rem) */
-        font-size: 1rem !important; 
-        line-height: 1.4 !important;
-        margin-bottom: 0.2rem !important; /* On réduit aussi l'espace sous le nom */
-    }
-    
-    /* On ajuste aussi l'espace global de la section contact sur mobile */
-    .contact-info {
-        padding-top: 1rem !important;
-    }
-}
+    .team-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; padding: 0 10px !important; margin-top: 2rem !important; }
+    .team-overlay { padding: 0.8rem !important; }
+    .team-overlay h3 { font-size: 0.85rem !important; margin-bottom: 0.2rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .team-overlay p { font-size: 0.6rem !important; letter-spacing: 1px !important; }
 
-/* =========================================================
-   SECTION ÉQUIPE (STYLE BENTO CARRÉ)
-   ========================================================= */
-
-/* 1. La Grille (4 colonnes sur PC, 2 sur Tablette, 1 sur Mobile) */
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 carrés alignés */
-    gap: 20px;
-    max-width: 1100px;
-    margin: 3rem auto 0 auto; /* Espace au-dessus */
-    padding: 0 2rem;
-    width: 100%;
-}
-
-/* 2. La Carte (Le Carré) */
-.team-card {
-    position: relative;
-    aspect-ratio: 1 / 1; /* Carré parfait */
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: #000;
-}
-
-/* 3. La Photo (L'effet "Cinéma") */
-.team-card img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    
-    /* L'EFFET MAGIQUE D'INTÉGRATION : */
-    filter: grayscale(100%) contrast(1.1) brightness(0.9); /* Noir et blanc + Contraste */
-    transition: all 0.5s ease;
-    opacity: 0.8;
-}
-
-/* 4. Le Texte (Nom + Rôle) - Toujours visible en bas */
-.team-overlay {
-    position: absolute;
-    bottom: 0; left: 0; width: 100%;
-    padding: 1.5rem;
-    
-    /* Dégradé pour que le texte soit lisible sur n'importe quelle image */
-    background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent);
-    
-    text-align: center;
-    z-index: 2;
-}
-
-.team-overlay h3 {
-    color: #fff;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.3rem;
-    font-weight: 400;
-}
-
-.team-overlay p {
-    color: var(--color-accent); /* Rouge */
-    font-size: 0.75rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* 5. L'Animation au Survol (PC uniquement) */
-@media (hover: hover) {
-    .team-card:hover {
-        border-color: var(--color-accent); /* Bordure rouge */
-    }
-    
-    .team-card:hover img {
-        filter: grayscale(0%) contrast(1) brightness(1); /* La couleur revient ! */
-        transform: scale(1.05); /* Zoom léger */
-        opacity: 1;
-    }
-}
-
-/* 6. RESPONSIVE (Tablette & Mobile) */
-@media (max-width: 1024px) {
-    .team-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 par ligne sur tablette */
-        gap: 15px;
-    }
+    .contact-info p:first-child { font-size: 1rem !important; line-height: 1.4 !important; margin-bottom: 0.2rem !important; }
 }
 
 @media (max-width: 600px) {
-    .team-grid {
-        grid-template-columns: 1fr; /* 1 par ligne sur mobile (Gros portraits) */
-        padding: 0 15px;
-    }
-    /* Sur mobile, on garde un peu de couleur pour que ce soit vivant */
-    .team-card img {
-        filter: grayscale(100%); /* On peut laisser 100% ou mettre 50% selon votre goût */
-    }
+    .team-card img { filter: grayscale(100%); }
 }
-
-/* =========================================================
-   CORRECTIF ÉQUIPE MOBILE (2 COLONNES / 2 LIGNES)
-   ========================================================= */
-@media (max-width: 768px) {
-    
-    .team-grid {
-        /* On force 2 colonnes au lieu d'une seule */
-        grid-template-columns: repeat(2, 1fr) !important; 
-        
-        /* On réduit l'espace entre les carrés pour gagner de la place */
-        gap: 10px !important; 
-        padding: 0 10px !important;
-        margin-top: 2rem !important;
-    }
-
-    /* On ajuste la taille du texte pour qu'il rentre dans les petits carrés */
-    .team-overlay {
-        padding: 0.8rem !important; /* Moins de marge interne */
-    }
-
-    .team-overlay h3 {
-        font-size: 0.85rem !important; /* Nom un peu plus petit */
-        margin-bottom: 0.2rem !important;
-        white-space: nowrap; /* Évite que le nom se coupe bêtement */
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .team-overlay p {
-        font-size: 0.6rem !important; /* Rôle plus discret */
-        letter-spacing: 1px !important;
-    }
-}
-
-/* =========================================================
-   CORRECTION ANTI-STRETCH ET PRÉVISUALISATION ADMIN
-   ========================================================= */
-.bento-item img, 
-.project-hero img {
-    position: absolute !important; 
-    top: 0; 
-    left: 0;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important; 
-    /* On a retiré le !important ici pour laisser le Javascript gérer le Focus : */
-    object-position: center; 
-    display: block;
-}
-
-.bento-item, .project-hero {
-    position: relative !important;
-    overflow: hidden !important;
-    background-color: #050505 !important;
-}
-
-/* --- Styles pour la Prévisualisation dans l'Admin --- */
-#image-preview {
-    width: 100%;
-    max-width: 400px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin: 1rem auto;
-    display: block;
-    transition: aspect-ratio 0.4s ease, object-position 0.4s ease, max-width 0.4s ease;
-    aspect-ratio: 1 / 1; /* Carré Standard par défaut */
-}
-#image-preview.bento-tall {
-    aspect-ratio: 1 / 2; /* Format Vertical */
-    max-width: 250px;
-}
-#image-preview.bento-big {
-    aspect-ratio: 1 / 1;
-    max-width: 100%; /* S'étend pour simuler le Grand Format */
-}
-
-/* =========================================================
-   SCROLL HORIZONTAL INFINI ET MODE STATIQUE (INTELLIGENT)
-   ========================================================= */
-
-/* --- MODE 1 : SCROLL INFINI (S'active s'il y a beaucoup de projets) --- */
-.bento-wrapper.is-scrollable {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    padding: 20px 5%;
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
-}
-.bento-wrapper.is-scrollable::-webkit-scrollbar { display: none; }
-
-.bento-grid.is-scrollable {
-    display: grid;
-    --cell-size: 250px; 
-    --gap: 20px;
-    grid-template-columns: none !important; 
-    grid-template-rows: repeat(3, var(--cell-size)) !important;
-    grid-auto-columns: var(--cell-size) !important;
-    grid-auto-flow: column dense !important;
-    gap: var(--gap) !important;
-    width: max-content !important; 
-    padding-right: 0 !important; /* Pas de marge pour un loop parfait */
-}
-
-/* Redimensionnement strict pour le mode scroll */
-.is-scrollable .bento-item { grid-row: span 1 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
-.is-scrollable .bento-tall { grid-row: span 2 !important; grid-column: span 1 !important; aspect-ratio: unset !important; }
-.is-scrollable .bento-wide { grid-row: span 1 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
-.is-scrollable .bento-big  { grid-row: span 2 !important; grid-column: span 2 !important; aspect-ratio: unset !important; }
-
-@media (max-width: 768px) {
-    .bento-grid.is-scrollable { --cell-size: 150px; --gap: 10px; }
-    .bento-wrapper.is-scrollable { padding: 10px 5%; }
-}
-
-/* --- MODE 2 : GRILLE FIXE (Visuel de départ, de 2 à 6 projets) --- */
-.bento-wrapper.is-static {
-    width: 100%;
-    overflow: visible;
-    padding: 20px 0;
-    /* On centre la grille au milieu de la page */
-    display: flex;
-    justify-content: center;
-}
-
-.bento-grid.is-static {
-    display: grid;
-    --cell-size: 250px; 
-    --gap: 20px;
-    
-    /* L'ADN BENTO : 3 lignes strictes, remplissage dense */
-    grid-template-rows: repeat(3, var(--cell-size)) !important;
-    grid-auto-columns: var(--cell-size) !important;
-    grid-auto-flow: column dense !important;
-    gap: var(--gap) !important;
-    
-    /* La grille ne prend que la taille de son contenu pour pouvoir être centrée */
-    width: max-content !important; 
-}
-
-/* On applique les mêmes verrous de pixels bruts que pour le mode scroll */
-.bento-grid.is-static .bento-item { width: var(--cell-size) !important; height: var(--cell-size) !important; }
-.bento-grid.is-static .bento-tall { height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
-.bento-grid.is-static .bento-wide { width: calc((var(--cell-size) * 2) + var(--gap)) !important; }
-.bento-grid.is-static .bento-big  { width: calc((var(--cell-size) * 2) + var(--gap)) !important; height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
-
-@media (max-width: 768px) {
-    .bento-grid.is-static {
-        --cell-size: 150px; 
-        --gap: 10px;
-    }
-}
-
-/* =========================================================
-   SYNOPSIS EXTENSIBLE (LIRE LA SUITE)
-   ========================================================= */
-.synopsis-wrapper {
-    position: relative;
-    max-height: 140px; /* Affiche environ 5 à 6 lignes par défaut */
-    overflow: hidden;
-    /* L'animation d'ouverture/fermeture très fluide */
-    transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.synopsis-wrapper.is-expanded {
-    max-height: 2000px; /* S'ouvre en grand pour libérer tout le texte */
-}
-
-/* Le dégradé noir par-dessus le bas du texte */
-.synopsis-fade {
-    position: absolute;
-    bottom: 0; 
-    left: 0;
-    width: 100%; 
-    height: 60px;
-    background: linear-gradient(to bottom, rgba(5,5,5,0), rgba(5,5,5,1));
-    transition: opacity 0.4s ease;
-    pointer-events: none; /* Laisse passer les clics à travers */
-}
-
-/* On efface le dégradé quand c'est ouvert */
-.synopsis-wrapper.is-expanded .synopsis-fade {
-    opacity: 0;
-}
-
-/* Le style du bouton "Lire la suite" */
-.btn-read-more {
-    background: transparent;
-    color: var(--color-accent);
-    border: none;
-    padding: 10px 0;
-    font-family: inherit;
-    font-weight: 600;
-    font-size: 0.8rem;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: inline-block;
-    margin-top: 5px;
-    transition: color 0.3s;
-}
-
-.btn-read-more:hover {
-    color: #fff;
-}
-
-.btn-read-more.hidden {
-    display: none !important;
-}
-
-/* =========================================================
-   BLINDAGE ANTI-STRETCH (SÉCURITÉ CHARGEMENT)
-   ========================================================= */
-.bento-item img, 
-.project-hero img, 
-.team-card img {
-    /* 1. L'image ne gère plus sa taille, elle obéit au conteneur */
-    position: absolute !important; 
-    top: 0; 
-    left: 0;
-    width: 100% !important;
-    height: 100% !important;
-    
-    /* 2. Empêche toute déformation, quitte à couper l'image */
-    object-fit: cover !important; 
-    
-    /* 3. Masque l'image par défaut (elle sera affichée par l'animation) */
-    opacity: 0;
-    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* L'animation qui affiche l'image doucement une fois qu'elle est prête */
-.image-loaded {
-    opacity: 1 !important;
-}
-
-/* On s'assure que les conteneurs sont bien relatifs pour bloquer les images absolues */
-.bento-item, .project-hero, .team-card {
-    position: relative !important;
-    background-color: #050505; /* Un fond sombre élégant pendant le chargement */
-    overflow: hidden;
-}
-
-/* =========================================================
-   BLINDAGE ANTI-STRETCH ABSOLU (LAZY LOAD SECURE)
-   ========================================================= */
-/* 1. La sécurité de base */
-.anti-stretch-img {
-    opacity: 0; /* Masqué tant que ce n'est pas chargé à 100% */
-    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* 2. L'apparition fluide (Gérée par le JS) */
-.bento-item .anti-stretch-img.loaded { opacity: 0.8; }
-.team-card .anti-stretch-img.loaded { opacity: 0.8; }
-.project-hero .anti-stretch-img.loaded { opacity: 0.8; }
-
-/* 3. On remet les effets de survol */
-.bento-item:hover .anti-stretch-img.loaded { opacity: 1; transform: scale(1.1); }
-@media (hover: hover) {
-    .team-card:hover .anti-stretch-img.loaded { opacity: 1; filter: grayscale(0%) contrast(1) brightness(1); transform: scale(1.05); }
-}
-
-/* 4. NETTOYAGE : On annule l'ancienne animation qui causait le bug sur la page projet */
-.project-hero img { animation: none !important; }
-
-/* =========================================================
-   SÉCURITÉ GRILLE (BFCache)
-   ========================================================= */
-
-/* On force la carte graphique pour le rendu du cache */
-.anti-stretch-img {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-}
-
-/* Dimensions basées sur les variables pour le responsive */
-.bento-grid.is-scrollable .bento-item {
-    width: var(--cell-size);
-    height: var(--cell-size);
-}
-.bento-grid.is-scrollable .bento-tall {
-    height: calc((var(--cell-size) * 2) + var(--gap));
-}
-.bento-grid.is-scrollable .bento-wide {
-    width: calc((var(--cell-size) * 2) + var(--gap));
-}
-.bento-grid.is-scrollable .bento-big {
-    width: calc((var(--cell-size) * 2) + var(--gap));
-    height: calc((var(--cell-size) * 2) + var(--gap));
-}
-
-/* Sécurité supplémentaire pour la Grille Statique */
-.bento-grid.is-static .bento-big,
-.bento-grid.is-static .bento-item:not(.bento-tall):not(.bento-wide) { 
-    aspect-ratio: 1 / 1 !important; 
-}
-
-/* =========================================================
-   CENTRAGE DU BENTO (S'IL N'Y A QU'UN SEUL PROJET)
-   ========================================================= */
-.bento-grid.is-static {
-    display: grid;
-    --cell-size: 250px; 
-    --gap: 20px;
-    
-    /* LE BLINDAGE DU CENTRAGE ABSOLU */
-    margin: 0 auto !important; 
-    
-    /* L'ADN BENTO */
-    grid-template-rows: repeat(3, var(--cell-size)) !important;
-    grid-auto-columns: var(--cell-size) !important;
-    grid-auto-flow: column dense !important;
-    gap: var(--gap) !important;
-    
-    width: max-content !important; 
-}
-
-/* On donne une taille "Premium" à l'affiche unique pour qu'elle ne soit pas minuscule */
-.bento-grid.is-static.is-single-item .bento-item {
-    width: 400px !important; 
-    max-width: 100%;
-}
-
-/* S'adapte intelligemment si tu choisis un format différent pour ton projet unique */
-.bento-grid.is-static.is-single-item .bento-wide { width: 600px !important; }
-.bento-grid.is-static.is-single-item .bento-tall { width: 350px !important; }
-.bento-grid.is-static.is-single-item .bento-big  { width: 500px !important; }
-
-/* Sur mobile, il reprend naturellement 100% de la largeur */
-@media (max-width: 768px) {
-    .bento-grid.is-static.is-single-item .bento-item,
-    .bento-grid.is-static.is-single-item .bento-wide,
-    .bento-grid.is-static.is-single-item .bento-tall,
-    .bento-grid.is-static.is-single-item .bento-big {
-        width: 100% !important;
-    }
-}
-
-/* =========================================================
-   LA PISTE DE DÉFILEMENT (SÉPARATION DES CLONES BENTO)
-   ========================================================= */
-.bento-track {
-    display: flex;
-    gap: 20px; /* L'espace entre le groupe 1, 2 et 3 */
-    width: max-content;
-}
-
-@media (max-width: 768px) {
-    .bento-track {
-        gap: 10px; /* On réduit l'espace sur mobile */
-    }
-}
-
-
