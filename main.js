@@ -619,7 +619,12 @@ function setupTeamForm() {
     const form = document.getElementById('team-form');
     if (!form) return;
 
-    form.querySelectorAll('.btn-cancel-team-bottom, .btn-cancel-team-top').forEach(btn => btn.addEventListener('click', returnToTeamList));
+    // CORRECTION : On cherche le bouton du haut dans tout le document, et celui du bas dans le formulaire
+    const btnCancelTop = document.querySelector('.btn-cancel-team-top');
+    const btnCancelBottom = form.querySelector('.btn-cancel-team-bottom');
+
+    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToTeamList);
+    if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToTeamList);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -656,7 +661,6 @@ function setupTeamForm() {
         } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
     });
 }
-
 async function loadAdminTeam() {
     const teamList = document.getElementById('team-list');
     if (!teamList) return;
@@ -811,3 +815,4 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
