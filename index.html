@@ -147,29 +147,39 @@
             window.addEventListener('pageshow', function(event) {
                 const transitionOverlay = document.querySelector('.page-transition');
                 
-                // Si la page sort du cache (Bouton Précédent)
                 if (event.persisted) {
+                    // SÉCURITÉ BFCache (Bouton Retour)
                     if (transitionOverlay) {
-                        // 1. On remet l'écran noir instantanément sans animation
+                        // 1. On fige l'écran au noir absolu instantanément
                         transitionOverlay.style.transition = 'none';
                         transitionOverlay.style.opacity = '1';
                         transitionOverlay.classList.add('active');
                         
-                        // 2. On attend 150ms (le temps que le navigateur décompresse la grille)
-                        setTimeout(() => {
-                            // On force le recalcul de la grille
+                        // 2. On synchronise avec la carte graphique du navigateur (Frame)
+                        requestAnimationFrame(() => {
+                            
+                            // On force la grille à se recalculer dans l'obscurité
                             const grid = document.querySelector('.bento-grid');
                             if (grid) {
                                 grid.style.display = 'none';
-                                grid.offsetHeight; // Force reflow
+                                grid.offsetHeight; // Le coup de poing invisible
                                 grid.style.display = '';
                             }
                             
-                            // 3. On enlève l'écran noir en douceur
-                            transitionOverlay.style.transition = 'opacity 0.5s ease-in-out';
-                            transitionOverlay.classList.remove('active');
-                            transitionOverlay.style.opacity = '0';
-                        }, 150);
+                            // 3. On déclenche la "marche arrière" fluide
+                            setTimeout(() => {
+                                // On applique une transition très douce
+                                transitionOverlay.style.transition = 'opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+                                transitionOverlay.style.opacity = '0';
+                                
+                                // On nettoie les styles forcés une fois l'animation terminée
+                                setTimeout(() => {
+                                    transitionOverlay.classList.remove('active');
+                                    transitionOverlay.style.transition = '';
+                                    transitionOverlay.style.opacity = '';
+                                }, 600);
+                            }, 50); // Le temps de laisser la grille prendre sa place
+                        });
                     }
                 } else {
                     // Chargement classique (Premier accès)
@@ -177,7 +187,6 @@
                         transitionOverlay.classList.add('active');
                         setTimeout(() => {
                             transitionOverlay.classList.remove('active');
-                            transitionOverlay.style.opacity = '0';
                         }, 50); 
                     }
                 }
@@ -322,6 +331,7 @@
     <script type="module" src="main.js?v=2.0"></script>
 </body>
 </html>
+
 
 
 
