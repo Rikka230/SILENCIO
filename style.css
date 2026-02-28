@@ -1202,3 +1202,30 @@ body.not-at-top .logo {
 
 /* 4. NETTOYAGE : On annule l'ancienne animation qui causait le bug sur la page projet */
 .project-hero img { animation: none !important; }
+
+/* =========================================================
+   LE VERROU FINAL (ANTI-STRETCH 2x2 & CACHE NAVIGATEUR)
+   ========================================================= */
+
+/* 1. On force la puce graphique (GPU) à calculer l'image en priorité absolue.
+      Cela empêche le navigateur de faire sauter le "object-fit: cover" au bouton retour */
+.anti-stretch-img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* 2. On rend le ratio 1/1 INDESTRUCTIBLE pour le bloc 2x2, 
+      même quand la grille n'a pas encore fini de charger ses colonnes */
+.bento-grid.is-scrollable .bento-big,
+.bento-grid.is-static .bento-big,
+.bento-big {
+    aspect-ratio: 1 / 1 !important;
+}
+
+/* 3. Sécurité supplémentaire pour le petit bloc standard (lui aussi doit rester carré) */
+.bento-grid.is-scrollable .bento-item:not(.bento-tall):not(.bento-wide),
+.bento-grid.is-static .bento-item:not(.bento-tall):not(.bento-wide) {
+    aspect-ratio: 1 / 1 !important;
+}
