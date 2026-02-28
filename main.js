@@ -237,6 +237,27 @@ function initAdmin() {
     }
 
     const navLinks = document.querySelectorAll('.admin-sidebar nav a');
+    // --- GESTION DE LA RECHERCHE (FILTRE INSTANTANÉ) ---
+    const searchInput = document.getElementById('search-project');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.sortable-item');
+            
+            items.forEach(item => {
+                const titleElement = item.querySelector('.item-info strong');
+                if (titleElement) {
+                    const title = titleElement.textContent.toLowerCase();
+                    // Si le titre contient la recherche, on affiche. Sinon, on cache.
+                    if (title.includes(term)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
     const allPanels = document.querySelectorAll('[data-tab]');
     const mainTitle = document.querySelector('.content-header h1');
 
@@ -693,3 +714,4 @@ function setupHomeVideo() {
         }
     });
 }
+
