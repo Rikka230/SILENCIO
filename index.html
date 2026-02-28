@@ -143,14 +143,32 @@
    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- SÉCURITÉ ET ANIMATION D'OUVERTURE ---
+           // --- SÉCURITÉ ET ANIMATION D'OUVERTURE ---
             window.addEventListener('pageshow', function(event) {
                 const transitionOverlay = document.querySelector('.page-transition');
-                if (transitionOverlay) {
-                    transitionOverlay.classList.add('active');
-                    setTimeout(() => {
+                
+                if (event.persisted) {
+                    // SÉCURITÉ ANTI-STRETCH : Le navigateur ressort la page de sa mémoire (Bouton retour)
+                    // On force la grille à cligner des yeux (Reflow) pour s'afficher parfaitement instantanément.
+                    const grid = document.querySelector('.bento-grid');
+                    if (grid) {
+                        grid.style.display = 'none';
+                        grid.offsetHeight; /* La ligne magique qui force le recalcul */
+                        grid.style.display = '';
+                    }
+                    
+                    if (transitionOverlay) {
                         transitionOverlay.classList.remove('active');
-                    }, 50); 
+                        transitionOverlay.style.opacity = '0';
+                    }
+                } else {
+                    // Chargement classique
+                    if (transitionOverlay) {
+                        transitionOverlay.classList.add('active');
+                        setTimeout(() => {
+                            transitionOverlay.classList.remove('active');
+                        }, 50); 
+                    }
                 }
             });
 
@@ -293,6 +311,7 @@
     <script type="module" src="main.js?v=2.0"></script>
 </body>
 </html>
+
 
 
 
