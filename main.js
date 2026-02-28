@@ -453,8 +453,11 @@ function setupDropzone() {
                 canvas.toBlob((blob) => {
                     optimizedImageBlob = blob;
                     const compressedUrl = URL.createObjectURL(blob);
-                    if(previewBloc) previewBloc.src = compressedUrl;
-                    if(previewCadrage) previewCadrage.src = compressedUrl;
+                    
+                    // ANTI-STRETCH : On retire la classe loaded pour forcer le fade-in
+                    if(previewBloc) { previewBloc.classList.remove('loaded'); previewBloc.src = compressedUrl; }
+                    if(previewCadrage) { previewCadrage.classList.remove('loaded'); previewCadrage.src = compressedUrl; }
+                    
                     syncBentoDA();
                 }, 'image/webp', 0.8);
             };
@@ -482,8 +485,8 @@ function resetProjectForm() {
 
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
-    if (previewBloc) previewBloc.removeAttribute('src');
-    if (previewCadrage) previewCadrage.removeAttribute('src');
+    if (previewBloc) { previewBloc.removeAttribute('src'); previewBloc.classList.remove('loaded'); }
+    if (previewCadrage) { previewCadrage.removeAttribute('src'); previewCadrage.classList.remove('loaded'); }
     syncBentoDA(); 
 
     document.getElementById('form-title').textContent = "Ajouter un projet";
@@ -495,7 +498,6 @@ function setupProjectForm() {
     const form = document.getElementById('project-form');
     if (!form) return;
 
-    // CORRECTION : On cherche le bouton du haut dans tout le document, et celui du bas dans le formulaire
     const btnCancelTop = document.querySelector('.btn-cancel-top');
     const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
 
@@ -565,7 +567,7 @@ async function loadAdminProjects() {
             const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                <img src="${project.imageAffiche}" class="item-thumb" style="object-position: ${focus}; object-fit: cover;">
+                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
                 <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
@@ -602,8 +604,10 @@ async function loadAdminProjects() {
                 document.getElementById('proj-focus-header-y').value = headerPos.y;
 
                 if (project.imageAffiche) {
-                    document.getElementById('image-preview-bloc').src = project.imageAffiche;
-                    document.getElementById('image-preview-cadrage').src = project.imageAffiche;
+                    const pB = document.getElementById('image-preview-bloc');
+                    const pC = document.getElementById('image-preview-cadrage');
+                    pB.classList.remove('loaded'); pB.src = project.imageAffiche;
+                    pC.classList.remove('loaded'); pC.src = project.imageAffiche;
                     syncBentoDA(); 
                 }
 
@@ -615,6 +619,14 @@ async function loadAdminProjects() {
             projectList.appendChild(li);
         });
         setupDragAndDrop('project-list', 'projects');
+        
+        // Sécurité Cache pour les listes
+        setTimeout(() => {
+            document.querySelectorAll('#project-list .anti-stretch-img').forEach(img => {
+                if (img.complete) img.classList.add('loaded');
+            });
+        }, 50);
+        
     } catch (error) {}
 }
 
@@ -646,6 +658,7 @@ function setupTeamDropzone() {
                 canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 canvas.toBlob((blob) => {
                     teamOptimizedImageBlob = blob;
+                    preview.classList.remove('loaded');
                     preview.src = URL.createObjectURL(blob);
                 }, 'image/webp', 0.8);
             };
@@ -665,7 +678,10 @@ function resetTeamForm() {
     const form = document.getElementById('team-form');
     if(!form) return;
     form.reset();
-    document.getElementById('team-preview').src = DEFAULT_AVATAR; // Retour à l'avatar par défaut
+    const tPrev = document.getElementById('team-preview');
+    tPrev.classList.remove('loaded');
+    tPrev.src = DEFAULT_AVATAR; 
+    
     document.getElementById('team-form-title').textContent = "Ajouter un membre";
     document.getElementById('btn-save-team').textContent = "Enregistrer le membre";
     teamOptimizedImageBlob = null; currentTeamEditId = null; currentTeamImageUrl = null;
@@ -675,7 +691,6 @@ function setupTeamForm() {
     const form = document.getElementById('team-form');
     if (!form) return;
 
-    // CORRECTION : On cherche le bouton du haut dans tout le document, et celui du bas dans le formulaire
     const btnCancelTop = document.querySelector('.btn-cancel-team-top');
     const btnCancelBottom = form.querySelector('.btn-cancel-team-bottom');
 
@@ -695,7 +710,6 @@ function setupTeamForm() {
         btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
 
         try {
-            // Si pas d'image choisie et aucune image existante, on met l'Avatar par défaut
             let imageUrl = currentTeamImageUrl || DEFAULT_AVATAR; 
             if (teamOptimizedImageBlob) {
                 const safeName = nom.replace(/\s+/g, '-').toLowerCase();
@@ -732,12 +746,11 @@ async function loadAdminTeam() {
             const li = document.createElement('li');
             li.className = 'sortable-item'; li.dataset.id = member.id; li.setAttribute('draggable', 'true');
 
-            // On utilise la photo ou l'avatar par défaut
             const avatar = member.photo || DEFAULT_AVATAR; 
 
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                <img src="${avatar}" class="item-thumb" style="border-radius: 50%; object-fit: cover;">
+                <img src="${avatar}" class="item-thumb anti-stretch-img" style="border-radius: 50%; object-fit: cover !important;" onload="this.classList.add('loaded')">
                 <div class="item-info"><strong>${member.nom}</strong><span>${member.role}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
@@ -757,7 +770,10 @@ async function loadAdminTeam() {
 
                 document.getElementById('team-name').value = member.nom || '';
                 document.getElementById('team-role').value = member.role || '';
-                document.getElementById('team-preview').src = avatar;
+                
+                const tPrev = document.getElementById('team-preview');
+                tPrev.classList.remove('loaded');
+                tPrev.src = avatar;
 
                 currentTeamEditId = member.id; currentTeamImageUrl = member.photo; teamOptimizedImageBlob = null;
                 document.getElementById('team-form-title').textContent = `Modifier : ${member.nom}`;
@@ -766,7 +782,15 @@ async function loadAdminTeam() {
             });
             teamList.appendChild(li);
         });
-        setupDragAndDrop('team-list', 'team'); // Active le drag & drop pour l'équipe
+        setupDragAndDrop('team-list', 'team');
+        
+        // Sécurité Cache pour les listes
+        setTimeout(() => {
+            document.querySelectorAll('#team-list .anti-stretch-img').forEach(img => {
+                if (img.complete) img.classList.add('loaded');
+            });
+        }, 50);
+        
     } catch (error) {}
 }
 
@@ -871,6 +895,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
