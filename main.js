@@ -148,10 +148,10 @@ async function initHomePage(){
             
             let teamHTML = '';
             members.forEach((member) => {
-                const avatar = member.photo || DEFAULT_AVATAR; // AVATAR PAR DÉFAUT SI VIDE
+                const avatar = member.photo || DEFAULT_AVATAR; 
                 teamHTML += `
                     <div class="team-card">
-                        <img src="${avatar}" alt="${member.nom}" loading="lazy">
+                        <img src="${avatar}" alt="${member.nom}" loading="lazy" onload="this.classList.add('image-loaded')">
                         <div class="team-overlay">
                             <h3>${member.nom}</h3>
                             <p>${member.role}</p>
@@ -850,6 +850,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
