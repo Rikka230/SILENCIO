@@ -444,7 +444,12 @@ function setupProjectForm() {
     const form = document.getElementById('project-form');
     if (!form) return;
 
-    form.querySelectorAll('.btn-cancel-bottom, .btn-cancel-top').forEach(btn => btn.addEventListener('click', returnToListView));
+    // CORRECTION : On cherche le bouton du haut dans tout le document, et celui du bas dans le formulaire
+    const btnCancelTop = document.querySelector('.btn-cancel-top');
+    const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
+
+    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView);
+    if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -815,4 +820,5 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
