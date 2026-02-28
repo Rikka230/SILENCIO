@@ -1179,3 +1179,26 @@ body.not-at-top .logo {
     background-color: #050505; /* Un fond sombre élégant pendant le chargement */
     overflow: hidden;
 }
+
+/* =========================================================
+   BLINDAGE ANTI-STRETCH ABSOLU (LAZY LOAD SECURE)
+   ========================================================= */
+/* 1. La sécurité de base */
+.anti-stretch-img {
+    opacity: 0; /* Masqué tant que ce n'est pas chargé à 100% */
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 2. L'apparition fluide (Gérée par le JS) */
+.bento-item .anti-stretch-img.loaded { opacity: 0.8; }
+.team-card .anti-stretch-img.loaded { opacity: 0.8; }
+.project-hero .anti-stretch-img.loaded { opacity: 0.8; }
+
+/* 3. On remet les effets de survol */
+.bento-item:hover .anti-stretch-img.loaded { opacity: 1; transform: scale(1.1); }
+@media (hover: hover) {
+    .team-card:hover .anti-stretch-img.loaded { opacity: 1; filter: grayscale(0%) contrast(1) brightness(1); transform: scale(1.05); }
+}
+
+/* 4. NETTOYAGE : On annule l'ancienne animation qui causait le bug sur la page projet */
+.project-hero img { animation: none !important; }
