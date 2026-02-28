@@ -1215,23 +1215,42 @@ body.not-at-top .logo {
     -webkit-backface-visibility: hidden;
 }
 
-/* 2. LE SECRET : On fige les dimensions mathématiques des blocs. 
-      La grille ne pourra JAMAIS les écraser, même au bouton retour ! */
+/* 2. LE SECRET : Dimensions figées en dur (Pixels absolus). 
+      On ne laisse même plus le navigateur calculer des variables ! */
 .bento-grid.is-scrollable .bento-item {
-    width: var(--cell-size) !important;
-    height: var(--cell-size) !important;
+    width: 250px !important;
+    height: 250px !important;
 }
 .bento-grid.is-scrollable .bento-tall {
-    height: calc((var(--cell-size) * 2) + var(--gap)) !important;
+    height: 520px !important; /* 250 + 250 + 20(gap) */
 }
 .bento-grid.is-scrollable .bento-wide {
-    width: calc((var(--cell-size) * 2) + var(--gap)) !important;
+    width: 520px !important; 
 }
 .bento-grid.is-scrollable .bento-big {
-    width: calc((var(--cell-size) * 2) + var(--gap)) !important;
-    height: calc((var(--cell-size) * 2) + var(--gap)) !important;
+    width: 520px !important;
+    height: 520px !important;
 }
 
-/* 3. Sécurité supplémentaire pour la Grille Statique (S'il y a peu de films) */
+/* Tailles figées en dur pour les petits écrans (Mobiles) */
+@media (max-width: 768px) {
+    .bento-grid.is-scrollable .bento-item {
+        width: 150px !important;
+        height: 150px !important;
+    }
+    .bento-grid.is-scrollable .bento-tall {
+        height: 310px !important; /* 150 + 150 + 10(gap) */
+    }
+    .bento-grid.is-scrollable .bento-wide {
+        width: 310px !important; 
+    }
+    .bento-grid.is-scrollable .bento-big {
+        width: 310px !important;
+        height: 310px !important;
+    }
+}
+
+/* 3. Sécurité supplémentaire pour la Grille Statique */
 .bento-grid.is-static .bento-big { aspect-ratio: 1 / 1 !important; }
 .bento-grid.is-static .bento-item:not(.bento-tall):not(.bento-wide) { aspect-ratio: 1 / 1 !important; }
+
