@@ -129,29 +129,52 @@ async function initHomePage(){
                 bentoContainer.appendChild(wrapper);
             } else {
                 wrapper.className = 'bento-wrapper is-scrollable';
-                grid.className = 'bento-grid is-scrollable';
-                grid.innerHTML = itemsHTML + itemsHTML + itemsHTML;
-                wrapper.appendChild(grid);
+                
+                // 1. Création de la "Piste" Flexbox
+                const track = document.createElement('div');
+                track.className = 'bento-track';
+
+                // 2. On crée 3 grilles STRICTEMENT SÉPARÉES pour empêcher le puzzle de se mélanger
+                const grid1 = document.createElement('div'); grid1.className = 'bento-grid is-scrollable'; grid1.innerHTML = itemsHTML;
+                const grid2 = document.createElement('div'); grid2.className = 'bento-grid is-scrollable'; grid2.innerHTML = itemsHTML;
+                const grid3 = document.createElement('div'); grid3.className = 'bento-grid is-scrollable'; grid3.innerHTML = itemsHTML;
+
+                track.appendChild(grid1);
+                track.appendChild(grid2);
+                track.appendChild(grid3);
+
+                wrapper.appendChild(track);
                 bentoContainer.appendChild(wrapper);
 
-                setTimeout(() => { wrapper.scrollLeft = grid.scrollWidth / 3; }, 100);
+                // 3. Le calcul absolu du saut de boucle
+                let jumpDistance = 0;
+                setTimeout(() => { 
+                    // On mesure l'écart au pixel près entre le début de la grille 1 et la grille 2
+                    jumpDistance = grid2.offsetLeft - grid1.offsetLeft;
+                    wrapper.scrollLeft = jumpDistance; 
+                }, 100);
+
                 let isLooping = false;
                 wrapper.addEventListener('scroll', () => {
-                    if (isLooping) return;
-                    const setWidth = grid.scrollWidth / 3;
-                    if (wrapper.scrollLeft < setWidth / 2) {
-                        isLooping = true; wrapper.scrollLeft += setWidth; requestAnimationFrame(() => isLooping = false);
-                    } else if (wrapper.scrollLeft > setWidth * 1.5) {
-                        isLooping = true; wrapper.scrollLeft -= setWidth; requestAnimationFrame(() => isLooping = false);
+                    if (isLooping || jumpDistance === 0) return;
+                    
+                    // On utilise maintenant la jumpDistance calculée mathématiquement
+                    if (wrapper.scrollLeft < jumpDistance / 2) {
+                        isLooping = true; 
+                        wrapper.scrollLeft += jumpDistance; 
+                        requestAnimationFrame(() => isLooping = false);
+                    } else if (wrapper.scrollLeft > jumpDistance * 1.5) {
+                        isLooping = true; 
+                        wrapper.scrollLeft -= jumpDistance; 
+                        requestAnimationFrame(() => isLooping = false);
                     }
                 });
+                
                 wrapper.addEventListener('wheel', (evt) => {
                     if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return; 
                     evt.preventDefault(); wrapper.scrollLeft += evt.deltaY;
                 }, { passive: false });
             }
-        } catch (error) { console.error("Erreur projets :", error); }
-    }
 
     // --- 2. CHARGEMENT DE L'ÉQUIPE ---
     const teamGrid = document.querySelector('.team-grid');
@@ -938,6 +961,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
