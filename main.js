@@ -195,7 +195,38 @@ function renderProject(data) {
     heroImage.style.objectPosition = data.imageFocusHeader || data.imageFocus || '50% 50%';
 
     document.title = `${data.titre} - Produit par Silencio Pictures`;
+    
+    // Remplissage du texte
     document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>');
+    
+    // --- L'INTELLIGENCE DU BOUTON "LIRE LA SUITE" ---
+    setTimeout(() => {
+        const synopsisWrapper = document.getElementById('synopsis-wrapper');
+        const dynSynopsis = document.getElementById('dyn-synopsis');
+        const btnReadMore = document.getElementById('btn-read-more');
+        const synopsisFade = document.getElementById('synopsis-fade');
+
+        // Si le texte dépasse la hauteur définie dans le CSS (140px)
+        if (dynSynopsis.scrollHeight > 140) {
+            btnReadMore.classList.remove('hidden'); // On affiche le bouton
+            
+            btnReadMore.addEventListener('click', () => {
+                const isExpanded = synopsisWrapper.classList.contains('is-expanded');
+                if (!isExpanded) {
+                    synopsisWrapper.classList.add('is-expanded');
+                    btnReadMore.textContent = 'Réduire';
+                } else {
+                    synopsisWrapper.classList.remove('is-expanded');
+                    btnReadMore.textContent = 'Lire la suite';
+                }
+            });
+        } else {
+            // Si le texte est court, on désactive le fondu noir qui ne sert à rien
+            if (synopsisFade) synopsisFade.style.display = 'none';
+        }
+    }, 50); // Le petit délai est nécessaire pour que le navigateur ait le temps de calculer la vraie taille du texte
+    
+    // Remplissage des autres données
     document.getElementById('dyn-realisateur').textContent = data.realisateur || '-';
     const castingCible = document.getElementById('dyn-casting');
     if (data.casting) castingCible.innerHTML = data.casting.split(',').map(nom => nom.trim()).join('<br>');
@@ -209,7 +240,6 @@ function renderProject(data) {
     if (data.videoTrailer) { videoIframe.src = data.videoTrailer; videoSection.style.display = 'block'; } 
     else { videoSection.style.display = 'none'; }
 }
-
 // =========================================
 // 6. LOGIQUE : ADMINISTRATION (ROUTAGE INTELLIGENT)
 // =========================================
@@ -820,5 +850,6 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
