@@ -61,7 +61,7 @@ if (path.includes('admin')) {
 }
 
 // =========================================
-// 4. LOGIQUE : PAGE D'ACCUEIL (SCROLL HORIZONTAL MANUEL)
+// 4. LOGIQUE : PAGE D'ACCUEIL (SCROLL INFINI INTELLIGENT)
 // =========================================
 async function initHomePage(){
     try {
@@ -103,37 +103,63 @@ async function initHomePage(){
         });
 
         const wrapper = document.createElement('div');
-        wrapper.className = 'bento-wrapper';
-
         const grid = document.createElement('div');
-        grid.className = 'bento-grid';
-        grid.innerHTML = itemsHTML; 
 
-        wrapper.appendChild(grid);
-        bentoContainer.appendChild(wrapper);
-
-        // --- INTELLIGENCE DE SCROLL SOURIS (PC/MAC) SÉCURISÉE ---
-        wrapper.addEventListener('wheel', (evt) => {
-            // On ignore si c'est un scroll naturel sur Trackpad (MacBook)
-            if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return;
-
-            const maxScrollLeft = wrapper.scrollWidth - wrapper.clientWidth;
+        // --- L'INTELLIGENCE DU SYSTÈME ---
+        // S'il y a 6 projets ou moins, on utilise le visuel de départ (Grille Fixe)
+        if (projects.length <= 6) {
+            wrapper.className = 'bento-wrapper is-static';
+            grid.className = 'bento-grid is-static';
+            grid.innerHTML = itemsHTML;
+            wrapper.appendChild(grid);
+            bentoContainer.appendChild(wrapper);
+        } 
+        // S'il y en a plus de 6, on active le Scroll Infini
+        else {
+            wrapper.className = 'bento-wrapper is-scrollable';
+            grid.className = 'bento-grid is-scrollable';
             
-            // Si on scrolle vers le HAUT et qu'on est au DÉBUT de la grille -> On laisse la page monter
-            if (evt.deltaY < 0 && wrapper.scrollLeft <= 0) return;
-            
-            // Si on scrolle vers le BAS et qu'on est à la FIN de la grille -> On laisse la page descendre
-            // Le Math.ceil() protège contre les bugs de pixels décimaux des écrans 4K/Retina
-            if (evt.deltaY > 0 && Math.ceil(wrapper.scrollLeft) >= maxScrollLeft - 1) return;
+            // On clone tes projets 3 fois pour que la boucle ne finisse jamais
+            grid.innerHTML = itemsHTML + itemsHTML + itemsHTML;
+            wrapper.appendChild(grid);
+            bentoContainer.appendChild(wrapper);
 
-            // SINON : On intercepte la molette et on fait glisser la grille à l'horizontale
-            evt.preventDefault();
-            wrapper.scrollLeft += evt.deltaY; 
-        }, { passive: false });
+            // 1. Placement initial silencieux au milieu (au début du 2e clone)
+            setTimeout(() => {
+                const setWidth = grid.scrollWidth / 3;
+                wrapper.scrollLeft = setWidth;
+            }, 100);
+
+            // 2. Écouteur de boucle magique
+            let isLooping = false;
+            wrapper.addEventListener('scroll', () => {
+                if (isLooping) return;
+                const setWidth = grid.scrollWidth / 3;
+                
+                // Si on a trop scrollé à gauche, on le renvoie à droite incognito
+                if (wrapper.scrollLeft < setWidth / 2) {
+                    isLooping = true;
+                    wrapper.scrollLeft += setWidth;
+                    requestAnimationFrame(() => isLooping = false);
+                } 
+                // Si on a trop scrollé à droite, on le renvoie à gauche incognito
+                else if (wrapper.scrollLeft > setWidth * 1.5) {
+                    isLooping = true;
+                    wrapper.scrollLeft -= setWidth;
+                    requestAnimationFrame(() => isLooping = false);
+                }
+            });
+
+            // 3. Transformation de la molette PC (Vertical -> Horizontal)
+            wrapper.addEventListener('wheel', (evt) => {
+                if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY)) return; 
+                evt.preventDefault();
+                wrapper.scrollLeft += evt.deltaY;
+            }, { passive: false });
+        }
 
     } catch (error) { console.error("Erreur de grille :", error); }
 }
-
 // =========================================
 // 5. LOGIQUE : PAGE PROJET DYNAMIQUE
 // =========================================
@@ -738,6 +764,7 @@ function setupHomeVideo() {
         }
     });
 }
+
 
 
 
