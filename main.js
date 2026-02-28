@@ -72,6 +72,13 @@ async function initHomePage(){
             const heroVideo = document.querySelector('.hero-video');
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
+        // --- SÉCURITÉ ANTI-CACHE (BFCache) ---
+        // Si les images viennent du cache (Bouton retour), on force leur apparition
+        setTimeout(() => {
+            document.querySelectorAll('.anti-stretch-img').forEach(img => {
+                if (img.complete) img.classList.add('loaded');
+            });
+        }, 50);
     } catch (error) {}
     
     // --- 1. CHARGEMENT DES PROJETS ---
@@ -248,6 +255,11 @@ function renderProject(data) {
     const videoIframe = document.getElementById('dyn-video-iframe');
     if (data.videoTrailer) { videoIframe.src = data.videoTrailer; videoSection.style.display = 'block'; } 
     else { videoSection.style.display = 'none'; }
+
+    // --- SÉCURITÉ ANTI-CACHE (BFCache) PROJET ---
+    setTimeout(() => {
+        if (heroImage.complete) heroImage.classList.add('loaded');
+    }, 50);
 }
 // =========================================
 // 6. LOGIQUE : ADMINISTRATION (ROUTAGE INTELLIGENT)
@@ -859,6 +871,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
