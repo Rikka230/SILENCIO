@@ -87,7 +87,12 @@ async function initHomePage(){
         try {
             const querySnapshot = await getDocs(collection(db, "projects"));
             let projects = [];
-            querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
+            querySnapshot.forEach((doc) => { 
+                const data = doc.data();
+                if (data.visible !== false) {
+                    projects.push({ id: doc.id, ...data }); 
+                }
+            });
             projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
             
             const titleElement = bentoContainer.querySelector('.section-title');
@@ -520,7 +525,8 @@ function setupProjectForm() {
             synopsis: document.getElementById('proj-synopsis') ? document.getElementById('proj-synopsis').value.trim() : '',
             formatAffichage: document.getElementById('proj-format') ? document.getElementById('proj-format').value : '',
             imageFocusBento: `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`,
-            imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`
+            imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`,
+            visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true
         };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
@@ -565,10 +571,14 @@ async function loadAdminProjects() {
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
 
             const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+            
+            // Le badge "Masqué" si le projet n'est pas public
+            const hiddenBadge = project.visible === false ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555;">MASQUÉ</span>' : '';
+
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
                 <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
-                <div class="item-info"><strong>${project.titre}</strong><span>${project.statut}</span></div>
+                <div class="item-info"><strong>${project.titre} ${hiddenBadge}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <button class="btn-icon edit" title="Modifier">✎</button>
                     <button class="btn-icon delete" title="Supprimer">✕</button>
@@ -594,7 +604,13 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
+                
+                // On remet la case à cocher dans le bon état
+                if(document.getElementById('proj-visible')) {
+                    document.getElementById('proj-visible').checked = project.visible !== false; 
+                }
 
+                // ... (La suite du code reste identique) ...
                 const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
                 document.getElementById('proj-focus-bento-x').value = bentoPos.x;
                 document.getElementById('proj-focus-bento-y').value = bentoPos.y;
@@ -895,6 +911,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
