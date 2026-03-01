@@ -116,7 +116,7 @@ async function initHomePage(){
             });
 
             // =========================================================
-            // L'INTELLIGENCE : LE BOUCHE-TROU AUTOMATIQUE (MULTIPLE DE 3)
+            // L'INTELLIGENCE : LE BOUCHE-TROU ADAPTATIF (3 ou 4)
             // =========================================================
             if (projects.length > 1) {
                 let totalCells = 0;
@@ -126,7 +126,12 @@ async function initHomePage(){
                     else totalCells += 1;
                 });
 
-                const missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
+                // Si <= 6 projets, on est en grille fixe de 4 colonnes (Multiple de 4)
+                // Si > 6 projets, on est en carrousel de 3 lignes (Multiple de 3)
+                const modulo = projects.length <= 6 ? 4 : 3;
+                
+                // Calcul des trous à combler
+                const missingCells = totalCells % modulo === 0 ? 0 : modulo - (totalCells % modulo);
                 
                 for (let i = 0; i < missingCells; i++) {
                     itemsHTML += `
@@ -987,6 +992,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
