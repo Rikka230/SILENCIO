@@ -101,19 +101,33 @@ async function initHomePage(){
             if (titleElement) bentoContainer.appendChild(titleElement);
 
             let itemsHTML = '';
-            projects.forEach((project) => {
-                const extraClass = project.formatAffichage || '';
-                const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-                itemsHTML += `
-                    <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
-                        <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')">
-                        <div class="bento-overlay">
-                            <h3>${project.titre.toUpperCase()}</h3>
-                            <p>${project.statut}</p>
-                        </div>
-                    </a>
+            
+            // =========================================================
+            // CAS SPÉCIAL : AUCUN PROJET EN LIGNE (0 projet)
+            // =========================================================
+            if (projects.length === 0) {
+                // On crée un énorme bloc 2x2 (bento-big)
+                itemsHTML = `
+                    <div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
+                        <span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span>
+                    </div>
                 `;
-            });
+            } else {
+                // Création des blocs projets habituels
+                projects.forEach((project) => {
+                    const extraClass = project.formatAffichage || '';
+                    const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+                    itemsHTML += `
+                        <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
+                            <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')">
+                            <div class="bento-overlay">
+                                <h3>${project.titre.toUpperCase()}</h3>
+                                <p>${project.statut}</p>
+                            </div>
+                        </a>
+                    `;
+                });
+            }
 
             // =========================================================
             // L'INTELLIGENCE : LE BOUCHE-TROU ADAPTATIF (3 ou 4)
@@ -142,13 +156,13 @@ async function initHomePage(){
             const wrapper = document.createElement('div');
             const grid = document.createElement('div');
 
-            // --- MODE 1 : GRILLE STATIQUE (De 1 à 6 projets) ---
+            // --- MODE 1 : GRILLE STATIQUE (De 0 à 6 projets) ---
             if (projects.length <= 6) {
                 wrapper.className = 'bento-wrapper is-static';
                 grid.className = 'bento-grid is-static';
                 
-                // Centrage absolu s'il n'y a qu'un seul projet
-                if (projects.length === 1) {
+                // Centrage absolu s'il n'y a qu'un seul projet (OU 0 projet = le grand bloc Silencio)
+                if (projects.length === 1 || projects.length === 0) {
                     grid.classList.add('is-single-item');
                 }
 
@@ -988,6 +1002,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
