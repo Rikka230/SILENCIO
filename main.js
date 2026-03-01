@@ -130,49 +130,85 @@ async function initHomePage(){
             }
 
             // =========================================================
-            // L'INTELLIGENCE : LE COMPTAGE "AU BLOC" ET BOUCHE-TROU
+            // L'INTELLIGENCE : RECTANGLE MINIMAL & DISTRIBUTION CENTRÉE
             // =========================================================
             let totalCells = 0;
-            let hasTallOrBig = false; // <-- NOUVEAU : Détection des grands formats
-            
-            projects.forEach(p => {
-                if (p.formatAffichage === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
-                else if (p.formatAffichage === 'bento-tall') { totalCells += 2; hasTallOrBig = true; }
-                else if (p.formatAffichage === 'bento-wide') { totalCells += 2; }
-                else { totalCells += 1; }
-            });
+            let hasTallOrBig = false;
 
-            // Détection du support (PC vs Mobile/Tablette)
+            // 1. On génère d'abord les vrais projets au centre
+            let projectsHTML = '';
+
+            if (projects.length === 0) {
+                projectsHTML = `
+                    <div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
+                        <span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span>
+                    </div>
+                `;
+            } else {
+                projects.forEach((project) => {
+                    const extraClass = project.formatAffichage || '';
+                    const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+
+                    if (extraClass === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
+                    else if (extraClass === 'bento-tall') { totalCells += 2; hasTallOrBig = true; }
+                    else if (extraClass === 'bento-wide') { totalCells += 2; }
+                    else { totalCells += 1; }
+
+                    projectsHTML += `
+                        <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
+                            <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')">
+                            <div class="bento-overlay">
+                                <h3>${project.titre.toUpperCase()}</h3>
+                                <p>${project.statut}</p>
+                            </div>
+                        </a>
+                    `;
+                });
+            }
+
             const isMobile = window.innerWidth <= 1024;
-            
-            // LA NOUVELLE RÈGLE D'OR :
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
+
+            let itemsHTML = '';
+            let gridCols = 4; // Colonnes par défaut
 
             if (projects.length > 1) {
                 let missingCells = 0;
-                
+
                 if (useScrollMode) {
-                    // Mode Scroll : 3 lignes fixes. Il faut un multiple de 3.
                     missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
                 } else {
-                    // Mode Statique (PC) : 4 colonnes fixes.
-                    // 1. Il faut un multiple de 4 pour faire une ligne complète.
-                    let requiredCells = Math.ceil(totalCells / 4) * 4;
-                    
-                    // 2. S'il y a un format Vertical ou Grand, il faut AU MOINS 2 lignes (8 cases) pour fermer le rectangle !
-                    if (hasTallOrBig && requiredCells < 8) {
-                        requiredCells = 8;
+                    let requiredCells = 0;
+                    if (hasTallOrBig) {
+                        if (totalCells <= 4) { requiredCells = 4; gridCols = 2; }      // Carré 2x2
+                        else if (totalCells <= 6) { requiredCells = 6; gridCols = 3; } // Rectangle 3x2
+                        else if (totalCells <= 8) { requiredCells = 8; gridCols = 4; } // Rectangle 4x2
+                        else { requiredCells = 12; gridCols = 4; }                     // Rectangle 4x3 (Maximum)
+                    } else {
+                        if (totalCells <= 2) { requiredCells = 2; gridCols = 2; }
+                        else if (totalCells === 3) { requiredCells = 3; gridCols = 3; }
+                        else if (totalCells === 4) { requiredCells = 4; gridCols = 4; }
+                        else if (totalCells <= 8) { requiredCells = 8; gridCols = 4; }
+                        else { requiredCells = 12; gridCols = 4; }
                     }
                     missingCells = requiredCells - totalCells;
                 }
-                
-                for (let i = 0; i < missingCells; i++) {
-                    itemsHTML += `
-                        <div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
-                            <span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span>
-                        </div>
-                    `;
-                }
+
+                const beforeCount = Math.floor(missingCells / 2);
+                const afterCount = Math.ceil(missingCells / 2);
+
+                const createSilencio = () => `
+                    <div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
+                        <span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span>
+                    </div>
+                `;
+
+                let beforeHTML = ''; for (let i = 0; i < beforeCount; i++) beforeHTML += createSilencio();
+                let afterHTML = ''; for (let i = 0; i < afterCount; i++) afterHTML += createSilencio();
+
+                itemsHTML = beforeHTML + projectsHTML + afterHTML;
+            } else {
+                itemsHTML = projectsHTML;
             }
             // =========================================================
 
@@ -180,14 +216,15 @@ async function initHomePage(){
             const grid = document.createElement('div');
 
             // --- MODE 1 : GRILLE STATIQUE ---
-            // On utilise maintenant notre nouvelle variable intelligente "useScrollMode"
             if (!useScrollMode) {
                 wrapper.className = 'bento-wrapper is-static';
                 grid.className = 'bento-grid is-static';
-                
-                // Centrage absolu s'il n'y a qu'un seul projet (ou 0 = le grand bloc Silencio)
+
                 if (projects.length <= 1) {
                     grid.classList.add('is-single-item');
+                } else if (!isMobile) {
+                    grid.style.setProperty('grid-template-columns', `repeat(${gridCols}, var(--cell-size))`, 'important');
+                    grid.style.setProperty('width', 'max-content', 'important');
                 }
 
                 grid.innerHTML = itemsHTML;
@@ -1027,6 +1064,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
