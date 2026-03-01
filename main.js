@@ -130,17 +130,27 @@ async function initHomePage(){
             }
 
             // =========================================================
-            // L'INTELLIGENCE : LE BOUCHE-TROU ADAPTATIF (3 ou 4)
+            // L'INTELLIGENCE : LE COMPTAGE "AU BLOC" ET BOUCHE-TROU
             // =========================================================
-            if (projects.length > 1) {
-                let totalCells = 0;
-                projects.forEach(p => {
-                    if (p.formatAffichage === 'bento-big') totalCells += 4;
-                    else if (p.formatAffichage === 'bento-tall' || p.formatAffichage === 'bento-wide') totalCells += 2;
-                    else totalCells += 1;
-                });
+            let totalCells = 0;
+            projects.forEach(p => {
+                if (p.formatAffichage === 'bento-big') totalCells += 4;
+                else if (p.formatAffichage === 'bento-tall' || p.formatAffichage === 'bento-wide') totalCells += 2;
+                else totalCells += 1;
+            });
 
-                const modulo = projects.length <= 6 ? 4 : 3;
+            // Détection du support (PC vs Mobile/Tablette)
+            const isMobile = window.innerWidth <= 1024;
+            
+            // LA NOUVELLE RÈGLE D'OR :
+            // - Sur Mobile : On lance le scroll si > 6 projets (ancienne règle)
+            // - Sur PC : On lance le scroll si l'encombrement dépasse 12 cases (nouveau calcul)
+            const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
+
+            if (projects.length > 1) {
+                // Si le mode Scroll est actif, on bouche les trous pour finir une colonne de 3
+                // Si le mode Statique est actif, on bouche les trous pour finir une ligne de 4
+                const modulo = useScrollMode ? 3 : 4;
                 const missingCells = totalCells % modulo === 0 ? 0 : modulo - (totalCells % modulo);
                 
                 for (let i = 0; i < missingCells; i++) {
@@ -156,13 +166,14 @@ async function initHomePage(){
             const wrapper = document.createElement('div');
             const grid = document.createElement('div');
 
-            // --- MODE 1 : GRILLE STATIQUE (De 0 à 6 projets) ---
-            if (projects.length <= 6) {
+            // --- MODE 1 : GRILLE STATIQUE ---
+            // On utilise maintenant notre nouvelle variable intelligente "useScrollMode"
+            if (!useScrollMode) {
                 wrapper.className = 'bento-wrapper is-static';
                 grid.className = 'bento-grid is-static';
                 
-                // Centrage absolu s'il n'y a qu'un seul projet (OU 0 projet = le grand bloc Silencio)
-                if (projects.length === 1 || projects.length === 0) {
+                // Centrage absolu s'il n'y a qu'un seul projet (ou 0 = le grand bloc Silencio)
+                if (projects.length <= 1) {
                     grid.classList.add('is-single-item');
                 }
 
@@ -170,9 +181,10 @@ async function initHomePage(){
                 wrapper.appendChild(grid);
                 bentoContainer.appendChild(wrapper);
             } 
-            // --- MODE 2 : CARROUSEL INFINI (7 projets ou plus) ---
+            // --- MODE 2 : CARROUSEL INFINI ---
             else {
                 wrapper.className = 'bento-wrapper is-scrollable';
+                // ... (La suite du code de création du carrousel reste exactement la même)
                 
                 const track = document.createElement('div');
                 track.className = 'bento-track';
@@ -1002,6 +1014,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
