@@ -182,20 +182,29 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 .bento-item:hover .anti-stretch-img.loaded { opacity: 1; transform: scale(1.05); }
 .bento-item:hover .bento-overlay { opacity: 1; transform: translateY(0); }
 
-/* --- MODE 1 : GRILLE STATIQUE (2 à 6 projets) - Le style classique --- */
-.bento-wrapper.is-static { width: 100%; max-width: 1100px; margin: 0 auto; padding: 20px 0; }
+/* --- MODE 1 : GRILLE STATIQUE (PC) --- */
+.bento-wrapper.is-static { 
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+    padding: 40px 0; 
+    overflow: visible; 
+}
 .bento-grid.is-static {
     display: grid; 
-    grid-template-columns: repeat(4, 1fr) !important; 
-    grid-auto-rows: auto; 
-    gap: 20px !important;
+    --cell-size: 250px; 
+    --gap: 20px; 
+    gap: var(--gap) !important;
     grid-auto-flow: dense !important; 
-    width: 100% !important;
+    /* La grille ne prend que la place de ses blocs ! */
+    width: max-content !important; 
+    margin: 0 auto !important;
 }
-.bento-grid.is-static .bento-item { grid-column: span 1; grid-row: span 1; aspect-ratio: 1 / 1 !important; }
-.bento-grid.is-static .bento-tall { grid-column: span 1 !important; grid-row: span 2 !important; aspect-ratio: 1 / 2 !important; }
-.bento-grid.is-static .bento-wide { grid-column: span 2 !important; grid-row: span 1 !important; aspect-ratio: 2 / 1 !important; }
-.bento-grid.is-static .bento-big  { grid-column: span 2 !important; grid-row: span 2 !important; aspect-ratio: 1 / 1 !important; }
+/* Tailles physiques strictes pour bloquer la grille */
+.bento-grid.is-static .bento-item { width: var(--cell-size) !important; height: var(--cell-size) !important; aspect-ratio: unset !important; }
+.bento-grid.is-static .bento-tall { height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-static .bento-wide { width: calc((var(--cell-size) * 2) + var(--gap)) !important; }
+.bento-grid.is-static .bento-big  { width: calc((var(--cell-size) * 2) + var(--gap)) !important; height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
 
 /* MODE 1B : UNIQUE (1 seul film centré) */
 .bento-grid.is-static.is-single-item { display: flex !important; justify-content: center !important; align-items: center !important; width: 100% !important; }
@@ -456,6 +465,7 @@ section.full-width-video {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
