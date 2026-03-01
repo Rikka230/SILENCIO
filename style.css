@@ -148,9 +148,20 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 /* -----------------------------------------
    6. ACCUEIL : VIDÉO ARRIÈRE-PLAN
    ----------------------------------------- */
-.hero-video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+.hero-video-container { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; 
+    /* LA MAGIE : Le fondu en transparence vers le bas pour tuer la ligne de coupure */
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
 .hero-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
-.video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8)); pointer-events: none; }
+
+.video-overlay { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    /* On force le dégradé à finir sur du noir 100% absolu */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 100%); 
+    pointer-events: none; 
+}
 
 /* -----------------------------------------
    7. ACCUEIL : NOUVEAU MOTEUR BENTO GRID
@@ -498,6 +509,7 @@ section.full-width-video {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
