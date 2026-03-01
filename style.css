@@ -248,6 +248,12 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 /* -----------------------------------------
    9. PAGE DÉTAIL PROJET
    ----------------------------------------- */
+section.project-content,
+section.project-video,
+section.full-width-video {
+    min-height: auto !important; 
+    justify-content: flex-start !important;
+}
 .project-hero { height: 70vh; min-height: 70vh; position: relative; overflow: hidden; display: block; background-color: #050505; }
 .project-hero img { 
     position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; object-fit: cover !important;
@@ -387,7 +393,7 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
    12. RESPONSIVE MOBILE & TABLETTE
    ----------------------------------------- */
 @media (max-width: 1024px) {
-    /* Header & Navigation Menu Fixes */
+    /* --- HEADER & NAVIGATION --- */
     header:not(.project-hero), nav, .nav-container { position: static !important; transform: none !important; mix-blend-mode: normal !important; filter: none !important; perspective: none !important; width: 100% !important; padding: 0 !important; margin: 0 !important; height: auto !important; background: transparent !important; border: none !important; box-shadow: none !important; }
     header:not(.project-hero) { position: fixed !important; top: 0; left: 0; z-index: 1200; padding: 1.5rem 1rem !important; pointer-events: none; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 20px !important; }
     
@@ -405,27 +411,57 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
     .nav-menu li { display: block !important; width: 100%; text-align: center; padding: 0; margin: 0; }
     .nav-link { font-size: 2rem !important; color: #ffffff !important; text-transform: uppercase; letter-spacing: 4px; text-decoration: none !important; display: block; text-shadow: none !important; }
 
+    /* --- SECTIONS GLOBALES --- */
     section:not(.project-hero) { padding-top: 160px !important; }
     #production { padding-top: 0 !important; }
     
-    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-
-    .project-content { display: flex !important; flex-direction: column !important; padding-bottom: 0 !important; min-height: auto !important; gap: 2rem !important; padding: 1rem 1.5rem !important; }
-    .synopsis { width: 100% !important; margin-bottom: 1rem !important; font-size: 1.1rem !important; }
-    .tech-specs { width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 1.5rem 1rem !important; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-bottom: 0 !important; padding-bottom: 0 !important; }
-    .project-hero { height: 45vh !important; min-height: 280px !important; }
-    .full-width-video { min-height: auto !important; height: auto !important; display: block !important; margin-top: -2rem !important; padding-top: 0 !important; padding-bottom: 2rem !important; position: relative; z-index: 10; }
-    .video-label { display: block !important; margin-top: 1rem !important; margin-bottom: 1rem !important; position: relative; z-index: 20; }
-
-   .bento-grid.is-static { grid-template-columns: 1fr !important; gap: 15px !important; }
-    
+    /* --- BENTO GRID (ACCUEIL) --- */
+    .bento-grid.is-static { grid-template-columns: 1fr !important; gap: 15px !important; }
     .bento-grid.is-static .bento-item, 
     .bento-grid.is-static .bento-big, 
     .bento-grid.is-static .bento-tall, 
     .bento-grid.is-static .bento-wide { 
         grid-column: span 1 !important; 
         grid-row: span 1 !important; 
-        aspect-ratio: 16 / 9 !important;
+        aspect-ratio: 16 / 9 !important; 
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Intelligence Mobile : Titres affichés par défaut (sans hover) */
+    .bento-overlay {
+        opacity: 1 !important; 
+        transform: translateY(0) !important; 
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent) !important;
+    }
+
+    /* Intelligence Mobile : Cacher les blocs "Silencio" inutiles en 1 colonne */
+    .bento-grid.is-static .silencio-placeholder {
+        display: none !important;
+    }
+
+    /* --- ÉQUIPE --- */
+    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+
+    /* --- PAGE PROJET --- */
+    .project-content { display: flex !important; flex-direction: column !important; padding-bottom: 0 !important; min-height: auto !important; gap: 2rem !important; padding: 1rem 1.5rem !important; }
+    .synopsis { width: 100% !important; margin-bottom: 1rem !important; font-size: 1.1rem !important; }
+    .tech-specs { width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 1.5rem 1rem !important; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-bottom: 0 !important; padding-bottom: 0 !important; }
+    .project-hero { height: 45vh !important; min-height: 280px !important; }
+    
+    /* Correction de l'espace vidéo sur mobile */
+    .project-video,
+    .full-width-video { 
+        min-height: auto !important; 
+        height: auto !important; 
+        display: block !important; 
+        margin-top: 0 !important; 
+        padding-top: 0 !important; 
+        padding-bottom: 2rem !important; 
+        position: relative; 
+        z-index: 10; 
+    }
+    .video-label { display: block !important; margin-top: 1rem !important; margin-bottom: 1rem !important; position: relative; z-index: 20; }
 }
 
 @media (max-width: 768px) {
@@ -449,5 +485,6 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
