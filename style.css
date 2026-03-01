@@ -190,28 +190,42 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
     padding: 40px 0; 
     overflow: visible; 
 }
+
 .bento-grid.is-static {
     display: grid; 
     --cell-size: 250px; 
     --gap: 20px; 
     gap: var(--gap) !important;
-    grid-auto-flow: dense !important; 
-    /* La grille ne prend que la place de ses blocs ! */
+    /* L'ordre de remplissage façon Tetris (colonne par colonne) */
+    grid-auto-flow: column dense !important; 
     width: max-content !important; 
     margin: 0 auto !important;
 }
-/* Tailles physiques strictes pour bloquer la grille */
-.bento-grid.is-static .bento-item { width: var(--cell-size) !important; height: var(--cell-size) !important; aspect-ratio: unset !important; }
-.bento-grid.is-static .bento-tall { height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
-.bento-grid.is-static .bento-wide { width: calc((var(--cell-size) * 2) + var(--gap)) !important; }
-.bento-grid.is-static .bento-big  { width: calc((var(--cell-size) * 2) + var(--gap)) !important; height: calc((var(--cell-size) * 2) + var(--gap)) !important; }
 
-/* MODE 1B : UNIQUE (1 seul film centré) */
-.bento-grid.is-static.is-single-item { display: flex !important; justify-content: center !important; align-items: center !important; width: 100% !important; }
-.bento-grid.is-static.is-single-item .bento-item { width: 400px !important; aspect-ratio: unset !important; }
-.bento-grid.is-static.is-single-item .bento-wide { width: 600px !important; aspect-ratio: 2/1 !important; }
-.bento-grid.is-static.is-single-item .bento-tall { width: 350px !important; aspect-ratio: 1/2 !important; }
-.bento-grid.is-static.is-single-item .bento-big  { width: 500px !important; aspect-ratio: 1/1 !important; }
+/* LE SECRET DU TETRIS : On verrouille les "Spans" (cases occupées) */
+.bento-grid.is-static .bento-item { 
+    width: var(--cell-size) !important; 
+    height: var(--cell-size) !important; 
+    grid-column: span 1 !important; 
+    grid-row: span 1 !important; 
+    aspect-ratio: unset !important; 
+}
+.bento-grid.is-static .bento-tall { 
+    height: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+    grid-column: span 1 !important;
+    grid-row: span 2 !important; 
+}
+.bento-grid.is-static .bento-wide { 
+    width: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+    grid-column: span 2 !important; 
+    grid-row: span 1 !important;
+}
+.bento-grid.is-static .bento-big  { 
+    width: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+    height: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+    grid-column: span 2 !important; 
+    grid-row: span 2 !important; 
+}
 
 /* --- MODE 2 : SCROLL INFINI (7 projets et +) --- */
 .bento-wrapper.is-scrollable {
@@ -465,6 +479,7 @@ section.full-width-video {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
