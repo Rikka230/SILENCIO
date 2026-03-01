@@ -1100,6 +1100,36 @@ function setupHomeVideo() {
     });
 }
 
+// =========================================
+// 11. SÉCURITÉ : TRANSITIONS DE PAGE (FONDU AU NOIR)
+// =========================================
+// On écoute TOUS les clics sur la page, même sur les projets générés dynamiquement
+document.addEventListener('click', (e) => {
+    // On vérifie si l'élément cliqué est un lien (ou à l'intérieur d'un lien)
+    const link = e.target.closest('a');
+    
+    // Si ce n'est pas un lien, ou s'il n'a pas de destination, on s'arrête
+    if (!link || !link.href) return;
+    
+    const href = link.getAttribute('href');
+    
+    // On ignore les liens de la barre d'admin (qui commencent par #), les mails et les nouveaux onglets
+    if (href.startsWith('#') || href.startsWith('mailto:') || link.target === '_blank') return;
+    
+    // On cherche la div de transition dans le HTML
+    const transition = document.querySelector('.page-transition');
+    
+    // Si la div existe, on lance la magie
+    if (transition) {
+        e.preventDefault(); // On bloque le saut de page brutal
+        transition.classList.add('active'); // On lance l'écran noir
+        
+        // On attend la fin de l'animation CSS (500ms) puis on téléporte le visiteur
+        setTimeout(() => {
+            window.location.href = link.href;
+        }, 500); 
+    }
+});
 
 
 
