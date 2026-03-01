@@ -196,35 +196,36 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
     --cell-size: 250px; 
     --gap: 20px; 
     gap: var(--gap) !important;
-    /* L'ordre de remplissage façon Tetris (colonne par colonne) */
-    grid-auto-flow: column dense !important; 
+    grid-auto-flow: dense !important; 
     width: max-content !important; 
     margin: 0 auto !important;
 }
 
-/* LE SECRET DU TETRIS : On verrouille les "Spans" (cases occupées) */
-.bento-grid.is-static .bento-item { 
-    width: var(--cell-size) !important; 
-    height: var(--cell-size) !important; 
-    grid-column: span 1 !important; 
-    grid-row: span 1 !important; 
-    aspect-ratio: unset !important; 
-}
-.bento-grid.is-static .bento-tall { 
-    height: calc((var(--cell-size) * 2) + var(--gap)) !important; 
-    grid-column: span 1 !important;
-    grid-row: span 2 !important; 
-}
-.bento-grid.is-static .bento-wide { 
-    width: calc((var(--cell-size) * 2) + var(--gap)) !important; 
-    grid-column: span 2 !important; 
-    grid-row: span 1 !important;
-}
-.bento-grid.is-static .bento-big  { 
-    width: calc((var(--cell-size) * 2) + var(--gap)) !important; 
-    height: calc((var(--cell-size) * 2) + var(--gap)) !important; 
-    grid-column: span 2 !important; 
-    grid-row: span 2 !important; 
+/* LE BOUCLIER : On verrouille la taille Tetris UNIQUEMENT sur écran PC ! */
+@media (min-width: 1025px) {
+    .bento-grid.is-static .bento-item { 
+        width: var(--cell-size) !important; 
+        height: var(--cell-size) !important; 
+        grid-column: span 1 !important; 
+        grid-row: span 1 !important; 
+        aspect-ratio: unset !important; 
+    }
+    .bento-grid.is-static .bento-tall { 
+        height: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+        grid-column: span 1 !important;
+        grid-row: span 2 !important; 
+    }
+    .bento-grid.is-static .bento-wide { 
+        width: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+        grid-column: span 2 !important; 
+        grid-row: span 1 !important;
+    }
+    .bento-grid.is-static .bento-big  { 
+        width: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+        height: calc((var(--cell-size) * 2) + var(--gap)) !important; 
+        grid-column: span 2 !important; 
+        grid-row: span 2 !important; 
+    }
 }
 
 /* --- MODE 2 : SCROLL INFINI (7 projets et +) --- */
@@ -446,7 +447,12 @@ section.full-width-video {
     .full-width-video { min-height: auto !important; height: auto !important; display: block !important; margin-top: -2rem !important; padding-top: 0 !important; padding-bottom: 2rem !important; position: relative; z-index: 10; }
     .video-label { display: block !important; margin-top: 1rem !important; margin-bottom: 1rem !important; position: relative; z-index: 20; }
 
-   .bento-grid.is-static { grid-template-columns: 1fr !important; gap: 15px !important; }
+   /* --- BENTO GRID (ACCUEIL) --- */
+    .bento-grid.is-static { 
+        grid-template-columns: 1fr !important; 
+        gap: 15px !important; 
+        width: 100% !important; /* Sécurité : On force la pleine largeur */
+    }
     
     .bento-grid.is-static .bento-item, 
     .bento-grid.is-static .bento-big, 
@@ -454,9 +460,22 @@ section.full-width-video {
     .bento-grid.is-static .bento-wide { 
         grid-column: span 1 !important; 
         grid-row: span 1 !important; 
-        aspect-ratio: 16 / 9 !important;
-    } /* <-- L'ACCOLADE MANQUANTE ÉTAIT ICI */
-} /* <-- ET CELLE-CI POUR FERMER LE BLOC @media */
+        aspect-ratio: 16 / 9 !important; /* Retour à tes proportions d'origine */
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Intelligence Mobile : Titres affichés par défaut (sans hover) */
+    .bento-overlay {
+        opacity: 1 !important; 
+        transform: translateY(0) !important; 
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent) !important;
+    }
+
+    /* Intelligence Mobile : Cacher les blocs "Silencio" inutiles en 1 colonne */
+    .bento-grid.is-static .silencio-placeholder {
+        display: none !important;
+    }
 
 @media (max-width: 768px) {
     .section-title { font-size: 1.1rem; letter-spacing: 2px; white-space: nowrap; }
@@ -479,6 +498,7 @@ section.full-width-video {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
