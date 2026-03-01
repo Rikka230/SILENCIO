@@ -135,28 +135,31 @@ async function initHomePage(){
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
 
             let itemsHTML = '';
-            let gridCols = 4; 
+            let requiredRows = 1;
+            let requiredCols = 4;
 
             if (projects.length > 1) {
                 let missingCells = 0;
 
                 if (useScrollMode) {
+                    requiredRows = 3;
                     missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
                 } else {
-                    let requiredCells = 0;
+                    // CALCUL DE LA PLUS PETITE BOÎTE PARFAITE POSSIBLE
                     if (hasTallOrBig) {
-                        if (totalCells <= 4) { requiredCells = 4; gridCols = 2; }      
-                        else if (totalCells <= 6) { requiredCells = 6; gridCols = 3; } 
-                        else if (totalCells <= 8) { requiredCells = 8; gridCols = 4; } 
-                        else { requiredCells = 12; gridCols = 4; }                     
+                        if (totalCells <= 4) { requiredRows = 2; requiredCols = 2; }      // Carré 2x2
+                        else if (totalCells <= 6) { requiredRows = 2; requiredCols = 3; } // Rectangle 3x2
+                        else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } // Rectangle 4x2
+                        else { requiredRows = 3; requiredCols = 4; }                      // Rectangle 4x3
                     } else {
-                        if (totalCells <= 2) { requiredCells = 2; gridCols = 2; }
-                        else if (totalCells === 3) { requiredCells = 3; gridCols = 3; }
-                        else if (totalCells === 4) { requiredCells = 4; gridCols = 4; }
-                        else if (totalCells <= 8) { requiredCells = 8; gridCols = 4; }
-                        else { requiredCells = 12; gridCols = 4; }
+                        if (totalCells <= 2) { requiredRows = 1; requiredCols = 2; }
+                        else if (totalCells === 3) { requiredRows = 1; requiredCols = 3; }
+                        else if (totalCells === 4) { requiredRows = 1; requiredCols = 4; }
+                        else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; }
+                        else { requiredRows = 3; requiredCols = 4; }
                     }
-                    missingCells = requiredCells - totalCells;
+                    const requiredTotal = requiredRows * requiredCols;
+                    missingCells = requiredTotal > totalCells ? requiredTotal - totalCells : 0;
                 }
 
                 const beforeCount = Math.floor(missingCells / 2);
@@ -188,14 +191,15 @@ async function initHomePage(){
                 if (projects.length <= 1) {
                     grid.classList.add('is-single-item');
                 } else if (!isMobile) {
-                    grid.style.setProperty('grid-template-columns', `repeat(${gridCols}, var(--cell-size))`, 'important');
-                    grid.style.setProperty('width', 'max-content', 'important');
+                    // ON FORCE PHYSIQUEMENT LA BOÎTE DANS LE NAVIGATEUR
+                    grid.style.setProperty('grid-template-columns', `repeat(${requiredCols}, var(--cell-size))`, 'important');
+                    grid.style.setProperty('grid-template-rows', `repeat(${requiredRows}, var(--cell-size))`, 'important');
                 }
 
                 grid.innerHTML = itemsHTML;
                 wrapper.appendChild(grid);
                 bentoContainer.appendChild(wrapper);
-            } 
+            }
             // --- MODE 2 : CARROUSEL INFINI ---
             else {
                 wrapper.className = 'bento-wrapper is-scrollable';
@@ -1023,6 +1027,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
