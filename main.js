@@ -72,7 +72,6 @@ async function initHomePage(){
             const heroVideo = document.querySelector('.hero-video');
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
-        // --- SÉCURITÉ ANTI-CACHE (BFCache) ---
         setTimeout(() => {
             document.querySelectorAll('.anti-stretch-img').forEach(img => {
                 if (img.complete) img.classList.add('loaded');
@@ -87,12 +86,9 @@ async function initHomePage(){
             const querySnapshot = await getDocs(collection(db, "projects"));
             let projects = [];
             
-            // On filtre les projets pour ne garder que ceux qui sont visibles
             querySnapshot.forEach((doc) => { 
                 const data = doc.data();
-                if (data.visible !== false) {
-                    projects.push({ id: doc.id, ...data }); 
-                }
+                if (data.visible !== false) projects.push({ id: doc.id, ...data }); 
             });
             projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
             
@@ -100,42 +96,11 @@ async function initHomePage(){
             bentoContainer.innerHTML = '';
             if (titleElement) bentoContainer.appendChild(titleElement);
 
-            let itemsHTML = '';
-            
-            // =========================================================
-            // CAS SPÉCIAL : AUCUN PROJET EN LIGNE (0 projet)
-            // =========================================================
-            if (projects.length === 0) {
-                // On crée un énorme bloc 2x2 (bento-big)
-                itemsHTML = `
-                    <div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
-                        <span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span>
-                    </div>
-                `;
-            } else {
-                // Création des blocs projets habituels
-                projects.forEach((project) => {
-                    const extraClass = project.formatAffichage || '';
-                    const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-                    itemsHTML += `
-                        <a href="projet.html?id=${project.id}" class="bento-item ${extraClass}">
-                            <img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')">
-                            <div class="bento-overlay">
-                                <h3>${project.titre.toUpperCase()}</h3>
-                                <p>${project.statut}</p>
-                            </div>
-                        </a>
-                    `;
-                });
-            }
-
             // =========================================================
             // L'INTELLIGENCE : RECTANGLE MINIMAL & DISTRIBUTION CENTRÉE
             // =========================================================
             let totalCells = 0;
             let hasTallOrBig = false;
-
-            // 1. On génère d'abord les vrais projets au centre
             let projectsHTML = '';
 
             if (projects.length === 0) {
@@ -170,7 +135,7 @@ async function initHomePage(){
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
 
             let itemsHTML = '';
-            let gridCols = 4; // Colonnes par défaut
+            let gridCols = 4; 
 
             if (projects.length > 1) {
                 let missingCells = 0;
@@ -180,10 +145,10 @@ async function initHomePage(){
                 } else {
                     let requiredCells = 0;
                     if (hasTallOrBig) {
-                        if (totalCells <= 4) { requiredCells = 4; gridCols = 2; }      // Carré 2x2
-                        else if (totalCells <= 6) { requiredCells = 6; gridCols = 3; } // Rectangle 3x2
-                        else if (totalCells <= 8) { requiredCells = 8; gridCols = 4; } // Rectangle 4x2
-                        else { requiredCells = 12; gridCols = 4; }                     // Rectangle 4x3 (Maximum)
+                        if (totalCells <= 4) { requiredCells = 4; gridCols = 2; }      
+                        else if (totalCells <= 6) { requiredCells = 6; gridCols = 3; } 
+                        else if (totalCells <= 8) { requiredCells = 8; gridCols = 4; } 
+                        else { requiredCells = 12; gridCols = 4; }                     
                     } else {
                         if (totalCells <= 2) { requiredCells = 2; gridCols = 2; }
                         else if (totalCells === 3) { requiredCells = 3; gridCols = 3; }
@@ -234,7 +199,6 @@ async function initHomePage(){
             // --- MODE 2 : CARROUSEL INFINI ---
             else {
                 wrapper.className = 'bento-wrapper is-scrollable';
-                // ... (La suite du code de création du carrousel reste exactement la même)
                 
                 const track = document.createElement('div');
                 track.className = 'bento-track';
@@ -261,13 +225,9 @@ async function initHomePage(){
                     if (isLooping || jumpDistance === 0) return;
                     
                     if (wrapper.scrollLeft < jumpDistance / 2) {
-                        isLooping = true; 
-                        wrapper.scrollLeft += jumpDistance; 
-                        requestAnimationFrame(() => isLooping = false);
+                        isLooping = true; wrapper.scrollLeft += jumpDistance; requestAnimationFrame(() => isLooping = false);
                     } else if (wrapper.scrollLeft > jumpDistance * 1.5) {
-                        isLooping = true; 
-                        wrapper.scrollLeft -= jumpDistance; 
-                        requestAnimationFrame(() => isLooping = false);
+                        isLooping = true; wrapper.scrollLeft -= jumpDistance; requestAnimationFrame(() => isLooping = false);
                     }
                 });
                 
@@ -311,7 +271,6 @@ async function initHomePage(){
     }, { threshold: 0.1 });
     document.querySelectorAll('.bento-item, .team-card').forEach(i => observer.observe(i));
 }
-
 // =========================================
 // 5. LOGIQUE : PAGE PROJET DYNAMIQUE
 // =========================================
@@ -1064,6 +1023,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
