@@ -278,17 +278,36 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 .tech-specs h4:first-child { margin-top: 0; }
 .tech-specs p { color: #888; margin-bottom: 0.5rem; }
 
-/* TRAILER */
-.full-width-video { 
-    width: 100%; 
-    background: transparent; 
-    margin-top: 0rem !important; /* Retire l'espace géant au-dessus */
-    padding: 0; 
-    text-align: center; 
-    border: none !important; 
-    position: relative; 
-    z-index: 10; 
-    min-height: auto !important; /* Force la section à s'adapter à la vidéo */
+/* TRAILER (CORRIGÉ AVEC LES VRAIES CLASSES HTML) */
+.project-video {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto 0 auto !important;
+    padding: 0 5% 50px 5%;
+    position: relative;
+    z-index: 10;
+    min-height: auto !important; /* LA LIGNE MAGIQUE QUI TUE L'ESPACE GÉANT */
+    display: block !important;
+}
+
+.video-responsive {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* Ratio 16/9 parfait */
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #000;
+}
+
+.video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
 }
 
 .video-label {
@@ -430,4 +449,5 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
