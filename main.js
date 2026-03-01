@@ -132,7 +132,7 @@ async function initHomePage(){
                 for (let i = 0; i < missingCells; i++) {
                     itemsHTML += `
                         <div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
-                            <span style="color: var(--color-accent); opacity: 0.1; font-size: 1.5rem; font-weight: 200; letter-spacing: 4px;">SILENCIO</span>
+                            <span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span>
                         </div>
                     `;
                 }
@@ -988,6 +988,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
