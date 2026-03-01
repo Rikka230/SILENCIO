@@ -341,23 +341,12 @@ async function initHomePage(){
         } catch (error) { console.error("Erreur équipe :", error); }
     }
 
-    // --- 3. ANIMATIONS D'APPARITION ---
-    // 1. On observe les affiches pour les faire glisser vers le haut au scroll
+   // --- 3. ANIMATIONS D'APPARITION ---
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
     }, { threshold: 0.1 });
     
     document.querySelectorAll('.bento-item, .team-card').forEach(i => observer.observe(i));
-
-    // 2. L'ANTI-POP : On révèle la section complète uniquement quand tout est chargé
-    setTimeout(() => {
-        const bContainer = document.querySelector('.bento-container');
-        const tGrid = document.querySelector('.team-grid');
-        
-        // On allume la lumière ! (Le titre est déjà bien en haut sans que personne n'ait vu le saut)
-        if (bContainer) bContainer.classList.add('is-ready');
-        if (tGrid) tGrid.classList.add('is-ready');
-    }, 150); // Ce petit délai laisse le temps au navigateur de remonter le titre en silence
 }
 
 // =========================================
@@ -1143,6 +1132,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
