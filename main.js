@@ -66,19 +66,25 @@ else { initHomePage(); }
 // =========================================
 async function initHomePage(){
     // =========================================================
-    // SÉCURITÉ : VERROUILLAGE DU SCROLL PENDANT LA CINÉMATIQUE
+    // INTELLIGENCE : GESTION DU LOADER (UNE SEULE FOIS PAR SESSION)
     // =========================================================
     const loader = document.getElementById('loader');
     if (loader) {
-        // 1. On bloque complètement le défilement de la page
-        document.body.style.overflow = 'hidden'; 
-        // 2. On force la page à rester tout en haut (contrecarre la mémoire du navigateur)
-        window.scrollTo(0, 0); 
-        
-        // 3. On relâche les freins après exactement 4.5 secondes (fin de l'animation CSS)
-        setTimeout(() => {
-            document.body.style.overflow = ''; 
-        }, 4500); 
+        // On vérifie si le visiteur a déjà vu l'intro pendant cette session
+        if (!sessionStorage.getItem('silencioIntroSeen')) {
+            // 1ère VISITE : On bloque le scroll et on joue la cinématique
+            document.body.style.overflow = 'hidden'; 
+            window.scrollTo(0, 0); 
+            
+            setTimeout(() => {
+                document.body.style.overflow = ''; 
+                // On mémorise qu'il a vu l'intro
+                sessionStorage.setItem('silencioIntroSeen', 'true');
+            }, 4500); 
+        } else {
+            // DÉJÀ VU (F5 ou navigation) : On cache le loader et on libère le scroll instantanément
+            loader.style.display = 'none';
+        }
     }
     // =========================================================
     try {
@@ -1093,6 +1099,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
