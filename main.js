@@ -133,25 +133,38 @@ async function initHomePage(){
             // L'INTELLIGENCE : LE COMPTAGE "AU BLOC" ET BOUCHE-TROU
             // =========================================================
             let totalCells = 0;
+            let hasTallOrBig = false; // <-- NOUVEAU : Détection des grands formats
+            
             projects.forEach(p => {
-                if (p.formatAffichage === 'bento-big') totalCells += 4;
-                else if (p.formatAffichage === 'bento-tall' || p.formatAffichage === 'bento-wide') totalCells += 2;
-                else totalCells += 1;
+                if (p.formatAffichage === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
+                else if (p.formatAffichage === 'bento-tall') { totalCells += 2; hasTallOrBig = true; }
+                else if (p.formatAffichage === 'bento-wide') { totalCells += 2; }
+                else { totalCells += 1; }
             });
 
             // Détection du support (PC vs Mobile/Tablette)
             const isMobile = window.innerWidth <= 1024;
             
             // LA NOUVELLE RÈGLE D'OR :
-            // - Sur Mobile : On lance le scroll si > 6 projets (ancienne règle)
-            // - Sur PC : On lance le scroll si l'encombrement dépasse 12 cases (nouveau calcul)
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
 
             if (projects.length > 1) {
-                // Si le mode Scroll est actif, on bouche les trous pour finir une colonne de 3
-                // Si le mode Statique est actif, on bouche les trous pour finir une ligne de 4
-                const modulo = useScrollMode ? 3 : 4;
-                const missingCells = totalCells % modulo === 0 ? 0 : modulo - (totalCells % modulo);
+                let missingCells = 0;
+                
+                if (useScrollMode) {
+                    // Mode Scroll : 3 lignes fixes. Il faut un multiple de 3.
+                    missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
+                } else {
+                    // Mode Statique (PC) : 4 colonnes fixes.
+                    // 1. Il faut un multiple de 4 pour faire une ligne complète.
+                    let requiredCells = Math.ceil(totalCells / 4) * 4;
+                    
+                    // 2. S'il y a un format Vertical ou Grand, il faut AU MOINS 2 lignes (8 cases) pour fermer le rectangle !
+                    if (hasTallOrBig && requiredCells < 8) {
+                        requiredCells = 8;
+                    }
+                    missingCells = requiredCells - totalCells;
+                }
                 
                 for (let i = 0; i < missingCells; i++) {
                     itemsHTML += `
@@ -1014,6 +1027,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
