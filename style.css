@@ -510,6 +510,30 @@ section.full-width-video {
     .team-card img { filter: grayscale(100%); }
 }
 
+   /* =========================================================
+   FIX ANTI-POP : FONDU ÉLÉGANT DE LA GRILLE ET DES TITRES
+   ========================================================= */
+/* On cache les conteneurs au chargement */
+.bento-container, .team-grid {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+/* Le JS ajoutera cette classe une fois le titre en place */
+.bento-container.is-ready, .team-grid.is-ready {
+    opacity: 1;
+}
+
+/* Bonus : Apparition des affiches en cascade (slide up) */
+.bento-item, .team-card {
+    opacity: 0;
+    transform: translateY(30px);
+    /* L'animation est gérée par ton "transition: all 0.4s ease" existant ! */
+}
+.bento-item.is-visible, .team-card.is-visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
 
 
 
