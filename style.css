@@ -424,6 +424,25 @@ section.full-width-video {
 #image-preview.bento-tall { aspect-ratio: 1 / 2; max-width: 250px; }
 #image-preview.bento-big { aspect-ratio: 1 / 1; max-width: 100%; }
 
+/* =========================================================
+   FIX DÉFINITIF ANTI-POP : STRUCTURE FIXE ET ANIMATION DOUCE
+   ========================================================= */
+/* 1. On désactive le centrage automatique qui fait bondir le titre */
+section#projects, section#about {
+    justify-content: flex-start !important;
+    padding-top: 150px !important; /* Le titre est verrouillé en haut, il ne bougera plus jamais */
+}
+
+/* 2. On fait apparaître les grilles avec une douce lévitation au chargement */
+.bento-wrapper, .team-grid {
+    animation: smoothArrival 0.8s ease-out forwards;
+}
+
+@keyframes smoothArrival {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
 /* -----------------------------------------
    12. RESPONSIVE MOBILE & TABLETTE
    ----------------------------------------- */
@@ -508,30 +527,6 @@ section.full-width-video {
 
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
-}
-
-   /* =========================================================
-   FIX ANTI-POP : FONDU ÉLÉGANT DE LA GRILLE ET DES TITRES
-   ========================================================= */
-/* On cache les conteneurs au chargement */
-.bento-container, .team-grid {
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-}
-/* Le JS ajoutera cette classe une fois le titre en place */
-.bento-container.is-ready, .team-grid.is-ready {
-    opacity: 1;
-}
-
-/* Bonus : Apparition des affiches en cascade (slide up) */
-.bento-item, .team-card {
-    opacity: 0;
-    transform: translateY(30px);
-    /* L'animation est gérée par ton "transition: all 0.4s ease" existant ! */
-}
-.bento-item.is-visible, .team-card.is-visible {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
 }
 
 
