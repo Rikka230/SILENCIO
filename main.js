@@ -97,10 +97,12 @@ async function initHomePage(){
             if (titleElement) bentoContainer.appendChild(titleElement);
 
             // =========================================================
-            // L'INTELLIGENCE : RECTANGLE MINIMAL & DISTRIBUTION CENTRÉE
+            // L'INTELLIGENCE : RECTANGLE MINIMAL & SIMULATEUR TETRIS
             // =========================================================
             let totalCells = 0;
             let hasTallOrBig = false;
+
+            // 1. On génère d'abord les vrais projets
             let projectsHTML = '';
 
             if (projects.length === 0) {
@@ -140,17 +142,64 @@ async function initHomePage(){
 
             if (projects.length > 1) {
                 let missingCells = 0;
+                let beforeCount = 0;
+                let afterCount = 0;
 
                 if (useScrollMode) {
-                    requiredRows = 3;
-                    missingCells = totalCells % 3 === 0 ? 0 : 3 - (totalCells % 3);
+                    // --- LE SIMULATEUR TETRIS (MODE SCROLL) ---
+                    // On simule une grille virtuelle de 3 lignes de haut
+                    let gridMap = [[], [], []];
+                    let maxCol = 0;
+                    
+                    projects.forEach(p => {
+                        let w = 1, h = 1;
+                        const format = p.formatAffichage || '';
+                        if (format === 'bento-big') { w = 2; h = 2; }
+                        else if (format === 'bento-tall') { w = 1; h = 2; }
+                        else if (format === 'bento-wide') { w = 2; h = 1; }
+                        
+                        let placed = false;
+                        let x = 0;
+                        while (!placed) {
+                            for (let y = 0; y <= 3 - h; y++) {
+                                let canFit = true;
+                                for (let dx = 0; dx < w; dx++) {
+                                    for (let dy = 0; dy < h; dy++) {
+                                        if (gridMap[y + dy][x + dx]) { canFit = false; break; }
+                                    }
+                                    if (!canFit) break;
+                                }
+                                if (canFit) {
+                                    for (let dx = 0; dx < w; dx++) {
+                                        for (let dy = 0; dy < h; dy++) { gridMap[y + dy][x + dx] = true; }
+                                    }
+                                    if (x + w > maxCol) maxCol = x + w;
+                                    placed = true;
+                                    break;
+                                }
+                            }
+                            if (!placed) x++;
+                        }
+                    });
+                    
+                    // On compte méthodiquement tous les trous vides laissés par les gros blocs
+                    for (let x = 0; x < maxCol; x++) {
+                        for (let y = 0; y < 3; y++) {
+                            if (!gridMap[y][x]) missingCells++;
+                        }
+                    }
+                    
+                    // En mode scroll, TOUS les blocs de secours doivent être à la fin 
+                    // pour boucher les trous sans décaler l'ordre des projets !
+                    afterCount = missingCells;
+
                 } else {
-                    // CALCUL DE LA PLUS PETITE BOÎTE PARFAITE POSSIBLE
+                    // --- CALCUL DE LA BOÎTE PARFAITE (MODE STATIQUE PC) ---
                     if (hasTallOrBig) {
-                        if (totalCells <= 4) { requiredRows = 2; requiredCols = 2; }      // Carré 2x2
-                        else if (totalCells <= 6) { requiredRows = 2; requiredCols = 3; } // Rectangle 3x2
-                        else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } // Rectangle 4x2
-                        else { requiredRows = 3; requiredCols = 4; }                      // Rectangle 4x3
+                        if (totalCells <= 4) { requiredRows = 2; requiredCols = 2; }      
+                        else if (totalCells <= 6) { requiredRows = 2; requiredCols = 3; } 
+                        else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } 
+                        else { requiredRows = 3; requiredCols = 4; }                     
                     } else {
                         if (totalCells <= 2) { requiredRows = 1; requiredCols = 2; }
                         else if (totalCells === 3) { requiredRows = 1; requiredCols = 3; }
@@ -160,10 +209,11 @@ async function initHomePage(){
                     }
                     const requiredTotal = requiredRows * requiredCols;
                     missingCells = requiredTotal > totalCells ? requiredTotal - totalCells : 0;
+                    
+                    // En mode statique, on encadre les projets de chaque côté (symétrie)
+                    beforeCount = Math.floor(missingCells / 2);
+                    afterCount = Math.ceil(missingCells / 2);
                 }
-
-                const beforeCount = Math.floor(missingCells / 2);
-                const afterCount = Math.ceil(missingCells / 2);
 
                 const createSilencio = () => `
                     <div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;">
@@ -1027,6 +1077,7 @@ function setupHomeVideo() {
         } catch (error) { UI.showToast("Erreur vidéo.", "error"); } finally { btnSave.textContent = "Mettre à jour la vidéo"; btnSave.disabled = false; }
     });
 }
+
 
 
 
