@@ -684,19 +684,29 @@ function setupProjectForm() {
     const form = document.getElementById('project-form');
     if (!form) return;
 
+    // --- CORRECTION : Réactivation des boutons Annuler ---
+    const btnCancelTop = document.querySelector('.btn-cancel-top');
+    const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
+
+    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView);
+    if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        // 1. On récupère la case à cocher
         const autoShareCheckbox = document.getElementById('proj-autoshare');
+        
+        // 2. Sécurité : Confirmation si la case est cochée
         if (autoShareCheckbox && autoShareCheckbox.checked) {
-            const confirmation = confirm("⚠️ ATTENTION : Publier sur les réseaux ?");
+            const confirmation = confirm("⚠️ ATTENTION : Vous avez coché l'annonce sur les réseaux sociaux.\n\nÊtes-vous sûr(e) de vouloir publier ce projet et l'envoyer sur vos réseaux ?");
             if (!confirmation) return; 
         }
 
-        // --- ON DÉCLARE LES VARIABLES UNE SEULE FOIS ---
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
 
+        // 3. Préparation des données (avec partageReseaux garanti)
         const projectData = {
             titre: title,
             statut: document.getElementById('proj-subtitle').value.trim(),
@@ -711,7 +721,7 @@ function setupProjectForm() {
             imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`,
             visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true,
             
-            // C'EST CETTE LIGNE QUI ENVOIE LA DONNÉE À FIREBASE
+            // On force l'envoi de la donnée (true ou false)
             partageReseaux: autoShareCheckbox ? autoShareCheckbox.checked : false
         };
 
@@ -736,8 +746,15 @@ function setupProjectForm() {
                 await addDoc(collection(db, "projects"), projectData);
                 UI.showToast("Projet publié !");
             }
-            loadAdminProjects(); returnToListView(); 
-        } catch (error) { console.error(error); UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
+            loadAdminProjects(); 
+            returnToListView(); // Retour à la liste après succès
+        } catch (error) { 
+            console.error("Erreur Firebase:", error); 
+            UI.showToast("Erreur lors de l'enregistrement.", "error"); 
+        } finally { 
+            btnSave.disabled = false; 
+            btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet";
+        }
     });
 }
 
@@ -1156,6 +1173,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
