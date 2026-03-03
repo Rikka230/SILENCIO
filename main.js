@@ -327,13 +327,24 @@ async function initHomePage(){
             let teamHTML = '';
             members.forEach((member) => {
                 const avatar = member.photo || DEFAULT_AVATAR; 
+                
+                // LA MAGIE : On sépare automatiquement le prénom et le nom de famille
+                let formattedName = member.nom;
+                const nameParts = formattedName.trim().split(' ');
+                if (nameParts.length > 1) {
+                    const nomFamille = nameParts.pop(); // On isole le dernier mot (nom)
+                    const prenom = nameParts.join(' '); // On garde le reste (prénom)
+                    // On met le nom à la ligne, avec une graisse légèrement plus forte pour le style
+                    formattedName = `${prenom}<br><strong style="font-weight: 600;">${nomFamille}</strong>`;
+                }
+
                 teamHTML += `
                     <div class="team-card">
                         <div class="team-photo-wrapper">
                             <img src="${avatar}" alt="${member.nom}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important;" onload="this.classList.add('loaded')">
                         </div>
                         <div class="team-info">
-                            <h3>${member.nom}</h3>
+                            <h3>${formattedName}</h3>
                             <p>${member.role}</p>
                         </div>
                     </div>
@@ -1134,6 +1145,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
