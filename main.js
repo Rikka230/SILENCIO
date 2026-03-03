@@ -329,8 +329,10 @@ async function initHomePage(){
                 const avatar = member.photo || DEFAULT_AVATAR; 
                 teamHTML += `
                     <div class="team-card">
-                        <img src="${avatar}" alt="${member.nom}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important;" onload="this.classList.add('loaded')">
-                        <div class="team-overlay">
+                        <div class="team-photo-wrapper">
+                            <img src="${avatar}" alt="${member.nom}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important;" onload="this.classList.add('loaded')">
+                        </div>
+                        <div class="team-info">
                             <h3>${member.nom}</h3>
                             <p>${member.role}</p>
                         </div>
@@ -1132,6 +1134,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
