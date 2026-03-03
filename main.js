@@ -692,6 +692,7 @@ function setupProjectForm() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
         // =========================================================
         // SÉCURITÉ : CONFIRMATION DE PUBLICATION SUR LES RÉSEAUX
         // =========================================================
@@ -706,8 +707,7 @@ function setupProjectForm() {
         }
         // =========================================================
 
-        const title = document.getElementById('proj-title').value.trim();
-        const btnSave = document.getElementById('btn-save');
+        // CORRECTION : Les variables déclarées une seule fois !
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
 
@@ -751,7 +751,6 @@ function setupProjectForm() {
             loadAdminProjects(); returnToListView(); 
         } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
     });
-}
 
 async function loadAdminProjects() {
     const projectList = document.getElementById('project-list');
@@ -1168,6 +1167,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
