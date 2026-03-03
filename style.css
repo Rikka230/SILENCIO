@@ -268,16 +268,27 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 /* -----------------------------------------
    8. ACCUEIL : SECTION ÉQUIPE
    ----------------------------------------- */
-.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1100px; margin: 3rem auto 0 auto; padding: 0 2rem; width: 100%; }
-.team-card { position: relative !important; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #050505; }
-.team-card img { filter: grayscale(100%) contrast(1.1) brightness(0.9); transition: all 0.5s ease; opacity: 0; }
-.team-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent); text-align: center; z-index: 2; }
-.team-overlay h3 { color: #fff; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; font-weight: 400; }
-.team-overlay p { color: var(--color-accent); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1100px; margin: 3rem auto 0 auto; padding: 0 2rem; width: 100%; }
 
+/* La carte globale devient une colonne transparente */
+.team-card { position: relative !important; display: flex; flex-direction: column; align-items: center; background: transparent; border: none; overflow: visible; }
+
+/* La photo a son propre bloc carré verrouillé */
+.team-photo-wrapper { 
+    position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; 
+    border: 1px solid rgba(255,255,255,0.1); background: #050505; transition: all 0.4s ease; 
+}
+.team-photo-wrapper img { filter: grayscale(100%) contrast(1.1) brightness(0.9); transition: all 0.5s ease; opacity: 0; }
+
+/* Le texte est posé proprement en dessous */
+.team-info { width: 100%; padding: 1.2rem 0 0 0; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.team-info h3 { color: #fff; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; font-weight: 500; }
+.team-info p { color: var(--color-accent); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; line-height: 1.5; margin: 0; }
+
+/* Animations au survol */
 @media (hover: hover) {
-    .team-card:hover { border-color: var(--color-accent); }
-    .team-card:hover .anti-stretch-img.loaded { filter: grayscale(0%) contrast(1) brightness(1); transform: scale(1.05); opacity: 1; }
+    .team-card:hover .team-photo-wrapper { border-color: var(--color-accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(215, 39, 37, 0.2); }
+    .team-card:hover .anti-stretch-img.loaded { filter: grayscale(0%) contrast(1) brightness(1); transform: scale(1.05); }
 }
 
 /* -----------------------------------------
@@ -528,6 +539,7 @@ section#projects, section#about {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
