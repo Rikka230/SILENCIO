@@ -667,6 +667,7 @@ function resetProjectForm() {
     if(document.getElementById('proj-focus-bento-y')) document.getElementById('proj-focus-bento-y').value = 50;
     if(document.getElementById('proj-focus-header-x')) document.getElementById('proj-focus-header-x').value = 50;
     if(document.getElementById('proj-focus-header-y')) document.getElementById('proj-focus-header-y').value = 50;
+    if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
 
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
@@ -706,7 +707,8 @@ function setupProjectForm() {
             formatAffichage: document.getElementById('proj-format') ? document.getElementById('proj-format').value : '',
             imageFocusBento: `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`,
             imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`,
-            visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true
+            visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true,
+            partageReseaux: document.getElementById('proj-autoshare') ? document.getElementById('proj-autoshare').checked : false
         };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
@@ -813,6 +815,11 @@ async function loadAdminProjects() {
                 // On met à jour l'état de la case à cocher dans le formulaire selon l'état actuel
                 if(document.getElementById('proj-visible')) {
                     document.getElementById('proj-visible').checked = project.visible !== false; 
+                }
+                
+                // --- NOUVEAU : Recharger la case réseaux sociaux ---
+                if(document.getElementById('proj-autoshare')) {
+                    document.getElementById('proj-autoshare').checked = project.partageReseaux === true;
                 }
 
                 const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
@@ -1145,6 +1152,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
