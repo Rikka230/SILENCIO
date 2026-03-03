@@ -479,7 +479,7 @@ section#projects, section#about {
     section:not(.project-hero) { padding-top: 160px !important; }
     #production { padding-top: 0 !important; }
     
-    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .team-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
     .project-content { display: flex !important; flex-direction: column !important; padding-bottom: 0 !important; min-height: auto !important; gap: 2rem !important; padding: 1rem 1.5rem !important; }
     .synopsis { width: 100% !important; margin-bottom: 1rem !important; font-size: 1.1rem !important; }
@@ -528,17 +528,18 @@ section#projects, section#about {
     .bento-grid.is-static.is-single-item .bento-item, .bento-grid.is-static.is-single-item .bento-wide, .bento-grid.is-static.is-single-item .bento-tall, .bento-grid.is-static.is-single-item .bento-big { width: 100% !important; }
     .bento-track { gap: 10px; }
     
-    .team-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; padding: 0 10px !important; margin-top: 2rem !important; }
-    .team-overlay { padding: 0.8rem !important; }
-    .team-overlay h3 { font-size: 0.85rem !important; margin-bottom: 0.2rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .team-overlay p { font-size: 0.6rem !important; letter-spacing: 1px !important; }
-
+    .team-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 15px !important; padding: 0 10px !important; margin-top: 2rem !important; }
+    .team-info { padding: 1rem 0 0 0 !important; }
+    .team-info h3 { font-size: 0.85rem !important; white-space: normal; overflow: visible; }
+    .team-info p { font-size: 0.6rem !important; letter-spacing: 1px !important; line-height: 1.4 !important; }
+   
     .contact-info p:first-child { font-size: 1rem !important; line-height: 1.4 !important; margin-bottom: 0.2rem !important; }
 }
 
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
