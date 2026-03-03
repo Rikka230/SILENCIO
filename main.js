@@ -692,6 +692,22 @@ function setupProjectForm() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        // =========================================================
+        // SÉCURITÉ : CONFIRMATION DE PUBLICATION SUR LES RÉSEAUX
+        // =========================================================
+        const autoShareCheckbox = document.getElementById('proj-autoshare');
+        if (autoShareCheckbox && autoShareCheckbox.checked) {
+            const confirmation = confirm("⚠️ ATTENTION : Vous avez coché l'annonce sur les réseaux sociaux.\n\nÊtes-vous sûr(e) de vouloir publier ce projet et l'envoyer instantanément sur vos réseaux (Facebook, Instagram, LinkedIn, X) ?");
+            
+            // Si l'utilisateur clique sur "Annuler", on stoppe tout l'enregistrement
+            if (!confirmation) {
+                return; 
+            }
+        }
+        // =========================================================
+
+        const title = document.getElementById('proj-title').value.trim();
+        const btnSave = document.getElementById('btn-save');
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
 
@@ -1152,6 +1168,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
