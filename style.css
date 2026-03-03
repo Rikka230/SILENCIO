@@ -280,10 +280,29 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 }
 .team-photo-wrapper img { filter: grayscale(100%) contrast(1.1) brightness(0.9); transition: all 0.5s ease; opacity: 0; }
 
-/* Le texte est posé proprement en dessous */
-.team-info { width: 100%; padding: 1.2rem 0 0 0; text-align: center; display: flex; flex-direction: column; gap: 4px; }
-.team-info h3 { color: #fff; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; font-weight: 500; }
-.team-info p { color: var(--color-accent); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; line-height: 1.5; margin: 0; }
+/* Le texte est posé proprement en dessous avec une hauteur bloquée */
+.team-info { width: 100%; padding: 1.2rem 0 0 0; text-align: center; display: flex; flex-direction: column; gap: 6px; }
+
+.team-info h3 { 
+    color: #fff; 
+    font-size: 1.1rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin: 0; 
+    font-weight: 300;
+    line-height: 1.2;
+    min-height: 2.4em; /* LE VERROU : Force toujours la hauteur de 2 lignes exactes */
+}
+
+.team-info p { 
+    color: var(--color-accent); 
+    font-size: 0.75rem; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    line-height: 1.5; 
+    margin: 0; 
+}
 
 /* Animations au survol */
 @media (hover: hover) {
@@ -539,6 +558,7 @@ section#projects, section#about {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
