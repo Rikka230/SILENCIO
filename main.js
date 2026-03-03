@@ -684,29 +684,16 @@ function setupProjectForm() {
     const form = document.getElementById('project-form');
     if (!form) return;
 
-    const btnCancelTop = document.querySelector('.btn-cancel-top');
-    const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
-
-    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView);
-    if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // =========================================================
-        // SÉCURITÉ : CONFIRMATION DE PUBLICATION SUR LES RÉSEAUX
-        // =========================================================
         const autoShareCheckbox = document.getElementById('proj-autoshare');
         if (autoShareCheckbox && autoShareCheckbox.checked) {
-            const confirmation = confirm("⚠️ ATTENTION : Vous avez coché l'annonce sur les réseaux sociaux.\n\nÊtes-vous sûr(e) de vouloir publier ce projet et l'envoyer instantanément sur vos réseaux (Facebook, Instagram, LinkedIn, X) ?");
-            
-            // Si l'utilisateur clique sur "Annuler", on stoppe tout l'enregistrement
-            if (!confirmation) {
-                return; 
-            }
+            const confirmation = confirm("⚠️ ATTENTION : Publier sur les réseaux ?");
+            if (!confirmation) return; 
         }
-        // =========================================================
 
+        // --- ON DÉCLARE LES VARIABLES UNE SEULE FOIS ---
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
 
@@ -723,7 +710,9 @@ function setupProjectForm() {
             imageFocusBento: `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`,
             imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`,
             visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true,
-            partageReseaux: document.getElementById('proj-autoshare') ? document.getElementById('proj-autoshare').checked : false
+            
+            // C'EST CETTE LIGNE QUI ENVOIE LA DONNÉE À FIREBASE
+            partageReseaux: autoShareCheckbox ? autoShareCheckbox.checked : false
         };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
@@ -748,7 +737,7 @@ function setupProjectForm() {
                 UI.showToast("Projet publié !");
             }
             loadAdminProjects(); returnToListView(); 
-        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
+        } catch (error) { console.error(error); UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; }
     });
 }
 
@@ -1167,6 +1156,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
