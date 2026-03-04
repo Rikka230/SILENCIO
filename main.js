@@ -367,11 +367,15 @@ function initAdmin() {
             const isVisible = e.target.checked;
             socialZone.style.display = isVisible ? 'block' : 'none';
             
-            // Si on vient d'ouvrir la zone, on force le rafraîchissement des images
+            // Si on allume le slider, on réactive la visualisation
             if (isVisible) {
+                // Petit délai pour laisser le temps au navigateur d'afficher la div
                 setTimeout(() => {
-                    syncBentoDA(); 
-                }, 50); // Un léger délai pour laisser le temps au CSS de s'afficher
+                    syncBentoDA();
+                    // On force l'affichage de l'image si elle est déjà chargée
+                    const pS = document.getElementById('image-preview-social');
+                    if (pS) pS.classList.add('loaded');
+                }, 100);
             }
         });
     }
@@ -427,25 +431,27 @@ function syncBentoDA() {
     function updateLiveView() {
         if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
 
-        // --- SÉCURITÉ : On s'assure que l'image Social a la même source que l'image Bloc ---
-        if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html'))) {
+        // --- CORRECTIF : On force la source sur l'aperçu Instagram s'il est vide ---
+        if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html') || previewSocial.src === "")) {
             previewSocial.src = previewBloc.src;
         }
 
-        // Mise à jour des positions selon les sliders
+        if (blocWrapper && formatSelect) {
+            blocWrapper.className = '';
+            if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
+        }
+
         previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
         if (previewCadrage) previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
         if (previewSocial) previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
     }
 
-    // On attache les écouteurs sur les sliders
     focusInputs.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.oninput = updateLiveView;
     });
     if (formatSelect) formatSelect.onchange = updateLiveView;
 
-    // Affichage des panneaux si une image est présente
     const daContainer = document.getElementById('image-da-container');
     const previewsGroup = document.getElementById('previews-group');
     const hasImage = previewBloc && previewBloc.src && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== "";
@@ -525,10 +531,24 @@ function resetProjectForm() {
     if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
     if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = 'none';
 
-    const pB = document.getElementById('image-preview-bloc'); const pC = document.getElementById('image-preview-cadrage'); const pS = document.getElementById('image-preview-social');
-    if (pB) { pB.removeAttribute('src'); pB.classList.remove('loaded'); }
-    if (pC) { pC.removeAttribute('src'); pC.classList.remove('loaded'); }
-    if (pS) { pS.removeAttribute('src'); pS.classList.remove('loaded'); }
+    canvas.toBlob((blob) => {
+                    optimizedImageBlob = blob;
+                    const compressedUrl = URL.createObjectURL(blob);
+                    
+                    const pB = document.getElementById('image-preview-bloc');
+                    const pC = document.getElementById('image-preview-cadrage');
+                    const pS = document.getElementById('image-preview-social');
+                    
+                    if(pB) pB.src = compressedUrl;
+                    if(pC) pC.src = compressedUrl;
+                    if(pS) pS.src = compressedUrl;
+                    
+                    // On attend que l'image principale soit chargée pour tout synchroniser
+                    pB.onload = () => {
+                        syncBentoDA();
+                        pB.classList.add('loaded');
+                    };
+                }, 'image/webp', 0.8);
     syncBentoDA(); 
 
     document.getElementById('form-title').textContent = "Ajouter un projet"; document.getElementById('btn-save').textContent = "Enregistrer le projet";
@@ -844,6 +864,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
