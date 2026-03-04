@@ -571,32 +571,46 @@ function setupProjectForm() {
             else { projectData.ordreAffichage = Date.now(); const newDocRef = await addDoc(collection(db, "projects"), projectData); finalProjectId = newDocRef.id; UI.showToast("Projet publié !"); }
 
             if (triggerWebhook) {
-                try {
-                    let finalSocialImageUrl = projectData.imageAffiche; 
-                    const sourceForCrop = optimizedImageBlob || currentEditImageUrl;
-                    
-                    if (sourceForCrop) {
+                let finalSocialImageUrl = projectData.imageAffiche; 
+                const sourceForCrop = optimizedImageBlob || currentEditImageUrl;
+                
+                // 1. TENTATIVE DE DÉCOUPE INSTAGRAM
+                if (sourceForCrop) {
+                    try {
                         btnSave.textContent = "Génération Instagram...";
-                        const cropX = document.getElementById('proj-focus-social-x').value;
-                        const cropY = document.getElementById('proj-focus-social-y').value;
+                        const cropX = document.getElementById('proj-focus-social-x') ? document.getElementById('proj-focus-social-x').value : 50;
+                        const cropY = document.getElementById('proj-focus-social-y') ? document.getElementById('proj-focus-social-y').value : 50;
                         
                         const socialBlob = await generateSocialCropBlob(sourceForCrop, cropX, cropY);
                         const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
                         const socialRef = ref(storage, `affiches_social/${Date.now()}_${safeTitle}_ig.jpg`);
                         await uploadBytes(socialRef, socialBlob);
                         finalSocialImageUrl = await getDownloadURL(socialRef);
+                    } catch (e) {
+                        console.warn("Échec de la découpe (Sécurité Firebase), envoi de l'image classique au robot.", e);
+                        // On garde l'image de base sans faire planter le script
                     }
+                }
 
+                // 2. ENVOI AU WEBHOOK MAKE (GARANTI)
+                try {
+                    btnSave.textContent = "Envoi à Make...";
                     const webhookUrl = "https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513"; 
                     await fetch(webhookUrl, {
                         method: "POST", headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            id: finalProjectId, titre: projectData.titre, statut: projectData.statut, synopsis: projectData.synopsis,
+                            id: finalProjectId, 
+                            titre: projectData.titre, 
+                            statut: projectData.statut, 
+                            synopsis: projectData.synopsis,
                             imageAffiche: projectData.imageAffiche,
                             imageSocial: finalSocialImageUrl 
                         })
                     });
-                } catch(e) { console.error("Erreur Webhook/JPG", e); }
+                    console.log("Le signal a bien été envoyé au robot !");
+                } catch(e) { 
+                    console.error("Erreur de connexion avec Make", e); 
+                }
             }
 
             loadAdminProjects(); returnToListView(); 
@@ -810,3 +824,4 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
