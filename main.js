@@ -952,7 +952,8 @@ async function loadContact() {
             document.getElementById('contact-phone-visible').checked = d.phoneVisible !== false;
             document.getElementById('contact-ig').value = d.instagram || '';
             document.getElementById('contact-li').value = d.linkedin || '';
-            document.getElementById('contact-vi').value = d.vimeo || '';
+            document.getElementById('contact-fb').value = d.facebook || '';
+            document.getElementById('contact-yt').value = d.youtube || '';
         }
     } catch(e) {}
 }
@@ -971,7 +972,8 @@ function setupContact() {
                 phoneVisible: document.getElementById('contact-phone-visible').checked,
                 instagram: document.getElementById('contact-ig').value,
                 linkedin: document.getElementById('contact-li').value,
-                vimeo: document.getElementById('contact-vi').value
+                facebook: document.getElementById('contact-fb').value,
+                youtube: document.getElementById('contact-yt').value
             }, { merge: true });
             UI.showToast("Contacts mis à jour !");
         } catch(e) { UI.showToast("Erreur", "error"); }
