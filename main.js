@@ -288,17 +288,14 @@ async function initHomePage(){
                     let lastRowItems = [];
                     let usedCellsLastRow = 0;
 
-                    // On regarde quels projets sont posés sur la toute dernière ligne
                     placedProjects.forEach(p => {
                         if (p.gridY + p.h - 1 === maxRow - 1) {
                             lastRowItems.push(p);
                             usedCellsLastRow += p.w;
-                            // Si un élément "tall" ou "big" déborde depuis le haut, on annule le centrage par sécurité
                             if (p.gridY < maxRow - 1) clearLastRow = false;
                         }
                     });
 
-                    // Si la ligne n'est pas pleine, on calcule l'écart et on pousse les blocs au centre !
                     if (clearLastRow && usedCellsLastRow < fixedCount) {
                         let shift = Math.floor((fixedCount - usedCellsLastRow) / 2);
                         if (shift > 0) {
@@ -311,21 +308,20 @@ async function initHomePage(){
                     }
                 }
 
-                // GÉNÉRATION HTML DES PROJETS (Avec leurs coordonnées exactes)
+                // GÉNÉRATION HTML DES PROJETS (Les "!" importants forcent le CSS à obéir)
                 let finalHTML = '';
                 placedProjects.forEach(p => {
                     const extraClass = p.formatAffichage || '';
                     const focus = p.imageFocusBento || p.imageFocus || '50% 50%';
-                    finalHTML += `<a href="projet.html?id=${p.id}" class="bento-item ${extraClass}" style="grid-column: ${p.gridX + 1} / span ${p.w}; grid-row: ${p.gridY + 1} / span ${p.h};"><img src="${p.imageAffiche}" alt="${p.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${p.titre.toUpperCase()}</h3><p>${p.statut || p.genre || ''}</p></div></a>`;
+                    finalHTML += `<a href="projet.html?id=${p.id}" class="bento-item ${extraClass}" style="grid-column: ${p.gridX + 1} / span ${p.w} !important; grid-row: ${p.gridY + 1} / span ${p.h} !important;"><img src="${p.imageAffiche}" alt="${p.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${p.titre.toUpperCase()}</h3><p>${p.statut || p.genre || ''}</p></div></a>`;
                 });
 
-                // GÉNÉRATION DES BLOCS SILENCIO (Uniquement pour les trous "coincés" à l'intérieur de la grille)
+                // GÉNÉRATION DES BLOCS SILENCIO (Avec "!" importants)
                 if (mode === 'static') {
                     for (let y = 0; y < maxRow; y++) {
                         let firstOccupiedX = 0;
                         let lastOccupiedX = fixedCount - 1;
                         
-                        // Sur la dernière ligne, on ignore les trous à gauche et à droite !
                         if (y === maxRow - 1) {
                             while (lastOccupiedX >= 0 && (!gridMap[y] || !gridMap[y][lastOccupiedX])) lastOccupiedX--;
                             while (firstOccupiedX <= lastOccupiedX && (!gridMap[y] || !gridMap[y][firstOccupiedX])) firstOccupiedX++;
@@ -333,7 +329,7 @@ async function initHomePage(){
                         
                         for (let x = firstOccupiedX; x <= lastOccupiedX; x++) {
                             if (!gridMap[y] || !gridMap[y][x]) {
-                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1; grid-row: ${y + 1} / span 1; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
+                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1 !important; grid-row: ${y + 1} / span 1 !important; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
                             }
                         }
                     }
@@ -346,7 +342,7 @@ async function initHomePage(){
                         }
                         for (let y = 0; y <= lastOccupiedY; y++) {
                             if (!gridMap[y] || !gridMap[y][x]) {
-                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1; grid-row: ${y + 1} / span 1; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
+                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1 !important; grid-row: ${y + 1} / span 1 !important; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
                             }
                         }
                     }
@@ -1162,6 +1158,7 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
+
 
 
 
