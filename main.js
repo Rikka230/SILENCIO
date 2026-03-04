@@ -416,6 +416,7 @@ function initAdmin() {
 // 8. MOTEUR D'ADMINISTRATION : PROJETS
 // =========================================
 
+// --- 8.1 VISUALISATION DA (SLIDERS) ---
 function syncBentoDA() {
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
@@ -432,7 +433,6 @@ function syncBentoDA() {
     function updateLiveView() {
         if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
 
-        // Force la source sur l'aperçu Instagram s'il est vide
         if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html') || previewSocial.src === "")) {
             previewSocial.src = previewBloc.src;
         }
@@ -442,16 +442,9 @@ function syncBentoDA() {
             if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
         }
 
-        // Mise à jour des positions
-        if (document.getElementById('proj-focus-bento-x')) {
-            previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
-        }
-        if (previewCadrage && document.getElementById('proj-focus-header-x')) {
-            previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
-        }
-        if (previewSocial && document.getElementById('proj-focus-social-x')) {
-            previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
-        }
+        previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
+        if (previewCadrage) previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
+        if (previewSocial) previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
     }
 
     focusInputs.forEach(id => {
@@ -473,6 +466,7 @@ function syncBentoDA() {
     }
 }
 
+// --- 8.2 GESTION DU DRAG & DROP ET IMPORT IMAGE ---
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
     if (!dropzone) return;
@@ -487,7 +481,7 @@ function setupDropzone() {
     fileInput.onchange = (e) => { if (e.target.files.length) handleFile(e.target.files[0]); };
 
     function handleFile(file) {
-        if (!file.type.startsWith('image/')) return;
+        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide", "error"); return; }
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
@@ -520,6 +514,7 @@ function setupDropzone() {
     }
 }
 
+// --- 8.3 NAVIGATION ET RESET ---
 function returnToListView() {
     document.getElementById('view-list').classList.remove('hidden'); 
     document.getElementById('view-form').classList.add('hidden');
@@ -533,14 +528,14 @@ function resetProjectForm() {
     if(!form) return; 
     form.reset();
     
-    // Reset Sliders
+    // Reset Sliders à 50%
     const inputs = ['proj-focus-bento-x', 'proj-focus-bento-y', 'proj-focus-header-x', 'proj-focus-header-y', 'proj-focus-social-x', 'proj-focus-social-y'];
     inputs.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = 50; });
 
     if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
     if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = 'none';
 
-    // Reset Previews
+    // Nettoyage Previews
     const previews = ['image-preview-bloc', 'image-preview-cadrage', 'image-preview-social'];
     previews.forEach(id => {
         const img = document.getElementById(id);
@@ -553,6 +548,7 @@ function resetProjectForm() {
     optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null; currentProjectWasShared = false;
 }
 
+// --- 8.4 ENREGISTREMENT FIREBASE & WEBHOOK ---
 function setupProjectForm() {
     const form = document.getElementById('project-form'); if (!form) return;
     const btnCancelTop = document.querySelector('.btn-cancel-top'); 
@@ -568,10 +564,10 @@ function setupProjectForm() {
         
         if (autoShareCheckbox && autoShareCheckbox.checked) {
             if (currentEditId && currentProjectWasShared) {
-                if (confirm("⚠️ Ce projet a DÉJÀ été publié. Forcer un doublon ?")) { triggerWebhook = true; } 
+                if (confirm("⚠️ Déjà publié sur les réseaux. Forcer un doublon ?")) { triggerWebhook = true; } 
                 else { triggerWebhook = false; autoShareCheckbox.checked = false; }
             } else {
-                if (confirm("⚠️ Publier ce projet sur les réseaux sociaux ?")) { triggerWebhook = true; } else { return; }
+                if (confirm("⚠️ Publier ce projet sur Instagram ?")) { triggerWebhook = true; } else { return; }
             }
         }
 
@@ -629,7 +625,7 @@ function setupProjectForm() {
                         const socialRef = ref(storage, `affiches_social/${Date.now()}_ig.jpg`);
                         await uploadBytes(socialRef, socialBlob);
                         finalSocialImageUrl = await getDownloadURL(socialRef);
-                    } catch (e) { console.warn("Échec découpe social", e); }
+                    } catch (e) { console.warn("Crop échoué (CORS), image standard envoyée."); }
                 }
 
                 await fetch("https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513", {
@@ -638,11 +634,12 @@ function setupProjectForm() {
                 });
             }
             loadAdminProjects(); returnToListView(); 
-        } catch (error) { UI.showToast("Erreur.", "error"); } 
+        } catch (error) { UI.showToast("Erreur lors de l'envoi", "error"); } 
         finally { btnSave.disabled = false; btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet"; }
     });
 }
 
+// --- 8.5 LISTE DES PROJETS & BOUTON EDIT ---
 async function loadAdminProjects() {
     const projectList = document.getElementById('project-list'); if (!projectList) return;
     try {
@@ -657,19 +654,18 @@ async function loadAdminProjects() {
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
             const focus = project.imageFocusBento || '50% 50%';
             const isHidden = project.visible === false;
-            const hiddenBadge = isHidden ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555; vertical-align: middle;">MASQUÉ</span>' : '';
             
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
-                <div class="item-info"><strong>${project.titre} ${hiddenBadge}</strong><span>${project.statut}</span></div>
+                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}" onload="this.classList.add('loaded')">
+                <div class="item-info"><strong>${project.titre} ${isHidden ? '[MASQUÉ]' : ''}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <label class="toggle-switch">
                         <input type="checkbox" class="toggle-visibility-slider" ${isHidden ? '' : 'checked'}>
                         <span class="slider"></span>
                     </label>
-                    <button class="btn-icon edit" title="Modifier">✎</button>
-                    <button class="btn-icon delete" title="Supprimer">✕</button>
+                    <button class="btn-icon edit">✎</button>
+                    <button class="btn-icon delete">✕</button>
                 </div>`;
 
             li.querySelector('.toggle-visibility-slider').onchange = async (e) => {
@@ -689,14 +685,14 @@ async function loadAdminProjects() {
                 currentEditId = project.id;
                 currentEditImageUrl = project.imageAffiche;
                 
-                // Remplissage Formulaire
+                // Remplissage textes
                 document.getElementById('proj-title').value = project.titre || '';
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
                 
-                // Focus Sliders
+                // Remplissage Sliders
                 const bPos = parsePosition(project.imageFocusBento || '50% 50%');
                 document.getElementById('proj-focus-bento-x').value = bPos.x;
                 document.getElementById('proj-focus-bento-y').value = bPos.y;
@@ -709,7 +705,7 @@ async function loadAdminProjects() {
                 document.getElementById('proj-focus-social-x').value = sPos.x;
                 document.getElementById('proj-focus-social-y').value = sPos.y;
 
-                // Partage
+                // Partage Instagram
                 const isShared = project.partageReseaux === true;
                 document.getElementById('proj-autoshare').checked = isShared;
                 document.getElementById('social-crop-zone').style.display = isShared ? 'block' : 'none';
@@ -732,8 +728,9 @@ async function loadAdminProjects() {
             projectList.appendChild(li);
         });
         setupDragAndDrop('project-list', 'projects');
-    } catch (error) { console.error(error); }
+    } catch (error) { console.error("Erreur projets:", error); }
 }
+
 // =========================================
 // 9. MOTEUR D'ADMINISTRATION : ÉQUIPE
 // =========================================
@@ -854,6 +851,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
