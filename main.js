@@ -724,6 +724,19 @@ async function loadAdminProjects() {
                 const headerPos = parsePosition(project.imageFocusHeader || project.imageFocus);
                 document.getElementById('proj-focus-header-x').value = headerPos.x; document.getElementById('proj-focus-header-y').value = headerPos.y;
                 const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
+                document.getElementById('proj-focus-social-x').value = socialPos.x; 
+                document.getElementById('proj-focus-social-y').value = socialPos.y;
+
+                if (project.imageAffiche) {
+                    const pB = document.getElementById('image-preview-bloc'); 
+                    const pC = document.getElementById('image-preview-cadrage'); 
+                    const pS = document.getElementById('image-preview-social'); // <-- AJOUT
+                    pB.classList.remove('loaded'); pB.src = project.imageAffiche;
+                    pC.classList.remove('loaded'); pC.src = project.imageAffiche;
+                    if(pS) { pS.classList.remove('loaded'); pS.src = project.imageAffiche; } // <-- AJOUT
+                    syncBentoDA(); 
+                }
+                const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
                 document.getElementById('proj-focus-social-x').value = socialPos.x; document.getElementById('proj-focus-social-y').value = socialPos.y;
 
                 if (project.imageAffiche) {
@@ -865,4 +878,5 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
