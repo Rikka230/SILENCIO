@@ -133,6 +133,8 @@ async function initHomePage(){
             loader.style.display = 'none';
         }
     }
+    
+    // --- CHARGEMENT DES PARAMÈTRES (VIDÉO, À PROPOS, CONTACT) ---
     try {
         const settingsRef = doc(db, "settings", "homepage");
         const settingsSnap = await getDoc(settingsRef);
@@ -140,6 +142,53 @@ async function initHomePage(){
             const heroVideo = document.querySelector('.hero-video');
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
+        
+        // 1. Textes "À Propos"
+        const aproposSnap = await getDoc(doc(db, "settings", "apropos"));
+        if (aproposSnap.exists() && aproposSnap.data().texte) {
+            const textEl = document.getElementById('dyn-apropos');
+            if (textEl) textEl.innerHTML = aproposSnap.data().texte.replace(/\n/g, '<br>');
+        }
+
+        // 2. Contacts et Réseaux
+        const contactSnap = await getDoc(doc(db, "settings", "contact"));
+        if (contactSnap.exists()) {
+            const c = contactSnap.data();
+            
+            if (c.email) {
+                const emailEl = document.getElementById('dyn-contact-email');
+                if (emailEl) { emailEl.textContent = c.email; emailEl.href = "mailto:" + c.email; }
+            }
+            
+            const phoneWrapper = document.getElementById('dyn-contact-phone-wrapper');
+            const phoneEl = document.getElementById('dyn-contact-phone');
+            const emailWrapper = document.getElementById('dyn-contact-email-wrapper');
+            
+            if (c.phone && c.phoneVisible !== false) {
+                if (phoneWrapper && phoneEl) {
+                    phoneEl.textContent = c.phone;
+                    phoneEl.href = "tel:" + c.phone.replace(/\s+/g, '');
+                    phoneWrapper.style.display = 'block';
+                    if (emailWrapper) emailWrapper.style.marginBottom = '0.5rem';
+                }
+            } else {
+                if (phoneWrapper) phoneWrapper.style.display = 'none';
+                if (emailWrapper) emailWrapper.style.marginBottom = '2rem';
+            }
+            
+            const setupSocial = (id, url) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (url && url.trim() !== '') { el.href = url; el.style.display = 'inline-block'; } 
+                    else { el.style.display = 'none'; }
+                }
+            };
+            setupSocial('dyn-link-ig', c.instagram);
+            setupSocial('dyn-link-fb', c.facebook);
+            setupSocial('dyn-link-li', c.linkedin);
+            setupSocial('dyn-link-yt', c.youtube);
+        }
+
         setTimeout(() => {
             document.querySelectorAll('.anti-stretch-img').forEach(img => { if (img.complete) img.classList.add('loaded'); });
         }, 50);
@@ -980,6 +1029,7 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
+
 
 
 
