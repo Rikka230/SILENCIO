@@ -69,7 +69,7 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
         try {
             let safeUrl;
 
-            // 1. On récupère l'image sous forme de données brutes (Blob)
+            // On récupère l'image sans bloquer Firebase
             if (sourceUrlOrBlob instanceof Blob) {
                 safeUrl = URL.createObjectURL(sourceUrlOrBlob);
             } else {
@@ -79,7 +79,6 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
                     const blob = await response.blob();
                     safeUrl = URL.createObjectURL(blob);
                 } catch (e) {
-                    // Plan B anti-blocage Firebase : le Proxy
                     const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sourceUrlOrBlob);
                     const responseProxy = await fetch(proxyUrl);
                     const blobProxy = await responseProxy.blob();
@@ -88,12 +87,12 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
             }
 
             const img = new Image();
-            // On a supprimé la ligne crossOrigin qui faisait tout planter !
+            // ATTENTION : On ne met SURTOUT PAS crossOrigin ici !
             
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 canvas.width = 1080;
-                canvas.height = 1350; // Format 4:5
+                canvas.height = 1350;
                 const ctx = canvas.getContext('2d');
 
                 const targetRatio = 4 / 5;
@@ -116,20 +115,17 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
 
-                // Génération du JPG forcé !
                 canvas.toBlob((blob) => {
                     URL.revokeObjectURL(safeUrl);
                     if(blob) resolve(blob);
-                    else reject("Échec de la création du fichier JPG");
+                    else reject("Échec JPG");
                 }, 'image/jpeg', 0.9);
             };
             
-            img.onerror = () => reject("Erreur lors du dessin de l'image");
+            img.onerror = () => reject("Erreur image source");
             img.src = safeUrl;
             
-        } catch (error) { 
-            reject(error); 
-        }
+        } catch (error) { reject(error); }
     });
 }
 
@@ -442,13 +438,12 @@ function syncBentoDA() {
     const previewSocial = document.getElementById('image-preview-social');
     const blocWrapper = document.getElementById('da-bloc-wrapper');
     const formatSelect = document.getElementById('proj-format');
-    const dropText = document.querySelector('.drop-text'); // Le texte "Glissez votre image"
+    const dropText = document.querySelector('.drop-text'); 
 
     function updateLiveView() {
-        if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html') || previewBloc.src === window.location.href) return;
+        if (!previewBloc || !previewBloc.getAttribute('src')) return;
 
-        // Si l'image Instagram est vide, on lui donne la même source
-        if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html') || previewSocial.src === "")) {
+        if (previewSocial && (!previewSocial.getAttribute('src'))) {
             previewSocial.src = previewBloc.src;
         }
 
@@ -478,11 +473,11 @@ function syncBentoDA() {
     const daContainer = document.getElementById('image-da-container');
     const previewsGroup = document.getElementById('previews-group');
     
-    // Vérification stricte : y a-t-il vraiment une image valide chargée ?
-    const hasImage = previewBloc && previewBloc.getAttribute('src') && previewBloc.getAttribute('src') !== "" && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== window.location.href;
+    // CORRECTION AFFICHAGE : Vérification en béton
+    const src = previewBloc ? previewBloc.getAttribute('src') : null;
+    const hasImage = src && src.trim() !== '' && !src.endsWith('admin.html') && src !== window.location.href;
 
     if (hasImage && daContainer && previewsGroup) {
-        // Mode VISUALISATION
         daContainer.classList.remove('da-container-single');
         daContainer.classList.add('da-container-split');
         if(dropText) dropText.style.display = 'none';
@@ -490,7 +485,6 @@ function syncBentoDA() {
         previewsGroup.classList.add('previews-visible');
         updateLiveView();
     } else if (daContainer && previewsGroup) {
-        // Mode DRAG & DROP (Aucune image)
         daContainer.classList.remove('da-container-split');
         daContainer.classList.add('da-container-single');
         if(dropText) dropText.style.display = 'block';
@@ -543,7 +537,6 @@ function setupDropzone() {
                     if(pC) { pC.src = compressedUrl; pC.classList.remove('loaded'); }
                     if(pS) { pS.src = compressedUrl; pS.classList.remove('loaded'); }
                     
-                    // On affiche la visualisation
                     setTimeout(() => {
                         syncBentoDA(); 
                         if(pB) pB.classList.add('loaded');
@@ -568,14 +561,12 @@ function resetProjectForm() {
     if(!form) return; 
     form.reset();
     
-    // Remise à zéro des sliders
     const inputs = ['proj-focus-bento-x', 'proj-focus-bento-y', 'proj-focus-header-x', 'proj-focus-header-y', 'proj-focus-social-x', 'proj-focus-social-y'];
     inputs.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = 50; });
 
     if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
     if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = 'none';
 
-    // Vider les images pour forcer le retour à l'écran Drag & Drop
     const pB = document.getElementById('image-preview-bloc');
     const pC = document.getElementById('image-preview-cadrage');
     const pS = document.getElementById('image-preview-social');
@@ -583,7 +574,7 @@ function resetProjectForm() {
     if (pC) { pC.removeAttribute('src'); pC.classList.remove('loaded'); }
     if (pS) { pS.removeAttribute('src'); pS.classList.remove('loaded'); }
 
-    syncBentoDA(); // Retour immédiat à l'écran d'import
+    syncBentoDA(); 
     
     document.getElementById('form-title').textContent = "Ajouter un projet"; 
     document.getElementById('btn-save').textContent = "Enregistrer le projet";
@@ -662,7 +653,7 @@ function setupProjectForm() {
                 
                 if (sourceForCrop) {
                     try {
-                        btnSave.textContent = "Génération Instagram...";
+                        btnSave.textContent = "Génération LinkedIn...";
                         const cropX = document.getElementById('proj-focus-social-x').value;
                         const cropY = document.getElementById('proj-focus-social-y').value;
                         const socialBlob = await generateSocialCropBlob(sourceForCrop, cropX, cropY);
@@ -671,12 +662,14 @@ function setupProjectForm() {
                         await uploadBytes(socialRef, socialBlob);
                         finalSocialImageUrl = await getDownloadURL(socialRef);
                     } catch (e) { 
+                        // SECURITÉ RENFORCÉE ICI
                         console.error("ERREUR CROP SOCIAL :", e);
-                        UI.showToast("Erreur : Impossible de générer le JPG pour LinkedIn", "error");
+                        UI.showToast("Erreur WebP/JPG : Échec pour LinkedIn", "error");
                         btnSave.disabled = false;
                         btnSave.textContent = "Réessayer";
-                        return; // On annule l'envoi à Make si on a pas le JPG !
+                        return; // Stoppe tout si le JPG n'est pas prêt
                     }
+                }
 
                 try {
                     btnSave.textContent = "Envoi à Make...";
@@ -785,7 +778,6 @@ async function loadAdminProjects() {
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
                 
-                // On force la visualisation
                 setTimeout(syncBentoDA, 100);
             });
 
@@ -915,6 +907,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
