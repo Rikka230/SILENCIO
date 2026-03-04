@@ -134,7 +134,7 @@ async function initHomePage(){
         }
     }
     
-    // --- CHARGEMENT DES PARAMÈTRES (VIDÉO, À PROPOS, CONTACT) ---
+    // --- CHARGEMENT DES PARAMÈTRES ---
     try {
         const settingsRef = doc(db, "settings", "homepage");
         const settingsSnap = await getDoc(settingsRef);
@@ -143,57 +143,37 @@ async function initHomePage(){
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
         
-        // 1. Textes "À Propos"
         const aproposSnap = await getDoc(doc(db, "settings", "apropos"));
         if (aproposSnap.exists() && aproposSnap.data().texte) {
             const textEl = document.getElementById('dyn-apropos');
             if (textEl) textEl.innerHTML = aproposSnap.data().texte.replace(/\n/g, '<br>');
         }
 
-        // 2. Contacts et Réseaux
         const contactSnap = await getDoc(doc(db, "settings", "contact"));
         if (contactSnap.exists()) {
             const c = contactSnap.data();
-            
             if (c.email) {
                 const emailEl = document.getElementById('dyn-contact-email');
                 if (emailEl) { emailEl.textContent = c.email; emailEl.href = "mailto:" + c.email; }
             }
-            
             const phoneWrapper = document.getElementById('dyn-contact-phone-wrapper');
             const phoneEl = document.getElementById('dyn-contact-phone');
             const emailWrapper = document.getElementById('dyn-contact-email-wrapper');
-            
             if (c.phone && c.phoneVisible !== false) {
                 if (phoneWrapper && phoneEl) {
-                    phoneEl.textContent = c.phone;
-                    phoneEl.href = "tel:" + c.phone.replace(/\s+/g, '');
-                    phoneWrapper.style.display = 'block';
-                    if (emailWrapper) emailWrapper.style.marginBottom = '0.5rem';
+                    phoneEl.textContent = c.phone; phoneEl.href = "tel:" + c.phone.replace(/\s+/g, '');
+                    phoneWrapper.style.display = 'block'; if (emailWrapper) emailWrapper.style.marginBottom = '0.5rem';
                 }
             } else {
-                if (phoneWrapper) phoneWrapper.style.display = 'none';
-                if (emailWrapper) emailWrapper.style.marginBottom = '2rem';
+                if (phoneWrapper) phoneWrapper.style.display = 'none'; if (emailWrapper) emailWrapper.style.marginBottom = '2rem';
             }
-            
-            const setupSocial = (id, url) => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (url && url.trim() !== '') { el.href = url; el.style.display = 'inline-block'; } 
-                    else { el.style.display = 'none'; }
-                }
-            };
-            setupSocial('dyn-link-ig', c.instagram);
-            setupSocial('dyn-link-fb', c.facebook);
-            setupSocial('dyn-link-li', c.linkedin);
-            setupSocial('dyn-link-yt', c.youtube);
+            const setupSocial = (id, url) => { const el = document.getElementById(id); if (el) { if (url && url.trim() !== '') { el.href = url; el.style.display = 'inline-block'; } else { el.style.display = 'none'; } } };
+            setupSocial('dyn-link-ig', c.instagram); setupSocial('dyn-link-fb', c.facebook); setupSocial('dyn-link-li', c.linkedin); setupSocial('dyn-link-yt', c.youtube);
         }
-
-        setTimeout(() => {
-            document.querySelectorAll('.anti-stretch-img').forEach(img => { if (img.complete) img.classList.add('loaded'); });
-        }, 50);
+        setTimeout(() => { document.querySelectorAll('.anti-stretch-img').forEach(img => { if (img.complete) img.classList.add('loaded'); }); }, 50);
     } catch (error) {}
     
+    // --- CHARGEMENT DES PROJETS ET GRILLE BENTO INTELLIGENTE ---
     const bentoContainer = document.querySelector('.bento-container');
     if (bentoContainer) {
         try {
@@ -208,82 +188,152 @@ async function initHomePage(){
             bentoContainer.innerHTML = '';
             if (titleElement) bentoContainer.appendChild(titleElement);
 
-            let totalCells = 0; let hasTallOrBig = false; let projectsHTML = '';
+            let totalCells = 0; 
+            let hasTallOrBig = false; 
+            let projectsHTML = '';
 
-            if (projects.length === 0) {
-                projectsHTML = `<div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span></div>`;
-            } else {
-                projects.forEach((project) => {
-                    const extraClass = project.formatAffichage || '';
-                    const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+            projects.forEach((project) => {
+                const extraClass = project.formatAffichage || '';
+                const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
 
-                    if (extraClass === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
-                    else if (extraClass === 'bento-tall') { totalCells += 2; hasTallOrBig = true; }
-                    else if (extraClass === 'bento-wide') { totalCells += 2; }
-                    else { totalCells += 1; }
+                if (extraClass === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
+                else if (extraClass === 'bento-tall' || extraClass === 'bento-wide') { totalCells += 2; hasTallOrBig = true; }
+                else { totalCells += 1; }
 
-                    projectsHTML += `<a href="projet.html?id=${project.id}" class="bento-item ${extraClass}"><img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${project.titre.toUpperCase()}</h3><p>${project.statut}</p></div></a>`;
-                });
-            }
+                projectsHTML += `<a href="projet.html?id=${project.id}" class="bento-item ${extraClass}"><img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${project.titre.toUpperCase()}</h3><p>${project.statut || project.genre || ''}</p></div></a>`;
+            });
 
             const isMobile = window.innerWidth <= 1024;
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
-            let itemsHTML = ''; let requiredRows = 1; let requiredCols = 4;
+            
+            const createSilencio = () => `<div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
+            
+            let itemsHTML = projectsHTML;
+            let gridRows = 1; 
+            let gridCols = 4;
 
-            if (projects.length > 1) {
-                let missingCells = 0; let beforeCount = 0; let afterCount = 0;
-                if (useScrollMode) {
-                    let gridMap = [[], [], []]; let maxCol = 0;
-                    projects.forEach(p => {
-                        let w = 1, h = 1; const format = p.formatAffichage || '';
-                        if (format === 'bento-big') { w = 2; h = 2; } else if (format === 'bento-tall') { w = 1; h = 2; } else if (format === 'bento-wide') { w = 2; h = 1; }
-                        let placed = false; let x = 0;
-                        while (!placed) {
-                            for (let y = 0; y <= 3 - h; y++) {
-                                let canFit = true;
-                                for (let dx = 0; dx < w; dx++) {
-                                    for (let dy = 0; dy < h; dy++) { if (gridMap[y + dy][x + dx]) { canFit = false; break; } }
-                                    if (!canFit) break;
-                                }
-                                if (canFit) {
-                                    for (let dx = 0; dx < w; dx++) { for (let dy = 0; dy < h; dy++) { gridMap[y + dy][x + dx] = true; } }
-                                    if (x + w > maxCol) maxCol = x + w; placed = true; break;
-                                }
-                            }
-                            if (!placed) x++;
-                        }
-                    });
-                    for (let x = 0; x < maxCol; x++) { for (let y = 0; y < 3; y++) { if (!gridMap[y][x]) missingCells++; } }
-                    afterCount = missingCells;
+            if (projects.length === 0) {
+                itemsHTML = `<div class=\"bento-item bento-big silencio-placeholder\" style=\"display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;\"><span style=\"color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;\">SILENCIO</span></div>`;
+            } else if (projects.length > 0) {
+                // ALGORITHME DE PACKING PARFAIT (Zéro trou, centrage optimisé)
+                let gridMap = [];
+                let mode = useScrollMode ? 'scroll' : 'static';
+                let fixedCount;
+                
+                if (mode === 'scroll') {
+                    fixedCount = isMobile ? 2 : 3; // 2 ou 3 lignes fixes
                 } else {
-                    if (hasTallOrBig) {
-                        if (totalCells <= 4) { requiredRows = 2; requiredCols = 2; } else if (totalCells <= 6) { requiredRows = 2; requiredCols = 3; } else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } else { requiredRows = 3; requiredCols = 4; }                     
+                    // Optimisation des colonnes fixes pour un centrage parfait (Évite que 2 petits projets ne s'étirent sur tout l'écran)
+                    if (isMobile) {
+                        fixedCount = 2;
                     } else {
-                        if (totalCells <= 2) { requiredRows = 1; requiredCols = 2; } else if (totalCells === 3) { requiredRows = 1; requiredCols = 3; } else if (totalCells === 4) { requiredRows = 1; requiredCols = 4; } else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } else { requiredRows = 3; requiredCols = 4; }
+                        if (totalCells <= 2 && !hasTallOrBig) fixedCount = Math.max(1, totalCells);
+                        else if (totalCells <= 4) fixedCount = 2;
+                        else if (totalCells <= 6) fixedCount = 3;
+                        else fixedCount = 4;
                     }
-                    const requiredTotal = requiredRows * requiredCols;
-                    missingCells = requiredTotal > totalCells ? requiredTotal - totalCells : 0;
-                    beforeCount = Math.floor(missingCells / 2); afterCount = Math.ceil(missingCells / 2);
                 }
 
-                const createSilencio = () => `<div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
-                let beforeHTML = ''; for (let i = 0; i < beforeCount; i++) beforeHTML += createSilencio();
-                let afterHTML = ''; for (let i = 0; i < afterCount; i++) afterHTML += createSilencio();
-                itemsHTML = beforeHTML + projectsHTML + afterHTML;
-            } else { itemsHTML = projectsHTML; }
+                function isFree(x, y, w, h) {
+                    if (mode === 'static' && x + w > fixedCount) return false;
+                    if (mode === 'scroll' && y + h > fixedCount) return false;
+                    for (let dy = 0; dy < h; dy++) {
+                        for (let dx = 0; dx < w; dx++) {
+                            if (gridMap[y + dy] && gridMap[y + dy][x + dx]) return false;
+                        }
+                    }
+                    return true;
+                }
 
-            const wrapper = document.createElement('div'); const grid = document.createElement('div');
+                function mark(x, y, w, h) {
+                    for (let dy = 0; dy < h; dy++) {
+                        if (!gridMap[y + dy]) gridMap[y + dy] = [];
+                        for (let dx = 0; dx < w; dx++) {
+                            gridMap[y + dy][x + dx] = true;
+                        }
+                    }
+                }
+
+                let maxCol = 0, maxRow = 0;
+
+                projects.forEach(p => {
+                    let w = 1, h = 1;
+                    const format = p.formatAffichage || '';
+                    if (format === 'bento-big') { w = 2; h = 2; }
+                    else if (format === 'bento-tall') { w = 1; h = 2; }
+                    else if (format === 'bento-wide') { w = 2; h = 1; }
+                    
+                    let placed = false; let y = 0, x = 0;
+                    
+                    if (mode === 'static') {
+                        while (!placed) {
+                            if (isFree(x, y, w, h)) { mark(x, y, w, h); maxRow = Math.max(maxRow, y + h); placed = true; } 
+                            else { x++; if (x >= fixedCount) { x = 0; y++; } }
+                        }
+                    } else {
+                        while (!placed) {
+                            if (isFree(x, y, w, h)) { mark(x, y, w, h); maxCol = Math.max(maxCol, x + w); placed = true; } 
+                            else { y++; if (y >= fixedCount) { y = 0; x++; } }
+                        }
+                    }
+                });
+
+                let holes = 0;
+                if (mode === 'static') {
+                    for (let y = 0; y < maxRow; y++) {
+                        for (let x = 0; x < fixedCount; x++) { if (!gridMap[y] || !gridMap[y][x]) holes++; }
+                    }
+                    gridRows = maxRow; gridCols = fixedCount;
+                } else {
+                    for (let x = 0; x < maxCol; x++) {
+                        for (let y = 0; y < fixedCount; y++) { if (!gridMap[y] || !gridMap[y][x]) holes++; }
+                    }
+                    gridRows = fixedCount; gridCols = maxCol;
+                }
+
+                // On ajoute exactement le bon nombre de blocs Silencio pour combler les trous de la grille
+                for (let i = 0; i < holes; i++) {
+                    itemsHTML += createSilencio();
+                }
+            }
+
+            // --- RENDU DANS LE DOM ---
+            const wrapper = document.createElement('div'); 
+            const grid = document.createElement('div');
+            
             if (!useScrollMode) {
-                wrapper.className = 'bento-wrapper is-static'; grid.className = 'bento-grid is-static';
-                if (projects.length <= 1) { grid.classList.add('is-single-item'); } 
-                else if (!isMobile) { grid.style.setProperty('grid-template-columns', `repeat(${requiredCols}, var(--cell-size))`, 'important'); grid.style.setProperty('grid-template-rows', `repeat(${requiredRows}, var(--cell-size))`, 'important'); }
-                grid.innerHTML = itemsHTML; wrapper.appendChild(grid); bentoContainer.appendChild(wrapper);
+                wrapper.className = 'bento-wrapper is-static'; 
+                // Centrage parfait de la grille statique
+                wrapper.style.display = 'flex';
+                wrapper.style.justifyContent = 'center';
+                wrapper.style.width = '100%';
+
+                grid.className = 'bento-grid is-static';
+                
+                if (projects.length <= 1 && !hasTallOrBig) { 
+                    grid.classList.add('is-single-item'); 
+                } else { 
+                    grid.style.setProperty('grid-template-columns', `repeat(${gridCols}, var(--cell-size))`, 'important'); 
+                    grid.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important'); 
+                }
+                grid.innerHTML = itemsHTML; 
+                wrapper.appendChild(grid); 
+                bentoContainer.appendChild(wrapper);
             } else {
-                wrapper.className = 'bento-wrapper is-scrollable'; const track = document.createElement('div'); track.className = 'bento-track';
+                wrapper.className = 'bento-wrapper is-scrollable'; 
+                const track = document.createElement('div'); track.className = 'bento-track';
+                
                 const grid1 = document.createElement('div'); grid1.className = 'bento-grid is-scrollable'; grid1.innerHTML = itemsHTML;
+                grid1.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important');
+                
                 const grid2 = document.createElement('div'); grid2.className = 'bento-grid is-scrollable'; grid2.innerHTML = itemsHTML;
+                grid2.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important');
+                
                 const grid3 = document.createElement('div'); grid3.className = 'bento-grid is-scrollable'; grid3.innerHTML = itemsHTML;
-                track.appendChild(grid1); track.appendChild(grid2); track.appendChild(grid3); wrapper.appendChild(track); bentoContainer.appendChild(wrapper);
+                grid3.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important');
+                
+                track.appendChild(grid1); track.appendChild(grid2); track.appendChild(grid3); 
+                wrapper.appendChild(track); bentoContainer.appendChild(wrapper);
 
                 let jumpDistance = 0;
                 setTimeout(() => { jumpDistance = grid2.offsetLeft - grid1.offsetLeft; wrapper.scrollLeft = jumpDistance; }, 100);
@@ -299,6 +349,7 @@ async function initHomePage(){
         } catch (error) {}
     }
 
+    // L'EQUIPE (Reste identique)
     const teamGrid = document.querySelector('.team-grid');
     if (teamGrid) {
         try {
@@ -1058,6 +1109,7 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
+
 
 
 
