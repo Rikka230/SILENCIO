@@ -65,67 +65,50 @@ function parsePosition(posString) {
 // 3. MOTEUR DE DÉCOUPE JPG (INSTAGRAM & LINKEDIN)
 // =========================================
 async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let safeUrl;
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1080;
+            canvas.height = 1350; // Format 4:5
+            const ctx = canvas.getContext('2d');
 
-            // On récupère l'image sans bloquer Firebase
-            if (sourceUrlOrBlob instanceof Blob) {
-                safeUrl = URL.createObjectURL(sourceUrlOrBlob);
-            } else {
-                try {
-                    const response = await fetch(sourceUrlOrBlob);
-                    if (!response.ok) throw new Error("CORS bloqué");
-                    const blob = await response.blob();
-                    safeUrl = URL.createObjectURL(blob);
-                } catch (e) {
-                    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sourceUrlOrBlob);
-                    const responseProxy = await fetch(proxyUrl);
-                    const blobProxy = await responseProxy.blob();
-                    safeUrl = URL.createObjectURL(blobProxy);
-                }
+            const targetRatio = 4 / 5;
+            const sourceRatio = img.width / img.height;
+            let sWidth, sHeight, sx, sy;
+
+            if (sourceRatio > targetRatio) { 
+                sHeight = img.height;
+                sWidth = img.height * targetRatio;
+                sx = (img.width - sWidth) * (focusX / 100);
+                sy = 0;
+            } else { 
+                sWidth = img.width;
+                sHeight = img.width / targetRatio;
+                sx = 0;
+                sy = (img.height - sHeight) * (focusY / 100);
             }
-
-            const img = new Image();
-            // ATTENTION : On ne met SURTOUT PAS crossOrigin ici !
             
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1080;
-                canvas.height = 1350;
-                const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
 
-                const targetRatio = 4 / 5;
-                const sourceRatio = img.width / img.height;
-                let sWidth, sHeight, sx, sy;
+            canvas.toBlob((blob) => {
+                if (blob) resolve(blob);
+                else reject("Erreur lors de la conversion en JPG");
+            }, 'image/jpeg', 0.9);
+        };
+        
+        img.onerror = () => reject("Impossible de charger l'image pour la découpe");
 
-                if (sourceRatio > targetRatio) { 
-                    sHeight = img.height;
-                    sWidth = img.height * targetRatio;
-                    sx = (img.width - sWidth) * (focusX / 100);
-                    sy = 0;
-                } else { 
-                    sWidth = img.width;
-                    sHeight = img.width / targetRatio;
-                    sx = 0;
-                    sy = (img.height - sHeight) * (focusY / 100);
-                }
-                
-                ctx.fillStyle = '#050505';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-
-                canvas.toBlob((blob) => {
-                    URL.revokeObjectURL(safeUrl);
-                    if(blob) resolve(blob);
-                    else reject("Échec JPG");
-                }, 'image/jpeg', 0.9);
-            };
-            
-            img.onerror = () => reject("Erreur image source");
-            img.src = safeUrl;
-            
-        } catch (error) { reject(error); }
+        // Si c'est une nouvelle image, on la lit directement. Si c'est une ancienne de Firebase, on utilise un Proxy
+        if (sourceUrlOrBlob instanceof Blob) {
+            img.src = URL.createObjectURL(sourceUrlOrBlob);
+        } else {
+            img.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sourceUrlOrBlob);
+        }
     });
 }
 
@@ -907,6 +890,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
