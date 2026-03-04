@@ -588,7 +588,7 @@ function setupProjectForm() {
 
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
-        btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
+        btnSave.textContent = "Upload de l'affiche principale..."; btnSave.disabled = true;
 
         const projectData = {
             titre: title,
@@ -622,35 +622,42 @@ function setupProjectForm() {
             let finalProjectId = currentEditId;
             if (currentEditId) { 
                 await updateDoc(doc(db, "projects", currentEditId), projectData); 
-                UI.showToast("Projet mis à jour !"); 
             } else { 
                 projectData.ordreAffichage = Date.now(); 
                 const newDocRef = await addDoc(collection(db, "projects"), projectData); 
                 finalProjectId = newDocRef.id; 
-                UI.showToast("Projet publié !"); 
             }
 
+            // === LE BLOC CRITIQUE POUR LE JPG ET LINKEDIN ===
             if (triggerWebhook) {
                 let finalSocialImageUrl = projectData.imageAffiche; 
                 const sourceForCrop = optimizedImageBlob || currentEditImageUrl;
                 
                 if (sourceForCrop) {
                     try {
-                        btnSave.textContent = "Génération LinkedIn...";
+                        btnSave.textContent = "Création du fichier JPG...";
                         const cropX = document.getElementById('proj-focus-social-x').value;
                         const cropY = document.getElementById('proj-focus-social-y').value;
                         const socialBlob = await generateSocialCropBlob(sourceForCrop, cropX, cropY);
+                        
+                        btnSave.textContent = "Sauvegarde du JPG dans Firebase...";
                         const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
-                        const socialRef = ref(storage, `affiches_social/${Date.now()}_${safeTitle}_ig.jpg`);
+                        const socialRef = ref(storage, `affiches_social/${Date.now()}_${safeTitle}.jpg`);
                         await uploadBytes(socialRef, socialBlob);
                         finalSocialImageUrl = await getDownloadURL(socialRef);
+                        
+                        btnSave.textContent = "Mise à jour de la base de données...";
+                        // OBLIGATION D'ÉCRIRE LE CHAMP DANS LA BASE DE DONNÉES
+                        await updateDoc(doc(db, "projects", finalProjectId), { 
+                            imageSocial: finalSocialImageUrl 
+                        });
+
                     } catch (e) { 
-                        // SECURITÉ RENFORCÉE ICI
-                        console.error("ERREUR CROP SOCIAL :", e);
-                        UI.showToast("Erreur WebP/JPG : Échec pour LinkedIn", "error");
+                        console.error("ERREUR CRITIQUE JPG :", e);
+                        UI.showToast("Erreur : Impossible de créer le JPG", "error");
                         btnSave.disabled = false;
-                        btnSave.textContent = "Réessayer";
-                        return; // Stoppe tout si le JPG n'est pas prêt
+                        btnSave.textContent = "Réessayer l'enregistrement";
+                        return; // ON STOPPE TOUT SI LE JPG N'EST PAS CRÉÉ
                     }
                 }
 
@@ -664,9 +671,14 @@ function setupProjectForm() {
                 } catch(e) { console.error("Erreur Webhook", e); }
             }
 
+            UI.showToast("Opération terminée avec succès !");
             loadAdminProjects(); returnToListView(); 
-        } catch (error) { UI.showToast("Erreur lors de l'envoi", "error"); } 
-        finally { btnSave.disabled = false; btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet"; }
+        } catch (error) { 
+            UI.showToast("Erreur lors de l'enregistrement", "error"); 
+        } finally { 
+            btnSave.disabled = false; 
+            btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet"; 
+        }
     });
 }
 
@@ -890,6 +902,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
