@@ -62,7 +62,7 @@ function parsePosition(posString) {
 }
 
 // =========================================
-// 3. MOTEUR DE DÉCOUPE JPG (INSTAGRAM)
+// 3. MOTEUR DE DÉCOUPE JPG (INSTAGRAM & LINKEDIN)
 // =========================================
 async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
     return new Promise(async (resolve, reject) => {
@@ -71,16 +71,25 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
             if (sourceUrlOrBlob instanceof Blob) {
                 safeUrl = URL.createObjectURL(sourceUrlOrBlob);
             } else {
-                const response = await fetch(sourceUrlOrBlob);
+                // ASTUCE ANTI-BLOCAGE FIREBASE : On passe par un pont Proxy si besoin
+                let response;
+                try {
+                    response = await fetch(sourceUrlOrBlob);
+                } catch (e) {
+                    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sourceUrlOrBlob);
+                    response = await fetch(proxyUrl);
+                }
                 const blob = await response.blob();
                 safeUrl = URL.createObjectURL(blob);
             }
 
             const img = new Image();
+            img.crossOrigin = "Anonymous"; // Autorise la manipulation des pixels
+            
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 canvas.width = 1080;
-                canvas.height = 1350; // Format Insta 4:5
+                canvas.height = 1350; // Format Réseaux Sociaux 4:5
                 const ctx = canvas.getContext('2d');
 
                 const targetRatio = 4 / 5;
@@ -103,6 +112,7 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
 
+                // GÉNÉRATION DU FICHIER JPG (Compatible LinkedIn)
                 canvas.toBlob((blob) => {
                     URL.revokeObjectURL(safeUrl);
                     resolve(blob);
@@ -891,6 +901,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
