@@ -415,150 +415,124 @@ function initAdmin() {
 // =========================================
 // 8. MOTEUR D'ADMINISTRATION : PROJETS
 // =========================================
-function syncBentoDA() {
-    const previewBloc = document.getElementById('image-preview-bloc');
-    const previewCadrage = document.getElementById('image-preview-cadrage');
-    const previewSocial = document.getElementById('image-preview-social');
-    const blocWrapper = document.getElementById('da-bloc-wrapper');
-    const formatSelect = document.getElementById('proj-format');
 
-    const focusInputs = [
-        'proj-focus-bento-x', 'proj-focus-bento-y',
-        'proj-focus-header-x', 'proj-focus-header-y',
-        'proj-focus-social-x', 'proj-focus-social-y'
-    ];
+async function loadAdminProjects() {
+    const projectList = document.getElementById('project-list');
+    if (!projectList) return;
 
-    function updateLiveView() {
-        if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
+    try {
+        const querySnapshot = await getDocs(collection(db, "projects"));
+        let projects = [];
+        querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
+        projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage);
+        projectList.innerHTML = '';
 
-        // --- CORRECTIF : On force la source sur l'aperçu Instagram s'il est vide ---
-        if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html') || previewSocial.src === "")) {
-            previewSocial.src = previewBloc.src;
-        }
+        projects.forEach(project => {
+            const li = document.createElement('li');
+            li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
 
-        if (blocWrapper && formatSelect) {
-            blocWrapper.className = '';
-            if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
-        }
+            const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+            const isHidden = project.visible === false;
+            const hiddenBadge = isHidden ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555; vertical-align: middle;">MASQUÉ</span>' : '';
+            const isChecked = isHidden ? '' : 'checked';
+            const titleStatus = isHidden ? 'Afficher sur le site' : 'Masquer du site';
 
-        previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
-        if (previewCadrage) previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
-        if (previewSocial) previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
-    }
+            li.innerHTML = `
+                <div class="drag-handle">☰</div>
+                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
+                <div class="item-info"><strong>${project.titre} ${hiddenBadge}</strong><span>${project.statut}</span></div>
+                <div class="item-actions" style="display: flex; align-items: center; gap: 12px;">
+                    <label class="toggle-switch" title="${titleStatus}">
+                        <input type="checkbox" class="toggle-visibility-slider" ${isChecked}>
+                        <span class="slider"></span>
+                    </label>
+                    <button class="btn-icon edit" title="Modifier">✎</button>
+                    <button class="btn-icon delete" title="Supprimer">✕</button>
+                </div>`;
 
-    focusInputs.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.oninput = updateLiveView;
-    });
-    if (formatSelect) formatSelect.onchange = updateLiveView;
+            // Action : Slider de visibilité
+            li.querySelector('.toggle-visibility-slider').addEventListener('change', async (e) => {
+                const newVis = e.target.checked;
+                try {
+                    await updateDoc(doc(db, "projects", project.id), { visible: newVis });
+                    UI.showToast(newVis ? "Le projet est en ligne !" : "Le projet est masqué !");
+                    loadAdminProjects();
+                } catch (error) { UI.showToast("Erreur.", "error"); e.target.checked = !newVis; }
+            });
 
-    const daContainer = document.getElementById('image-da-container');
-    const previewsGroup = document.getElementById('previews-group');
-    const hasImage = previewBloc && previewBloc.src && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== "";
+            // Action : Supprimer
+            li.querySelector('.delete').addEventListener('click', async () => {
+                if(confirm(`Supprimer "${project.titre}" ?`)) { await deleteDoc(doc(db, "projects", project.id)); loadAdminProjects(); }
+            });
 
-    if (hasImage && daContainer && previewsGroup) {
-        daContainer.classList.remove('da-container-single');
-        daContainer.classList.add('da-container-split');
-        previewsGroup.classList.remove('previews-hidden');
-        previewsGroup.classList.add('previews-visible');
-        updateLiveView();
-    }
-}
+            // Action : MODIFIER (RECHARGE TOUT LE FORMULAIRE)
+            li.querySelector('.edit').addEventListener('click', () => {
+                document.getElementById('view-list').classList.add('hidden');
+                document.getElementById('view-form').classList.remove('hidden');
+                const btnAddNew = document.getElementById('btn-add-new');
+                if (btnAddNew) btnAddNew.style.display = 'none';
 
-function setupDropzone() {
-    const dropzone = document.getElementById('image-dropzone');
-    if (!dropzone) return;
-    const fileInput = document.getElementById('proj-image');
-    
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(name => {
-        dropzone.addEventListener(name, (e) => { e.preventDefault(); e.stopPropagation(); });
-    });
-
-    dropzone.onclick = () => fileInput.click();
-    dropzone.ondrop = (e) => handleFile(e.dataTransfer.files[0]);
-    fileInput.onchange = (e) => { if (e.target.files.length) handleFile(e.target.files[0]); };
-
-    function handleFile(file) {
-        if (!file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1920;
-                let width = img.width, height = img.height;
-                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height;
-                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                // Remplissage textes
+                currentEditId = project.id;
+                currentEditImageUrl = project.imageAffiche;
+                document.getElementById('proj-title').value = project.titre || '';
+                document.getElementById('proj-subtitle').value = project.statut || '';
+                document.getElementById('proj-video').value = project.videoTrailer || '';
                 
-                canvas.toBlob((blob) => {
-                    optimizedImageBlob = blob;
-                    const compressedUrl = URL.createObjectURL(blob);
-                    
+                if(document.getElementById('proj-genre')) document.getElementById('proj-genre').value = project.genre || '';
+                if(document.getElementById('proj-annee')) document.getElementById('proj-annee').value = project.annee || '';
+                if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
+                if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
+                if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
+                if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
+                
+                // Remplissage focus
+                const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
+                document.getElementById('proj-focus-bento-x').value = bentoPos.x;
+                document.getElementById('proj-focus-bento-y').value = bentoPos.y;
+
+                const headerPos = parsePosition(project.imageFocusHeader || project.imageFocus);
+                document.getElementById('proj-focus-header-x').value = headerPos.x;
+                document.getElementById('proj-focus-header-y').value = headerPos.y;
+
+                const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
+                document.getElementById('proj-focus-social-x').value = socialPos.x;
+                document.getElementById('proj-focus-social-y').value = socialPos.y;
+
+                // Visibilité et Partage
+                if(document.getElementById('proj-visible')) document.getElementById('proj-visible').checked = project.visible !== false;
+                
+                const isShared = project.partageReseaux === true;
+                if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = isShared;
+                if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = isShared ? 'block' : 'none';
+                currentProjectWasShared = isShared;
+
+                // Preview images
+                if (project.imageAffiche) {
                     const pB = document.getElementById('image-preview-bloc');
                     const pC = document.getElementById('image-preview-cadrage');
                     const pS = document.getElementById('image-preview-social');
-                    
-                    // On attache un écouteur : dès que l'image est chargée dans le DOM, on lance la synchro
-                    pB.onload = () => { syncBentoDA(); pB.classList.add('loaded'); };
-                    
-                    pB.src = compressedUrl;
-                    if(pC) pC.src = compressedUrl;
-                    if(pS) pS.src = compressedUrl;
-                    
-                }, 'image/webp', 0.8);
-            };
-        };
-    }
-}
+                    if(pB) { pB.src = project.imageAffiche; pB.classList.add('loaded'); }
+                    if(pC) { pC.src = project.imageAffiche; pC.classList.add('loaded'); }
+                    if(pS) { pS.src = project.imageAffiche; if(isShared) pS.classList.add('loaded'); }
+                }
 
-function returnToListView() {
-    document.getElementById('view-list').classList.remove('hidden'); document.getElementById('view-form').classList.add('hidden');
-    const btnAddNew = document.getElementById('btn-add-new'); if (btnAddNew) btnAddNew.style.display = 'block';
-    resetProjectForm();
-}
+                document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
+                document.getElementById('btn-save').textContent = "Mettre à jour";
+                setTimeout(syncBentoDA, 100);
+                document.querySelector('#view-form').scrollIntoView({ behavior: 'smooth' });
+            });
 
-function resetProjectForm() {
-    const form = document.getElementById('project-form'); if(!form) return; form.reset();
-    if(document.getElementById('proj-focus-bento-x')) document.getElementById('proj-focus-bento-x').value = 50;
-    if(document.getElementById('proj-focus-bento-y')) document.getElementById('proj-focus-bento-y').value = 50;
-    if(document.getElementById('proj-focus-header-x')) document.getElementById('proj-focus-header-x').value = 50;
-    if(document.getElementById('proj-focus-header-y')) document.getElementById('proj-focus-header-y').value = 50;
-    if(document.getElementById('proj-focus-social-x')) document.getElementById('proj-focus-social-x').value = 50;
-    if(document.getElementById('proj-focus-social-y')) document.getElementById('proj-focus-social-y').value = 50;
-    if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
-    if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = 'none';
+            projectList.appendChild(li);
+        });
 
-    canvas.toBlob((blob) => {
-                    optimizedImageBlob = blob;
-                    const compressedUrl = URL.createObjectURL(blob);
-                    
-                    const pB = document.getElementById('image-preview-bloc');
-                    const pC = document.getElementById('image-preview-cadrage');
-                    const pS = document.getElementById('image-preview-social');
-                    
-                    if(pB) pB.src = compressedUrl;
-                    if(pC) pC.src = compressedUrl;
-                    if(pS) pS.src = compressedUrl;
-                    
-                    // On attend que l'image principale soit chargée pour tout synchroniser
-                    pB.onload = () => {
-                        syncBentoDA();
-                        pB.classList.add('loaded');
-                    };
-                }, 'image/webp', 0.8);
-    syncBentoDA(); 
-
-    document.getElementById('form-title').textContent = "Ajouter un projet"; document.getElementById('btn-save').textContent = "Enregistrer le projet";
-    optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null; currentProjectWasShared = false;
+        setupDragAndDrop('project-list', 'projects');
+    } catch (error) { console.error("Erreur projets:", error); }
 }
 
 function setupProjectForm() {
-    const form = document.getElementById('project-form'); if (!form) return;
-    const btnCancelTop = document.querySelector('.btn-cancel-top'); const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
-    if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView); if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
+    const form = document.getElementById('project-form');
+    if (!form) return;
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -567,14 +541,18 @@ function setupProjectForm() {
         
         if (autoShareCheckbox && autoShareCheckbox.checked) {
             if (currentEditId && currentProjectWasShared) {
-                if (confirm("⚠️ Ce projet a DÉJÀ été publié sur vos réseaux sociaux.\nVoulez-vous forcer un doublon ?")) { triggerWebhook = true; } else { triggerWebhook = false; autoShareCheckbox.checked = false; }
+                if (!confirm("⚠️ Ce projet a DÉJÀ été publié. Forcer un doublon ?")) {
+                    autoShareCheckbox.checked = false;
+                } else { triggerWebhook = true; }
             } else {
-                if (confirm("⚠️ Vous allez publier ce projet sur les réseaux sociaux.\nÊtes-vous sûr(e) ?")) { triggerWebhook = true; } else { return; }
+                if (confirm("⚠️ Publier ce projet sur les réseaux sociaux ?")) { triggerWebhook = true; } 
+                else { return; }
             }
         }
 
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
+        btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
 
         const projectData = {
             titre: title,
@@ -593,185 +571,36 @@ function setupProjectForm() {
             partageReseaux: currentProjectWasShared || triggerWebhook
         };
 
-        if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
-        btnSave.textContent = "Enregistrement..."; btnSave.disabled = true;
-
         try {
             let imageUrl = currentEditImageUrl;
             if (optimizedImageBlob) {
-                const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
-                const imageRef = ref(storage, `affiches/${Date.now()}_${safeTitle}.webp`);
+                const imageRef = ref(storage, `affiches/${Date.now()}.webp`);
                 await uploadBytes(imageRef, optimizedImageBlob);
                 imageUrl = await getDownloadURL(imageRef);
             }
             projectData.imageAffiche = imageUrl;
 
             let finalProjectId = currentEditId;
-            if (currentEditId) { await updateDoc(doc(db, "projects", currentEditId), projectData); UI.showToast("Projet mis à jour !"); } 
-            else { projectData.ordreAffichage = Date.now(); const newDocRef = await addDoc(collection(db, "projects"), projectData); finalProjectId = newDocRef.id; UI.showToast("Projet publié !"); }
+            if (currentEditId) { await updateDoc(doc(db, "projects", currentEditId), projectData); } 
+            else { projectData.ordreAffichage = Date.now(); const newRef = await addDoc(collection(db, "projects"), projectData); finalProjectId = newRef.id; }
 
             if (triggerWebhook) {
-                let finalSocialImageUrl = projectData.imageAffiche; 
-                const sourceForCrop = optimizedImageBlob || currentEditImageUrl;
-                
-                // 1. TENTATIVE DE DÉCOUPE INSTAGRAM
-                if (sourceForCrop) {
-                    try {
-                        btnSave.textContent = "Génération Instagram...";
-                        const cropX = document.getElementById('proj-focus-social-x') ? document.getElementById('proj-focus-social-x').value : 50;
-                        const cropY = document.getElementById('proj-focus-social-y') ? document.getElementById('proj-focus-social-y').value : 50;
-                        
-                        const socialBlob = await generateSocialCropBlob(sourceForCrop, cropX, cropY);
-                        const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
-                        const socialRef = ref(storage, `affiches_social/${Date.now()}_${safeTitle}_ig.jpg`);
-                        await uploadBytes(socialRef, socialBlob);
-                        finalSocialImageUrl = await getDownloadURL(socialRef);
-                    } catch (e) {
-                        console.warn("Échec de la découpe (Sécurité Firebase), envoi de l'image classique au robot.", e);
-                        // On garde l'image de base sans faire planter le script
-                    }
-                }
-
-                // 2. ENVOI AU WEBHOOK MAKE (GARANTI)
+                let finalSocialImageUrl = projectData.imageAffiche;
                 try {
-                    btnSave.textContent = "Envoi à Make...";
-                    const webhookUrl = "https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513"; 
-                    await fetch(webhookUrl, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            id: finalProjectId, 
-                            titre: projectData.titre, 
-                            statut: projectData.statut, 
-                            synopsis: projectData.synopsis,
-                            imageAffiche: projectData.imageAffiche,
-                            imageSocial: finalSocialImageUrl 
-                        })
-                    });
-                    console.log("Le signal a bien été envoyé au robot !");
-                } catch(e) { 
-                    console.error("Erreur de connexion avec Make", e); 
-                }
+                    const socBlob = await generateSocialCropBlob(optimizedImageBlob || imageUrl, document.getElementById('proj-focus-social-x').value, document.getElementById('proj-focus-social-y').value);
+                    const socRef = ref(storage, `affiches_social/${Date.now()}.jpg`);
+                    await uploadBytes(socRef, socBlob);
+                    finalSocialImageUrl = await getDownloadURL(socRef);
+                } catch(e) { console.warn("Crop échoué."); }
+
+                await fetch("https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...projectData, id: finalProjectId, imageSocial: finalSocialImageUrl })
+                });
             }
-
-            loadAdminProjects(); returnToListView(); 
-        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet"; }
+            UI.showToast("Succès !"); loadAdminProjects(); returnToListView();
+        } catch (error) { UI.showToast("Erreur.", "error"); } finally { btnSave.disabled = false; btnSave.textContent = "Enregistrer"; }
     });
-}
-
-async function loadAdminProjects() {
-    const projectList = document.getElementById('project-list'); if (!projectList) return;
-    try {
-        const querySnapshot = await getDocs(collection(db, "projects"));
-        let projects = []; querySnapshot.forEach((doc) => { projects.push({ id: doc.id, ...doc.data() }); });
-        projects.sort((a, b) => b.ordreAffichage - a.ordreAffichage); projectList.innerHTML = '';
-
-        projects.forEach(project => {
-            const li = document.createElement('li'); li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
-            const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-            const isHidden = project.visible === false;
-            const hiddenBadge = isHidden ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555; vertical-align: middle;">MASQUÉ</span>' : '';
-            const isChecked = isHidden ? '' : 'checked';
-            const titleStatus = isHidden ? 'Afficher' : 'Masquer';
-
-            li.innerHTML = `
-                <div class="drag-handle">☰</div>
-                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
-                <div class="item-info"><strong>${project.titre} ${hiddenBadge}</strong><span>${project.statut}</span></div>
-                <div class="item-actions" style="display: flex; align-items: center; gap: 12px;">
-                    <label class="toggle-switch" title="${titleStatus}">
-                        <input type="checkbox" class="toggle-visibility-slider" ${isChecked}>
-                        <span class="slider"></span>
-                    </label>
-                    <button class="btn-icon edit" title="Modifier">✎</button>
-                    <button class="btn-icon delete" title="Supprimer">✕</button>
-                </div>`;
-
-            li.querySelector('.toggle-visibility-slider').addEventListener('change', async (e) => {
-                const newVis = e.target.checked;
-                try { await updateDoc(doc(db, "projects", project.id), { visible: newVis }); UI.showToast(newVis ? "En ligne !" : "Masqué !"); loadAdminProjects(); } 
-                catch (err) { UI.showToast("Erreur.", "error"); e.target.checked = !newVis; }
-            });
-
-            li.querySelector('.delete').addEventListener('click', async () => { if(confirm(`Supprimer "${project.titre}" ?`)) { await deleteDoc(doc(db, "projects", project.id)); loadAdminProjects(); } });
-
-            // Remplace le bloc li.querySelector('.edit').onclick dans la Section 8 par celui-ci :
-
-li.querySelector('.edit').onclick = () => {
-    // 1. Changement de vue
-    document.getElementById('view-list').classList.add('hidden');
-    document.getElementById('view-form').classList.remove('hidden');
-    const btnAddNew = document.getElementById('btn-add-new');
-    if (btnAddNew) btnAddNew.style.display = 'none';
-
-    // 2. Remplissage des données
-    currentEditId = project.id;
-    currentEditImageUrl = project.imageAffiche;
-    document.getElementById('proj-title').value = project.titre || '';
-    document.getElementById('proj-subtitle').value = project.statut || '';
-    document.getElementById('proj-video').value = project.videoTrailer || '';
-    
-    // Champs optionnels (vérification de l'existence)
-    if(document.getElementById('proj-genre')) document.getElementById('proj-genre').value = project.genre || '';
-    if(document.getElementById('proj-annee')) document.getElementById('proj-annee').value = project.annee || '';
-    if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
-    if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
-    if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
-    if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
-    
-    // 3. Gestion des Sliders de focus
-    const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
-    document.getElementById('proj-focus-bento-x').value = bentoPos.x;
-    document.getElementById('proj-focus-bento-y').value = bentoPos.y;
-
-    const headerPos = parsePosition(project.imageFocusHeader || project.imageFocus);
-    document.getElementById('proj-focus-header-x').value = headerPos.x;
-    document.getElementById('proj-focus-header-y').value = headerPos.y;
-
-    const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
-    document.getElementById('proj-focus-social-x').value = socialPos.x;
-    document.getElementById('proj-focus-social-y').value = socialPos.y;
-
-    // 4. État des boutons de visibilité et partage
-    if(document.getElementById('proj-visible')) document.getElementById('proj-visible').checked = project.visible !== false;
-    
-    const isShared = project.partageReseaux === true;
-    if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = isShared;
-    if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = isShared ? 'block' : 'none';
-
-    currentProjectWasShared = isShared;
-
-    // 5. Chargement des images de preview
-    if (project.imageAffiche) {
-        const pB = document.getElementById('image-preview-bloc');
-        const pC = document.getElementById('image-preview-cadrage');
-        const pS = document.getElementById('image-preview-social');
-        
-        if(pB) { pB.src = project.imageAffiche; pB.classList.add('loaded'); }
-        if(pC) { pC.src = project.imageAffiche; pC.classList.add('loaded'); }
-        if(pS) { 
-            pS.src = project.imageAffiche; 
-            if(isShared) pS.classList.add('loaded');
-        }
-    }
-
-    document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
-    document.getElementById('btn-save').textContent = "Mettre à jour";
-
-    // 6. Synchronisation DA
-    setTimeout(() => {
-        syncBentoDA();
-    }, 100);
-};
-
-                currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null;
-                document.getElementById('form-title').textContent = `Modifier : ${project.titre}`; document.getElementById('btn-save').textContent = "Mettre à jour";
-                document.querySelector('#view-form').scrollIntoView({ behavior: 'smooth' });
-            });
-            projectList.appendChild(li);
-        });
-        setupDragAndDrop('project-list', 'projects');
-        setTimeout(() => { document.querySelectorAll('#project-list .anti-stretch-img').forEach(img => { if (img.complete) img.classList.add('loaded'); }); }, 50);
-    } catch (error) {}
 }
 
 // =========================================
@@ -894,6 +723,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
