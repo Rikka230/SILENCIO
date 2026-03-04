@@ -359,11 +359,20 @@ function initAdmin() {
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(auth).then(() => { window.location.href = 'index.html'; }); });
 
+    // --- GESTION DU SLIDER RÉSEAUX SOCIAUX ---
     const shareToggle = document.getElementById('proj-autoshare');
     const socialZone = document.getElementById('social-crop-zone');
     if (shareToggle && socialZone) {
         shareToggle.addEventListener('change', (e) => {
-            socialZone.style.display = e.target.checked ? 'block' : 'none';
+            const isVisible = e.target.checked;
+            socialZone.style.display = isVisible ? 'block' : 'none';
+            
+            // Si on vient d'ouvrir la zone, on force le rafraîchissement des images
+            if (isVisible) {
+                setTimeout(() => {
+                    syncBentoDA(); 
+                }, 50); // Un léger délai pour laisser le temps au CSS de s'afficher
+            }
         });
     }
 
@@ -835,6 +844,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
