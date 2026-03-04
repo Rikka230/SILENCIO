@@ -403,64 +403,58 @@ function initAdmin() {
 // 8. MOTEUR D'ADMINISTRATION : PROJETS
 // =========================================
 function syncBentoDA() {
-    const daContainer = document.getElementById('image-da-container');
-    const previewsGroup = document.getElementById('previews-group');
-    const dropText = document.querySelector('.drop-text');
-
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
-    const previewSocial = document.getElementById('image-preview-social'); // Aperçu Instagram
+    const previewSocial = document.getElementById('image-preview-social');
     const blocWrapper = document.getElementById('da-bloc-wrapper');
 
     const formatSelect = document.getElementById('proj-format');
-    const focusBentoX = document.getElementById('proj-focus-bento-x'); 
-    const focusBentoY = document.getElementById('proj-focus-bento-y');
-    const focusHeaderX = document.getElementById('proj-focus-header-x'); 
-    const focusHeaderY = document.getElementById('proj-focus-header-y');
-    const focusSocialX = document.getElementById('proj-focus-social-x'); // Slider X Social
-    const focusSocialY = document.getElementById('proj-focus-social-y'); // Slider Y Social
-
-    if (!daContainer || !previewsGroup || !previewBloc) return;
+    const focusInputs = [
+        'proj-focus-bento-x', 'proj-focus-bento-y',
+        'proj-focus-header-x', 'proj-focus-header-y',
+        'proj-focus-social-x', 'proj-focus-social-y'
+    ];
 
     function updateLiveView() {
-        if (!previewBloc.src || previewBloc.src === "" || previewBloc.src.endsWith('admin.html')) return;
-        
-        if(blocWrapper) {
+        // Sécurité : Si l'image n'a pas de source, on ne fait rien
+        if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
+
+        if (blocWrapper && formatSelect) {
             blocWrapper.className = '';
-            if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
+            if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
         }
-        
+
         // Mise à jour Bento
-        if (focusBentoX && focusBentoY) previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
+        previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
         // Mise à jour Header
-        if (focusHeaderX && focusHeaderY) previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
-        // Mise à jour Social (Instagram 4:5)
-        if (focusSocialX && focusSocialY && previewSocial) previewSocial.style.objectPosition = `${focusSocialX.value}% ${focusSocialY.value}%`;
+        if (previewCadrage) previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
+        // Mise à jour Instagram
+        if (previewSocial) previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
     }
 
-    // Écouteurs pour la mise à jour en temps réel
-    if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
-    if (focusBentoX) focusBentoX.addEventListener('input', updateLiveView);
-    if (focusBentoY) focusBentoY.addEventListener('input', updateLiveView);
-    if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView);
-    if (focusHeaderY) focusHeaderY.addEventListener('input', updateLiveView);
-    if (focusSocialX) focusSocialX.addEventListener('input', updateLiveView);
-    if (focusSocialY) focusSocialY.addEventListener('input', updateLiveView);
+    // On attache les écouteurs sur TOUS les inputs de focus
+    focusInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.removeEventListener('input', updateLiveView); // On évite les doublons
+            el.addEventListener('input', updateLiveView);
+        }
+    });
+    
+    if (formatSelect) {
+        formatSelect.removeEventListener('change', updateLiveView);
+        formatSelect.addEventListener('change', updateLiveView);
+    }
 
-    const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith('admin.html');
-    if (hasImage) {
-        daContainer.classList.remove('da-container-single');
-        daContainer.classList.add('da-container-split');
-        if(dropText) dropText.style.display = 'none';
-        previewsGroup.classList.remove('previews-hidden');
-        previewsGroup.classList.add('previews-visible');
+    // Logique d'affichage des panneaux
+    const daContainer = document.getElementById('image-da-container');
+    const previewsGroup = document.getElementById('previews-group');
+    const hasImage = previewBloc && previewBloc.src && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== "";
+
+    if (hasImage && daContainer && previewsGroup) {
+        daContainer.classList.replace('da-container-single', 'da-container-split');
+        previewsGroup.classList.replace('previews-hidden', 'previews-visible');
         updateLiveView();
-    } else {
-        daContainer.classList.remove('da-container-split');
-        daContainer.classList.add('da-container-single');
-        if(dropText) dropText.style.display = 'block';
-        previewsGroup.classList.remove('previews-visible');
-        previewsGroup.classList.add('previews-hidden');
     }
 }
 
@@ -840,5 +834,6 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
