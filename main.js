@@ -670,8 +670,13 @@ function setupProjectForm() {
                         const socialRef = ref(storage, `affiches_social/${Date.now()}_${safeTitle}_ig.jpg`);
                         await uploadBytes(socialRef, socialBlob);
                         finalSocialImageUrl = await getDownloadURL(socialRef);
-                    } catch (e) { console.warn("Crop échoué", e); }
-                }
+                    } catch (e) { 
+                        console.error("ERREUR CROP SOCIAL :", e);
+                        UI.showToast("Erreur : Impossible de générer le JPG pour LinkedIn", "error");
+                        btnSave.disabled = false;
+                        btnSave.textContent = "Réessayer";
+                        return; // On annule l'envoi à Make si on a pas le JPG !
+                    }
 
                 try {
                     btnSave.textContent = "Envoi à Make...";
@@ -910,6 +915,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
