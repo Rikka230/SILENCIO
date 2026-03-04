@@ -407,8 +407,8 @@ function syncBentoDA() {
     const previewCadrage = document.getElementById('image-preview-cadrage');
     const previewSocial = document.getElementById('image-preview-social');
     const blocWrapper = document.getElementById('da-bloc-wrapper');
-
     const formatSelect = document.getElementById('proj-format');
+
     const focusInputs = [
         'proj-focus-bento-x', 'proj-focus-bento-y',
         'proj-focus-header-x', 'proj-focus-header-y',
@@ -416,7 +416,6 @@ function syncBentoDA() {
     ];
 
     function updateLiveView() {
-        // Sécurité : Si l'image n'a pas de source, on ne fait rien
         if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
 
         if (blocWrapper && formatSelect) {
@@ -424,36 +423,29 @@ function syncBentoDA() {
             if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
         }
 
-        // Mise à jour Bento
+        // Mise à jour des positions selon les sliders
         previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
-        // Mise à jour Header
         if (previewCadrage) previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
-        // Mise à jour Instagram
         if (previewSocial) previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
     }
 
-    // On attache les écouteurs sur TOUS les inputs de focus
+    // On attache les écouteurs sur les sliders
     focusInputs.forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
-            el.removeEventListener('input', updateLiveView); // On évite les doublons
-            el.addEventListener('input', updateLiveView);
-        }
+        if (el) el.oninput = updateLiveView;
     });
-    
-    if (formatSelect) {
-        formatSelect.removeEventListener('change', updateLiveView);
-        formatSelect.addEventListener('change', updateLiveView);
-    }
+    if (formatSelect) formatSelect.onchange = updateLiveView;
 
-    // Logique d'affichage des panneaux
+    // Affichage des panneaux si une image est présente
     const daContainer = document.getElementById('image-da-container');
     const previewsGroup = document.getElementById('previews-group');
     const hasImage = previewBloc && previewBloc.src && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== "";
 
     if (hasImage && daContainer && previewsGroup) {
-        daContainer.classList.replace('da-container-single', 'da-container-split');
-        previewsGroup.classList.replace('previews-hidden', 'previews-visible');
+        daContainer.classList.remove('da-container-single');
+        daContainer.classList.add('da-container-split');
+        previewsGroup.classList.remove('previews-hidden');
+        previewsGroup.classList.add('previews-visible');
         updateLiveView();
     }
 }
@@ -463,39 +455,48 @@ function setupDropzone() {
     if (!dropzone) return;
     const fileInput = document.getElementById('proj-image');
     
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-    ['dragenter', 'dragover'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false); });
-    ['dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false); });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(name => {
+        dropzone.addEventListener(name, (e) => { e.preventDefault(); e.stopPropagation(); });
+    });
 
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
-    fileInput.addEventListener('change', function() { if (this.files.length) handleFile(this.files[0]); });
+    dropzone.onclick = () => fileInput.click();
+    dropzone.ondrop = (e) => handleFile(e.dataTransfer.files[0]);
+    fileInput.onchange = (e) => { if (e.target.files.length) handleFile(e.target.files[0]); };
 
     function handleFile(file) {
-        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide.", "error"); return; }
-        const reader = new FileReader(); reader.readAsDataURL(file);
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
         reader.onload = (event) => {
-            const img = new Image(); img.src = event.target.result;
+            const img = new Image();
+            img.src = event.target.result;
             img.onload = () => {
-                const canvas = document.createElement('canvas'); const MAX_WIDTH = 1920; let width = img.width, height = img.height;
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1920;
+                let width = img.width, height = img.height;
                 if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                
                 canvas.toBlob((blob) => {
                     optimizedImageBlob = blob;
                     const compressedUrl = URL.createObjectURL(blob);
+                    
                     const pB = document.getElementById('image-preview-bloc');
                     const pC = document.getElementById('image-preview-cadrage');
                     const pS = document.getElementById('image-preview-social');
-                    if(pB) { pB.classList.remove('loaded'); pB.src = compressedUrl; }
-                    if(pC) { pC.classList.remove('loaded'); pC.src = compressedUrl; }
-                    if(pS) { pS.classList.remove('loaded'); pS.src = compressedUrl; }
-                    syncBentoDA();
+                    
+                    // On attache un écouteur : dès que l'image est chargée dans le DOM, on lance la synchro
+                    pB.onload = () => { syncBentoDA(); pB.classList.add('loaded'); };
+                    
+                    pB.src = compressedUrl;
+                    if(pC) pC.src = compressedUrl;
+                    if(pS) pS.src = compressedUrl;
+                    
                 }, 'image/webp', 0.8);
             };
         };
     }
-    syncBentoDA();
 }
 
 function returnToListView() {
@@ -834,6 +835,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
