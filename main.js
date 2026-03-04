@@ -427,9 +427,9 @@ function syncBentoDA() {
     function updateLiveView() {
         if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
 
-        if (blocWrapper && formatSelect) {
-            blocWrapper.className = '';
-            if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
+        // --- SÉCURITÉ : On s'assure que l'image Social a la même source que l'image Bloc ---
+        if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html'))) {
+            previewSocial.src = previewBloc.src;
         }
 
         // Mise à jour des positions selon les sliders
@@ -844,6 +844,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
