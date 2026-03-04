@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="admin.css?v=2.0">
 </head>
 <body>
+
     <div id="login-overlay" class="login-overlay">
         <div id="login-box" class="login-box hidden">
             <h2>SILENCIO <span>ADMIN</span></h2>
@@ -23,7 +24,6 @@
                 <button type="submit" class="btn-primary" style="width: 100%;">Connexion</button>
                 <p id="login-error" class="error-text hidden">Identifiants incorrects.</p>
             </form>
-            
             <div style="margin-top: 2rem;">
                 <a href="index.html" class="back-link-login">← Retour au site public</a>
             </div>
@@ -33,24 +33,23 @@
     <div id="toast" class="toast hidden">Mise à jour réussie.</div>
 
     <div class="admin-layout">
+        
         <aside class="admin-sidebar">
-    <div class="admin-logo">SILENCIO <span>ADMIN</span></div>
-    
-    <nav>
-        <a href="#projets" class="active">Gestion des Projets</a>
-        <a href="#accueil">Vidéo d'Accueil</a>
-        <a href="#equipe">L'Équipe</a>
-    </nav>
-    
-    <div class="sidebar-footer">
-        <a href="index.html" target="_blank" class="btn-secondary" style="display: block; text-align: center; margin-bottom: 15px; text-decoration: none; font-size: 0.8rem;">
-            Voir le site
-        </a>
-        <button class="btn-primary logout-btn" style="width: 100%;">
-            Déconnexion
-        </button>
-    </div>
-</aside>
+            <div class="admin-logo">SILENCIO <span>ADMIN</span></div>
+            <nav>
+                <a href="#projets" class="active">Gestion des Projets</a>
+                <a href="#accueil">Vidéo d'Accueil</a>
+                <a href="#equipe">L'Équipe</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" target="_blank" class="btn-secondary" style="display: block; text-align: center; margin-bottom: 15px; text-decoration: none; font-size: 0.8rem;">
+                    Voir le site
+                </a>
+                <button class="btn-primary logout-btn" style="width: 100%;">
+                    Déconnexion
+                </button>
+            </div>
+        </aside>
 
         <main class="admin-content">
             <header class="content-header">
@@ -60,13 +59,11 @@
 
             <div class="dashboard-grid">
                 
-               <section id="view-list" class="panel list-panel" data-tab="projets">
-                    
+                <section id="view-list" class="panel list-panel" data-tab="projets">
                     <div class="search-container" style="margin-bottom: 1.5rem; position: relative;">
                         <input type="text" id="search-project" placeholder="Rechercher un film par titre..." style="width: 100%; padding: 12px 12px 12px 40px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px; font-family: inherit;">
                         <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5;">🔍</span>
                     </div>
-
                     <div class="list-scroll-container">
                         <ul id="project-list" class="sortable-list">
                             </ul>
@@ -74,7 +71,6 @@
                 </section>
 
                 <section id="view-form" class="panel form-panel hidden" data-tab="projets">
-                    
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
                         <h2 id="form-title" style="margin-bottom: 0;">Ajouter un projet</h2>
                         <button type="button" class="btn-secondary btn-cancel-top" style="padding: 5px 15px; font-size: 0.8rem;">✕ Annuler</button>
@@ -85,7 +81,6 @@
                             <label>Titre du projet</label>
                             <input type="text" id="proj-title" placeholder="Ex: Neon Nights" required>
                         </div>
-
                         <div class="form-group">
                             <label>Statut / Sous-titre</label>
                             <input type="text" id="proj-subtitle" placeholder="Ex: Court-métrage" required>
@@ -150,34 +145,20 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Genre</label>
-                            <input type="text" id="proj-genre" placeholder="Ex: Drame / Thriller">
-                        </div>
-                        <div class="form-group">
-                            <label>Année</label>
-                            <input type="text" id="proj-annee" placeholder="Ex: 2025">
-                        </div>
-                        <div class="form-group">
-                            <label>Réalisation</label>
-                            <input type="text" id="proj-realisateur" placeholder="Ex: Joseph Hsu">
-                        </div>
-                        <div class="form-group">
-                            <label>Casting</label>
-                            <input type="text" id="proj-casting" placeholder="Ex: Ronald Cheng, Sammi Cheng...">
-                        </div>
+                        <div class="form-group"><label>Genre</label><input type="text" id="proj-genre" placeholder="Ex: Drame / Thriller"></div>
+                        <div class="form-group"><label>Année</label><input type="text" id="proj-annee" placeholder="Ex: 2025"></div>
+                        <div class="form-group"><label>Réalisation</label><input type="text" id="proj-realisateur" placeholder="Ex: Joseph Hsu"></div>
+                        <div class="form-group"><label>Casting</label><input type="text" id="proj-casting" placeholder="Ex: Ronald Cheng, Sammi Cheng..."></div>
                         <div class="form-group">
                             <label>Synopsis</label>
                             <textarea id="proj-synopsis" rows="5" placeholder="Résumé du film..." style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                         </div>
-
                         <div class="form-group">
                             <label>Lien Vidéo YouTube (Trailer)</label>
                             <input type="url" id="proj-video" placeholder="Collez n'importe quel lien YouTube ici...">
                         </div>
 
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 2rem; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 4px;">
-                            <input type="checkbox" id="proj-visible" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--color-accent);">
                             <label class="toggle-switch">
                                 <input type="checkbox" id="proj-visible" checked>
                                 <span class="slider"></span>
@@ -185,13 +166,12 @@
                             <span>Visible sur le site</span>
                         </div>
 
-                        <div class="form-group checkbox-group" style="margin-top: 15px; padding: 10px; background: rgba(215, 39, 37, 0.1); border-left: 3px solid var(--color-accent); border-radius: 4px;">
-                            <input type="checkbox" id="proj-autoshare">
+                        <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 15px; padding: 15px; background: rgba(215, 39, 37, 0.1); border-left: 3px solid var(--color-accent); border-radius: 4px;">
                             <label class="toggle-switch">
                                 <input type="checkbox" id="proj-autoshare">
                                 <span class="slider"></span>
                             </label>
-                            <span>PARTAGE SUR LES RÉSEAUX</span>
+                            <span style="font-weight: 600;">PARTAGE SUR LES RÉSEAUX</span>
                         </div>
 
                         <div class="form-actions">
@@ -232,7 +212,6 @@
                     
                     <form id="team-form">
                         <div style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 2rem;">
-                            
                             <div style="flex: 0 0 150px; text-align: center; margin: 0 auto;">
                                 <label style="display:block; margin-bottom: 10px;">Photo (Avatar)</label>
                                 <div id="team-dropzone" class="dropzone" style="width: 150px; height: 150px; min-height: 150px; border-radius: 50%; padding: 5px; background: #050505; position: relative; overflow: hidden; border: 2px dashed rgba(255,255,255,0.2);">
@@ -241,7 +220,6 @@
                                     <div class="team-hover-text" style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; opacity:0; transition:0.3s; border-radius: 50%; font-size: 0.8rem; color:#fff;">Modifier</div>
                                 </div>
                             </div>
-                            
                             <div style="flex: 1; min-width: 250px;">
                                 <div class="form-group">
                                     <label>Nom Complet</label>
@@ -264,37 +242,7 @@
             </div>
         </main>
     </div>
-    <script type="module" src="main.js?v=3.0"></script>
+    
+    <script type="module" src="main.js?v=5.0"></script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
