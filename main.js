@@ -738,16 +738,44 @@ function setupProjectForm() {
             }
             projectData.imageAffiche = imageUrl;
 
+            let finalProjectId = currentEditId;
+
+            // 1. Sauvegarde dans Firebase
             if (currentEditId) {
                 await updateDoc(doc(db, "projects", currentEditId), projectData);
                 UI.showToast("Projet mis à jour !");
             } else {
                 projectData.ordreAffichage = Date.now();
-                await addDoc(collection(db, "projects"), projectData);
+                const newDocRef = await addDoc(collection(db, "projects"), projectData);
+                finalProjectId = newDocRef.id; // On récupère l'ID du nouveau projet
                 UI.showToast("Projet publié !");
             }
+
+            // 2. LA SONNETTE MAKE (WEBHOOK)
+            if (projectData.partageReseaux === true) {
+                try {
+                    // Remplace ce lien par celui que Make t'a donné !
+                    const webhookUrl = "https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513"; 
+                    
+                    await fetch(webhookUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            id: finalProjectId,
+                            titre: projectData.titre,
+                            statut: projectData.statut,
+                            synopsis: projectData.synopsis,
+                            imageAffiche: projectData.imageAffiche
+                        })
+                    });
+                    console.log("Signal envoyé au robot !");
+                } catch(e) {
+                    console.error("Erreur d'envoi au robot", e);
+                }
+            }
+
             loadAdminProjects(); 
-            returnToListView(); // Retour à la liste après succès
+            returnToListView(); 
         } catch (error) { 
             console.error("Erreur Firebase:", error); 
             UI.showToast("Erreur lors de l'enregistrement.", "error"); 
@@ -1173,6 +1201,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
