@@ -330,6 +330,75 @@ function renderProject(data) {
     setTimeout(() => { if (heroImage.complete) heroImage.classList.add('loaded'); }, 50);
 }
 
+function initAdmin() {
+    const loginOverlay = document.getElementById('login-overlay');
+    const loginForm = document.getElementById('login-form');
+    let currentTab = 'projets';
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            loginOverlay.classList.add('hidden');
+            setupDropzone(); setupProjectForm(); loadAdminProjects();
+            setupTeamDropzone(); setupTeamForm(); loadAdminTeam();
+            setupHomeVideo();
+        } else {
+            loginOverlay.classList.remove('hidden'); document.getElementById('login-box').classList.remove('hidden');
+        }
+    });
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value; const password = document.getElementById('admin-password').value; const btn = loginForm.querySelector('button');
+            btn.textContent = "Vérification..."; btn.disabled = true;
+            signInWithEmailAndPassword(auth, email, password).then(() => { UI.showToast("Connexion réussie"); btn.textContent = "Connexion"; btn.disabled = false; }).catch(() => { document.getElementById('login-error').classList.remove('hidden'); btn.textContent = "Connexion"; btn.disabled = false; });
+        });
+    }
+
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(auth).then(() => { window.location.href = 'index.html'; }); });
+
+    // --- GESTION DU SLIDER RÉSEAUX SOCIAUX ---
+    const shareToggle = document.getElementById('proj-autoshare');
+    const socialZone = document.getElementById('social-crop-zone');
+    if (shareToggle && socialZone) {
+        shareToggle.addEventListener('change', (e) => {
+            socialZone.style.display = e.target.checked ? 'block' : 'none';
+        });
+    }
+
+    const btnAddNew = document.getElementById('btn-add-new');
+    if (btnAddNew) {
+        btnAddNew.addEventListener('click', () => {
+            if (currentTab === 'projets') { document.getElementById('view-list').classList.add('hidden'); document.getElementById('view-form').classList.remove('hidden'); resetProjectForm(); } 
+            else if (currentTab === 'equipe') { document.getElementById('view-team-list').classList.add('hidden'); document.getElementById('view-team-form').classList.remove('hidden'); resetTeamForm(); }
+            btnAddNew.style.display = 'none';
+        });
+    }
+
+    const navLinks = document.querySelectorAll('.admin-sidebar nav a');
+    const allPanels = document.querySelectorAll('[data-tab]');
+    const mainTitle = document.querySelector('.content-header h1');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const target = link.getAttribute('href').replace('#', ''); 
+            if (!target || target.startsWith('http')) return;
+            e.preventDefault(); currentTab = target; navLinks.forEach(l => l.classList.remove('active')); link.classList.add('active');
+            allPanels.forEach(panel => panel.classList.add('hidden'));
+            if (target === 'projets') { mainTitle.textContent = "Projets en Production"; document.getElementById('view-list').classList.remove('hidden'); if (btnAddNew) btnAddNew.style.display = 'block'; } 
+            else if (target === 'accueil') { document.getElementById('panel-accueil').classList.remove('hidden'); mainTitle.textContent = "Vidéo d'Accueil"; if (btnAddNew) btnAddNew.style.display = 'none'; } 
+            else if (target === 'equipe') { mainTitle.textContent = "L'Équipe"; document.getElementById('view-team-list').classList.remove('hidden'); if (btnAddNew) btnAddNew.style.display = 'block'; }
+        });
+    });
+
+    const searchInput = document.getElementById('search-project');
+    if (searchInput) searchInput.addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); document.querySelectorAll('#project-list .sortable-item').forEach(item => { const titleElement = item.querySelector('.item-info strong'); if (titleElement) item.style.display = titleElement.textContent.toLowerCase().includes(term) ? 'flex' : 'none'; }); });
+
+    const searchTeam = document.getElementById('search-team');
+    if (searchTeam) searchTeam.addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); document.querySelectorAll('#team-list .sortable-item').forEach(item => { const nameElement = item.querySelector('.item-info strong'); if (nameElement) item.style.display = nameElement.textContent.toLowerCase().includes(term) ? 'flex' : 'none'; }); });
+}
+
 // =========================================
 // 7. MOTEUR DE PROJETS (D&D, UPLOAD, CRUD)
 // =========================================
@@ -878,5 +947,6 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
