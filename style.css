@@ -130,14 +130,16 @@ h1 {
 #contact { text-align: center; border-top: none; }
 .contact-info { padding-top: 1rem; }
 .contact-info p { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 300; }
-.contact-info a[href^="mailto:"] {
+.contact-info a[href^="mailto:"], .contact-info a[href^="tel:"] {
     font-family: 'Montserrat', sans-serif !important; font-weight: 200 !important;       
     letter-spacing: 2px !important; color: #cccccc !important;         
     font-size: clamp(1rem, 1.5vw, 1.4rem) !important; white-space: nowrap !important;    
     text-decoration: none !important; border-bottom: 1px solid rgba(215, 39, 37, 0.4); 
     padding-bottom: 8px; display: inline-block; transition: all 0.3s ease;
 }
-.contact-info a[href^="mailto:"]:hover { color: #ffffff !important; border-bottom-color: #D72725; transform: translateY(-2px); }
+.contact-info a[href^="mailto:"]:hover, .contact-info a[href^="tel:"]:hover { 
+    color: #ffffff !important; border-bottom-color: #D72725; transform: translateY(-2px); 
+}
 
 .insta-link { display: inline-block; color: #fff; transition: all 0.3s ease; margin-top: 1rem; opacity: 0.7; }
 .insta-link svg { width: 40px; height: 40px; }
@@ -558,6 +560,7 @@ section#projects, section#about {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
