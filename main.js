@@ -409,42 +409,58 @@ function syncBentoDA() {
 
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
-    const previewSocial = document.getElementById('image-preview-social');
+    const previewSocial = document.getElementById('image-preview-social'); // Aperçu Instagram
     const blocWrapper = document.getElementById('da-bloc-wrapper');
 
     const formatSelect = document.getElementById('proj-format');
-    const focusBentoX = document.getElementById('proj-focus-bento-x'); const focusBentoY = document.getElementById('proj-focus-bento-y');
-    const focusHeaderX = document.getElementById('proj-focus-header-x'); const focusHeaderY = document.getElementById('proj-focus-header-y');
-    const focusSocialX = document.getElementById('proj-focus-social-x'); const focusSocialY = document.getElementById('proj-focus-social-y');
+    const focusBentoX = document.getElementById('proj-focus-bento-x'); 
+    const focusBentoY = document.getElementById('proj-focus-bento-y');
+    const focusHeaderX = document.getElementById('proj-focus-header-x'); 
+    const focusHeaderY = document.getElementById('proj-focus-header-y');
+    const focusSocialX = document.getElementById('proj-focus-social-x'); // Slider X Social
+    const focusSocialY = document.getElementById('proj-focus-social-y'); // Slider Y Social
 
     if (!daContainer || !previewsGroup || !previewBloc) return;
 
     function updateLiveView() {
-        if (!previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
+        if (!previewBloc.src || previewBloc.src === "" || previewBloc.src.endsWith('admin.html')) return;
+        
         if(blocWrapper) {
             blocWrapper.className = '';
             if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
         }
-        if (focusBentoX && focusBentoY && previewBloc) previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
-        if (focusHeaderX && focusHeaderY && previewCadrage) previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
+        
+        // Mise à jour Bento
+        if (focusBentoX && focusBentoY) previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
+        // Mise à jour Header
+        if (focusHeaderX && focusHeaderY) previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
+        // Mise à jour Social (Instagram 4:5)
         if (focusSocialX && focusSocialY && previewSocial) previewSocial.style.objectPosition = `${focusSocialX.value}% ${focusSocialY.value}%`;
     }
 
+    // Écouteurs pour la mise à jour en temps réel
     if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
-    if (focusBentoX) focusBentoX.addEventListener('input', updateLiveView); if (focusBentoY) focusBentoY.addEventListener('input', updateLiveView);
-    if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView); if (focusHeaderY) focusHeaderY.addEventListener('input', updateLiveView);
-    if (focusSocialX) focusSocialX.addEventListener('input', updateLiveView); if (focusSocialY) focusSocialY.addEventListener('input', updateLiveView);
+    if (focusBentoX) focusBentoX.addEventListener('input', updateLiveView);
+    if (focusBentoY) focusBentoY.addEventListener('input', updateLiveView);
+    if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView);
+    if (focusHeaderY) focusHeaderY.addEventListener('input', updateLiveView);
+    if (focusSocialX) focusSocialX.addEventListener('input', updateLiveView);
+    if (focusSocialY) focusSocialY.addEventListener('input', updateLiveView);
 
-    const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
+    const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith('admin.html');
     if (hasImage) {
-        daContainer.classList.remove('da-container-single'); daContainer.classList.add('da-container-split');
+        daContainer.classList.remove('da-container-single');
+        daContainer.classList.add('da-container-split');
         if(dropText) dropText.style.display = 'none';
-        previewsGroup.classList.remove('previews-hidden'); previewsGroup.classList.add('previews-visible');
+        previewsGroup.classList.remove('previews-hidden');
+        previewsGroup.classList.add('previews-visible');
         updateLiveView();
     } else {
-        daContainer.classList.remove('da-container-split'); daContainer.classList.add('da-container-single');
+        daContainer.classList.remove('da-container-split');
+        daContainer.classList.add('da-container-single');
         if(dropText) dropText.style.display = 'block';
-        previewsGroup.classList.remove('previews-visible'); previewsGroup.classList.add('previews-hidden');
+        previewsGroup.classList.remove('previews-visible');
+        previewsGroup.classList.add('previews-hidden');
     }
 }
 
@@ -824,4 +840,5 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
