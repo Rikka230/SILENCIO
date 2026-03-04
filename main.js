@@ -134,7 +134,7 @@ async function initHomePage(){
         }
     }
     
-    // --- CHARGEMENT DES PARAMÈTRES ---
+    // --- CHARGEMENT DES PARAMÈTRES (VIDÉO, À PROPOS, CONTACT) ---
     try {
         const settingsRef = doc(db, "settings", "homepage");
         const settingsSnap = await getDoc(settingsRef);
@@ -143,37 +143,57 @@ async function initHomePage(){
             if (heroVideo) { heroVideo.src = settingsSnap.data().backgroundVideo; heroVideo.load(); }
         }
         
+        // 1. Textes "À Propos"
         const aproposSnap = await getDoc(doc(db, "settings", "apropos"));
         if (aproposSnap.exists() && aproposSnap.data().texte) {
             const textEl = document.getElementById('dyn-apropos');
             if (textEl) textEl.innerHTML = aproposSnap.data().texte.replace(/\n/g, '<br>');
         }
 
+        // 2. Contacts et Réseaux
         const contactSnap = await getDoc(doc(db, "settings", "contact"));
         if (contactSnap.exists()) {
             const c = contactSnap.data();
+            
             if (c.email) {
                 const emailEl = document.getElementById('dyn-contact-email');
                 if (emailEl) { emailEl.textContent = c.email; emailEl.href = "mailto:" + c.email; }
             }
+            
             const phoneWrapper = document.getElementById('dyn-contact-phone-wrapper');
             const phoneEl = document.getElementById('dyn-contact-phone');
             const emailWrapper = document.getElementById('dyn-contact-email-wrapper');
+            
             if (c.phone && c.phoneVisible !== false) {
                 if (phoneWrapper && phoneEl) {
-                    phoneEl.textContent = c.phone; phoneEl.href = "tel:" + c.phone.replace(/\s+/g, '');
-                    phoneWrapper.style.display = 'block'; if (emailWrapper) emailWrapper.style.marginBottom = '0.5rem';
+                    phoneEl.textContent = c.phone;
+                    phoneEl.href = "tel:" + c.phone.replace(/\s+/g, '');
+                    phoneWrapper.style.display = 'block';
+                    if (emailWrapper) emailWrapper.style.marginBottom = '0.5rem';
                 }
             } else {
-                if (phoneWrapper) phoneWrapper.style.display = 'none'; if (emailWrapper) emailWrapper.style.marginBottom = '2rem';
+                if (phoneWrapper) phoneWrapper.style.display = 'none';
+                if (emailWrapper) emailWrapper.style.marginBottom = '2rem';
             }
-            const setupSocial = (id, url) => { const el = document.getElementById(id); if (el) { if (url && url.trim() !== '') { el.href = url; el.style.display = 'inline-block'; } else { el.style.display = 'none'; } } };
-            setupSocial('dyn-link-ig', c.instagram); setupSocial('dyn-link-fb', c.facebook); setupSocial('dyn-link-li', c.linkedin); setupSocial('dyn-link-yt', c.youtube);
+            
+            const setupSocial = (id, url) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (url && url.trim() !== '') { el.href = url; el.style.display = 'inline-block'; } 
+                    else { el.style.display = 'none'; }
+                }
+            };
+            setupSocial('dyn-link-ig', c.instagram);
+            setupSocial('dyn-link-fb', c.facebook);
+            setupSocial('dyn-link-li', c.linkedin);
+            setupSocial('dyn-link-yt', c.youtube);
         }
-        setTimeout(() => { document.querySelectorAll('.anti-stretch-img').forEach(img => { if (img.complete) img.classList.add('loaded'); }); }, 50);
+
+        setTimeout(() => {
+            document.querySelectorAll('.anti-stretch-img').forEach(img => { if (img.complete) img.classList.add('loaded'); });
+        }, 50);
     } catch (error) {}
     
-    // --- CHARGEMENT DES PROJETS ET GRILLE BENTO INTELLIGENTE ---
     const bentoContainer = document.querySelector('.bento-container');
     if (bentoContainer) {
         try {
@@ -188,201 +208,82 @@ async function initHomePage(){
             bentoContainer.innerHTML = '';
             if (titleElement) bentoContainer.appendChild(titleElement);
 
-            let totalCells = 0; 
-            let hasTallOrBig = false; 
+            let totalCells = 0; let hasTallOrBig = false; let projectsHTML = '';
 
-            projects.forEach((project) => {
-                const extraClass = project.formatAffichage || '';
-                if (extraClass === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
-                else if (extraClass === 'bento-tall' || extraClass === 'bento-wide') { totalCells += 2; hasTallOrBig = true; }
-                else { totalCells += 1; }
-            });
+            if (projects.length === 0) {
+                projectsHTML = `<div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span></div>`;
+            } else {
+                projects.forEach((project) => {
+                    const extraClass = project.formatAffichage || '';
+                    const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
+
+                    if (extraClass === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
+                    else if (extraClass === 'bento-tall') { totalCells += 2; hasTallOrBig = true; }
+                    else if (extraClass === 'bento-wide') { totalCells += 2; }
+                    else { totalCells += 1; }
+
+                    projectsHTML += `<a href="projet.html?id=${project.id}" class="bento-item ${extraClass}"><img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${project.titre.toUpperCase()}</h3><p>${project.statut}</p></div></a>`;
+                });
+            }
 
             const isMobile = window.innerWidth <= 1024;
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
-            
-            let itemsHTML = '';
-            let gridRows = 1; 
-            let gridCols = 4;
+            let itemsHTML = ''; let requiredRows = 1; let requiredCols = 4;
 
-            if (projects.length === 0) {
-                itemsHTML = `<div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span></div>`;
-            } else if (projects.length > 0) {
-                
-                // ALGORITHME DE PACKING ABSOLU (Positionnement exact, Centrage de la dernière ligne)
-                let gridMap = [];
-                let mode = useScrollMode ? 'scroll' : 'static';
-                let fixedCount;
-                
-                if (mode === 'scroll') {
-                    fixedCount = isMobile ? 2 : 3;
-                } else {
-                    if (isMobile) {
-                        fixedCount = 2;
-                    } else {
-                        if (totalCells <= 2 && !hasTallOrBig) fixedCount = Math.max(1, totalCells);
-                        else if (totalCells <= 4) fixedCount = 2;
-                        else if (totalCells <= 6) fixedCount = 3;
-                        else fixedCount = 4;
-                    }
-                }
-
-                function isFree(x, y, w, h) {
-                    for (let dy = 0; dy < h; dy++) {
-                        for (let dx = 0; dx < w; dx++) {
-                            if (gridMap[y + dy] && gridMap[y + dy][x + dx]) return false;
-                        }
-                    }
-                    return true;
-                }
-
-                function mark(x, y, w, h) {
-                    for (let dy = 0; dy < h; dy++) {
-                        if (!gridMap[y + dy]) gridMap[y + dy] = [];
-                        for (let dx = 0; dx < w; dx++) {
-                            gridMap[y + dy][x + dx] = true;
-                        }
-                    }
-                }
-
-                let maxCol = 0, maxRow = 0;
-                let placedProjects = [];
-
-                projects.forEach(p => {
-                    let w = 1, h = 1;
-                    const format = p.formatAffichage || '';
-                    if (format === 'bento-big') { w = 2; h = 2; }
-                    else if (format === 'bento-tall') { w = 1; h = 2; }
-                    else if (format === 'bento-wide') { w = 2; h = 1; }
-                    
-                    let placed = false; let y = 0, x = 0;
-                    
-                    if (mode === 'static') {
+            if (projects.length > 1) {
+                let missingCells = 0; let beforeCount = 0; let afterCount = 0;
+                if (useScrollMode) {
+                    let gridMap = [[], [], []]; let maxCol = 0;
+                    projects.forEach(p => {
+                        let w = 1, h = 1; const format = p.formatAffichage || '';
+                        if (format === 'bento-big') { w = 2; h = 2; } else if (format === 'bento-tall') { w = 1; h = 2; } else if (format === 'bento-wide') { w = 2; h = 1; }
+                        let placed = false; let x = 0;
                         while (!placed) {
-                            if (x + w <= fixedCount && isFree(x, y, w, h)) { 
-                                mark(x, y, w, h); 
-                                maxRow = Math.max(maxRow, y + h); 
-                                placedProjects.push({...p, gridX: x, gridY: y, w, h});
-                                placed = true; 
-                            } else { 
-                                x++; if (x + w > fixedCount) { x = 0; y++; } 
+                            for (let y = 0; y <= 3 - h; y++) {
+                                let canFit = true;
+                                for (let dx = 0; dx < w; dx++) {
+                                    for (let dy = 0; dy < h; dy++) { if (gridMap[y + dy][x + dx]) { canFit = false; break; } }
+                                    if (!canFit) break;
+                                }
+                                if (canFit) {
+                                    for (let dx = 0; dx < w; dx++) { for (let dy = 0; dy < h; dy++) { gridMap[y + dy][x + dx] = true; } }
+                                    if (x + w > maxCol) maxCol = x + w; placed = true; break;
+                                }
                             }
-                        }
-                    } else {
-                        while (!placed) {
-                            if (y + h <= fixedCount && isFree(x, y, w, h)) { 
-                                mark(x, y, w, h); 
-                                maxCol = Math.max(maxCol, x + w); 
-                                placedProjects.push({...p, gridX: x, gridY: y, w, h});
-                                placed = true; 
-                            } else { 
-                                y++; if (y + h > fixedCount) { y = 0; x++; } 
-                            }
-                        }
-                    }
-                });
-
-                // CENTRAGE MAGIQUE DE LA DERNIÈRE LIGNE (Mode Statique uniquement)
-                if (mode === 'static' && maxRow > 0) {
-                    let clearLastRow = true;
-                    let lastRowItems = [];
-                    let usedCellsLastRow = 0;
-
-                    placedProjects.forEach(p => {
-                        if (p.gridY + p.h - 1 === maxRow - 1) {
-                            lastRowItems.push(p);
-                            usedCellsLastRow += p.w;
-                            if (p.gridY < maxRow - 1) clearLastRow = false;
+                            if (!placed) x++;
                         }
                     });
-
-                    if (clearLastRow && usedCellsLastRow < fixedCount) {
-                        let shift = Math.floor((fixedCount - usedCellsLastRow) / 2);
-                        if (shift > 0) {
-                            lastRowItems.forEach(p => { for(let i=0; i<p.w; i++) gridMap[p.gridY][p.gridX + i] = false; });
-                            lastRowItems.forEach(p => {
-                                p.gridX += shift;
-                                for(let i=0; i<p.w; i++) gridMap[p.gridY][p.gridX + i] = true;
-                            });
-                        }
-                    }
-                }
-
-                // GÉNÉRATION HTML DES PROJETS (Les "!" importants forcent le CSS à obéir)
-                let finalHTML = '';
-                placedProjects.forEach(p => {
-                    const extraClass = p.formatAffichage || '';
-                    const focus = p.imageFocusBento || p.imageFocus || '50% 50%';
-                    finalHTML += `<a href="projet.html?id=${p.id}" class="bento-item ${extraClass}" style="grid-column: ${p.gridX + 1} / span ${p.w} !important; grid-row: ${p.gridY + 1} / span ${p.h} !important;"><img src="${p.imageAffiche}" alt="${p.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${p.titre.toUpperCase()}</h3><p>${p.statut || p.genre || ''}</p></div></a>`;
-                });
-
-                // GÉNÉRATION DES BLOCS SILENCIO (Avec "!" importants)
-                if (mode === 'static') {
-                    for (let y = 0; y < maxRow; y++) {
-                        let firstOccupiedX = 0;
-                        let lastOccupiedX = fixedCount - 1;
-                        
-                        if (y === maxRow - 1) {
-                            while (lastOccupiedX >= 0 && (!gridMap[y] || !gridMap[y][lastOccupiedX])) lastOccupiedX--;
-                            while (firstOccupiedX <= lastOccupiedX && (!gridMap[y] || !gridMap[y][firstOccupiedX])) firstOccupiedX++;
-                        }
-                        
-                        for (let x = firstOccupiedX; x <= lastOccupiedX; x++) {
-                            if (!gridMap[y] || !gridMap[y][x]) {
-                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1 !important; grid-row: ${y + 1} / span 1 !important; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
-                            }
-                        }
-                    }
-                    gridRows = maxRow; gridCols = fixedCount;
+                    for (let x = 0; x < maxCol; x++) { for (let y = 0; y < 3; y++) { if (!gridMap[y][x]) missingCells++; } }
+                    afterCount = missingCells;
                 } else {
-                    for (let x = 0; x < maxCol; x++) {
-                        let lastOccupiedY = fixedCount - 1;
-                        if (x === maxCol - 1) {
-                            while(lastOccupiedY >= 0 && (!gridMap[lastOccupiedY] || !gridMap[lastOccupiedY][x])) lastOccupiedY--;
-                        }
-                        for (let y = 0; y <= lastOccupiedY; y++) {
-                            if (!gridMap[y] || !gridMap[y][x]) {
-                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1 !important; grid-row: ${y + 1} / span 1 !important; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
-                            }
-                        }
+                    if (hasTallOrBig) {
+                        if (totalCells <= 4) { requiredRows = 2; requiredCols = 2; } else if (totalCells <= 6) { requiredRows = 2; requiredCols = 3; } else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } else { requiredRows = 3; requiredCols = 4; }                     
+                    } else {
+                        if (totalCells <= 2) { requiredRows = 1; requiredCols = 2; } else if (totalCells === 3) { requiredRows = 1; requiredCols = 3; } else if (totalCells === 4) { requiredRows = 1; requiredCols = 4; } else if (totalCells <= 8) { requiredRows = 2; requiredCols = 4; } else { requiredRows = 3; requiredCols = 4; }
                     }
-                    gridRows = fixedCount; gridCols = maxCol;
+                    const requiredTotal = requiredRows * requiredCols;
+                    missingCells = requiredTotal > totalCells ? requiredTotal - totalCells : 0;
+                    beforeCount = Math.floor(missingCells / 2); afterCount = Math.ceil(missingCells / 2);
                 }
-                itemsHTML = finalHTML;
-            }
 
-            // --- RENDU DANS LE DOM ---
-            const wrapper = document.createElement('div'); 
-            const grid = document.createElement('div');
-            
+                const createSilencio = () => `<div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
+                let beforeHTML = ''; for (let i = 0; i < beforeCount; i++) beforeHTML += createSilencio();
+                let afterHTML = ''; for (let i = 0; i < afterCount; i++) afterHTML += createSilencio();
+                itemsHTML = beforeHTML + projectsHTML + afterHTML;
+            } else { itemsHTML = projectsHTML; }
+
+            const wrapper = document.createElement('div'); const grid = document.createElement('div');
             if (!useScrollMode) {
-                wrapper.className = 'bento-wrapper is-static'; 
-                grid.className = 'bento-grid is-static';
-                
-                if (projects.length <= 1 && !hasTallOrBig) { 
-                    grid.classList.add('is-single-item'); 
-                } else { 
-                    grid.style.setProperty('grid-template-columns', `repeat(${gridCols}, var(--cell-size))`, 'important'); 
-                    grid.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important'); 
-                }
-                grid.innerHTML = itemsHTML; 
-                wrapper.appendChild(grid); 
-                bentoContainer.appendChild(wrapper);
+                wrapper.className = 'bento-wrapper is-static'; grid.className = 'bento-grid is-static';
+                if (projects.length <= 1) { grid.classList.add('is-single-item'); } 
+                else if (!isMobile) { grid.style.setProperty('grid-template-columns', `repeat(${requiredCols}, var(--cell-size))`, 'important'); grid.style.setProperty('grid-template-rows', `repeat(${requiredRows}, var(--cell-size))`, 'important'); }
+                grid.innerHTML = itemsHTML; wrapper.appendChild(grid); bentoContainer.appendChild(wrapper);
             } else {
-                wrapper.className = 'bento-wrapper is-scrollable'; 
-                const track = document.createElement('div'); track.className = 'bento-track';
-                
+                wrapper.className = 'bento-wrapper is-scrollable'; const track = document.createElement('div'); track.className = 'bento-track';
                 const grid1 = document.createElement('div'); grid1.className = 'bento-grid is-scrollable'; grid1.innerHTML = itemsHTML;
-                grid1.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important');
-                
                 const grid2 = document.createElement('div'); grid2.className = 'bento-grid is-scrollable'; grid2.innerHTML = itemsHTML;
-                grid2.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important');
-                
                 const grid3 = document.createElement('div'); grid3.className = 'bento-grid is-scrollable'; grid3.innerHTML = itemsHTML;
-                grid3.style.setProperty('grid-template-rows', `repeat(${gridRows}, var(--cell-size))`, 'important');
-                
-                track.appendChild(grid1); track.appendChild(grid2); track.appendChild(grid3); 
-                wrapper.appendChild(track); bentoContainer.appendChild(wrapper);
+                track.appendChild(grid1); track.appendChild(grid2); track.appendChild(grid3); wrapper.appendChild(track); bentoContainer.appendChild(wrapper);
 
                 let jumpDistance = 0;
                 setTimeout(() => { jumpDistance = grid2.offsetLeft - grid1.offsetLeft; wrapper.scrollLeft = jumpDistance; }, 100);
@@ -398,7 +299,6 @@ async function initHomePage(){
         } catch (error) {}
     }
 
-    // L'EQUIPE
     const teamGrid = document.querySelector('.team-grid');
     if (teamGrid) {
         try {
@@ -1158,9 +1058,6 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
-
-
-
 
 
 
