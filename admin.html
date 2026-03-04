@@ -39,6 +39,8 @@
             <nav>
                 <a href="#projets" class="active">Gestion des Projets</a>
                 <a href="#accueil">Vidéo d'Accueil</a>
+                <a href="#apropos">À Propos</a>
+                <a href="#contact">Contact & Réseaux</a>
                 <a href="#equipe">L'Équipe</a>
             </nav>
             <div class="sidebar-footer">
@@ -82,7 +84,7 @@
                             <input type="text" id="proj-title" placeholder="Ex: Neon Nights" required>
                         </div>
                         <div class="form-group">
-                            <label>Statut / Sous-titre</label>
+                            <label>Genre</label>
                             <input type="text" id="proj-subtitle" placeholder="Ex: Court-métrage" required>
                         </div>
 
@@ -145,7 +147,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group"><label>Genre</label><input type="text" id="proj-genre" placeholder="Ex: Drame / Thriller"></div>
+                        <div class="form-group"><label>Mots-clés / Thème</label><input type="text" id="proj-genre" placeholder="Ex: Thriller / Art-house"></div>
                         <div class="form-group"><label>Année</label><input type="text" id="proj-annee" placeholder="Ex: 2025"></div>
                         <div class="form-group"><label>Réalisation</label><input type="text" id="proj-realisateur" placeholder="Ex: Joseph Hsu"></div>
                         <div class="form-group"><label>Casting</label><input type="text" id="proj-casting" placeholder="Ex: Ronald Cheng, Sammi Cheng..."></div>
@@ -156,6 +158,20 @@
                         <div class="form-group">
                             <label>Lien Vidéo YouTube (Trailer)</label>
                             <input type="url" id="proj-video" placeholder="Collez n'importe quel lien YouTube ici...">
+                        </div>
+
+                        <div class="form-group" style="position: relative; margin-top: 2rem; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed var(--color-border); border-radius: 8px;">
+                            <label style="display: flex; align-items: center; gap: 10px; color: var(--color-text-muted);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                Liens externes du film (Site Officiel, IMDb, Réseaux...)
+                            </label>
+                            <div style="display: flex; gap: 15px; margin-top: 15px; opacity: 0.2; pointer-events: none;">
+                                <input type="text" placeholder="URL du Site Officiel" style="flex: 1;" disabled>
+                                <input type="text" placeholder="URL Instagram" style="flex: 1;" disabled>
+                            </div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--color-accent); color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10; cursor: help;" title="Bientôt disponible : Liez directement les sites et réseaux de vos films !">
+                                🚧 MODULE EN CRÉATION
+                            </div>
                         </div>
 
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 2rem; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 4px;">
@@ -177,7 +193,7 @@
                             </div>
 
                             <div id="social-crop-zone" style="display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                                <h4 style="margin-bottom: 15px; font-size: 0.9rem; color: var(--color-accent);">Cadrage Instagram (Format vertical 4:5)</h4>
+                                <h4 style="margin-bottom: 15px; font-size: 0.9rem; color: var(--color-accent);">Cadrage Instagram / LinkedIn (Format vertical 4:5)</h4>
                                 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                                     
                                     <div style="flex: 0 0 160px;">
@@ -196,9 +212,6 @@
                                             <span style="flex:1; text-align:center;">↔ X (Horiz.)</span>
                                             <span style="flex:1; text-align:center;">↕ Y (Vertic.)</span>
                                         </div>
-                                        <p style="font-size: 0.8rem; color: #aaa; margin-top: 15px; line-height: 1.4;">
-                                            Une image <strong>JPG dédiée (1080x1350)</strong> sera automatiquement générée et envoyée au robot lors de la publication.
-                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -220,6 +233,59 @@
                             <p class="help-text">Privilégie une vidéo très courte et compressée (moins de 5Mo) pour un chargement instantané sur mobile.</p>
                         </div>
                         <button type="submit" id="btn-save-video" class="btn-primary">Mettre à jour la vidéo</button>
+                    </form>
+                </section>
+
+                <section id="panel-apropos" class="panel form-panel hidden" data-tab="apropos" style="grid-column: 1 / -1;">
+                    <h2>Texte de présentation</h2>
+                    <form id="apropos-form">
+                        <div class="form-group">
+                            <label>Phrase d'accroche / Présentation</label>
+                            <textarea id="apropos-text" rows="6" style="width: 100%; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); border-radius: 4px; font-family: inherit; resize: vertical;" placeholder="Nous sommes Silencio Pictures..."></textarea>
+                        </div>
+                        <button type="submit" id="btn-save-apropos" class="btn-primary">Mettre à jour le texte</button>
+                    </form>
+                </section>
+
+                <section id="panel-contact" class="panel form-panel hidden" data-tab="contact" style="grid-column: 1 / -1;">
+                    <h2>Coordonnées & Réseaux Sociaux</h2>
+                    <form id="contact-form">
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 250px;">
+                                <h3>Informations de Contact</h3>
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label>Adresse E-mail</label>
+                                    <input type="email" id="contact-email" placeholder="contact@silenciopictures.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Numéro de Téléphone</label>
+                                    <input type="tel" id="contact-phone" placeholder="+33 6 00 00 00 00">
+                                </div>
+                                <div class="form-group" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); border-radius: 4px;">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="contact-phone-visible" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span>Afficher le téléphone sur le site public</span>
+                                </div>
+                            </div>
+                            <div style="flex: 1; min-width: 250px;">
+                                <h3>Réseaux Sociaux</h3>
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label>Lien Instagram</label>
+                                    <input type="url" id="contact-ig" placeholder="https://instagram.com/silenciopictures">
+                                </div>
+                                <div class="form-group">
+                                    <label>Lien LinkedIn</label>
+                                    <input type="url" id="contact-li" placeholder="https://linkedin.com/company/silenciopictures">
+                                </div>
+                                <div class="form-group">
+                                    <label>Lien Vimeo / YouTube</label>
+                                    <input type="url" id="contact-vi" placeholder="https://vimeo.com/silenciopictures">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-save-contact" class="btn-primary" style="margin-top: 20px;">Mettre à jour les contacts</button>
                     </form>
                 </section>
 
@@ -273,7 +339,6 @@
         </main>
     </div>
     
-    <script type="module" src="main.js?v=5.0"></script>
+    <script type="module" src="main.js?v=6.0"></script>
 </body>
 </html>
-
