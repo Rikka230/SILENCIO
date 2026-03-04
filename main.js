@@ -694,44 +694,59 @@ async function loadAdminProjects() {
 
             li.querySelector('.delete').addEventListener('click', async () => { if(confirm(`Supprimer "${project.titre}" ?`)) { await deleteDoc(doc(db, "projects", project.id)); loadAdminProjects(); } });
 
-            li.querySelector('.edit').addEventListener('click', () => {
-                resetProjectForm(); document.getElementById('view-list').classList.add('hidden'); document.getElementById('view-form').classList.remove('hidden');
-                const btnAddNew = document.getElementById('btn-add-new'); if (btnAddNew) btnAddNew.style.display = 'none';
+            li.querySelector('.edit').onclick = () => {
+            // 1. On change de vue
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-form').classList.remove('hidden');
+            
+            // 2. On remplit les IDs et les textes
+            currentEditId = p.id;
+            currentEditImageUrl = p.imageAffiche;
+            document.getElementById('proj-title').value = p.titre || '';
+            document.getElementById('proj-subtitle').value = p.statut || '';
+            document.getElementById('proj-synopsis').value = p.synopsis || '';
+            document.getElementById('proj-video').value = p.videoTrailer || '';
+            document.getElementById('proj-format').value = p.formatAffichage || '';
+            
+            // 3. On remplit les curseurs (Sliders)
+            const bentoPos = parsePosition(p.imageFocusBento);
+            document.getElementById('proj-focus-bento-x').value = bentoPos.x;
+            document.getElementById('proj-focus-bento-y').value = bentoPos.y;
+            
+            const headPos = parsePosition(p.imageFocusHeader);
+            document.getElementById('proj-focus-header-x').value = headPos.x;
+            document.getElementById('proj-focus-header-y').value = headPos.y;
 
-                document.getElementById('proj-title').value = project.titre || ''; document.getElementById('proj-subtitle').value = project.statut || ''; document.getElementById('proj-video').value = project.videoTrailer || '';
-                if(document.getElementById('proj-genre')) document.getElementById('proj-genre').value = project.genre || '';
-                if(document.getElementById('proj-annee')) document.getElementById('proj-annee').value = project.annee || '';
-                if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
-                if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
-                if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
-                if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
-                if(document.getElementById('proj-visible')) document.getElementById('proj-visible').checked = project.visible !== false; 
-                if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = project.partageReseaux === true;
-                if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = (project.partageReseaux === true) ? 'block' : 'none';
+            const socPos = parsePosition(p.imageFocusSocial || '50% 50%');
+            document.getElementById('proj-focus-social-x').value = socPos.x;
+            document.getElementById('proj-focus-social-y').value = socPos.y;
 
-                currentProjectWasShared = (project.partageReseaux === true);
+            // 4. On gère l'état du volet de partage
+            const isShared = p.partageReseaux === true;
+            document.getElementById('proj-autoshare').checked = isShared;
+            document.getElementById('social-crop-zone').style.display = isShared ? 'block' : 'none';
 
-                const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
-                document.getElementById('proj-focus-bento-x').value = bentoPos.x; document.getElementById('proj-focus-bento-y').value = bentoPos.y;
-                const headerPos = parsePosition(project.imageFocusHeader || project.imageFocus);
-                document.getElementById('proj-focus-header-x').value = headerPos.x; document.getElementById('proj-focus-header-y').value = headerPos.y;
-                const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
-                document.getElementById('proj-focus-social-x').value = socialPos.x; document.getElementById('proj-focus-social-y').value = socialPos.y;
+            // 5. CRUCIAL : On réinjecte la source dans les 3 images de preview
+            const pB = document.getElementById('image-preview-bloc');
+            const pC = document.getElementById('image-preview-cadrage');
+            const pS = document.getElementById('image-preview-social');
 
-                if (project.imageAffiche) {
-                    const pB = document.getElementById('image-preview-bloc'); 
-                    const pC = document.getElementById('image-preview-cadrage'); 
-                    const pS = document.getElementById('image-preview-social'); 
-                    
-                    if (pB) { pB.classList.remove('loaded'); pB.src = project.imageAffiche; }
-                    if (pC) { pC.classList.remove('loaded'); pC.src = project.imageAffiche; }
-                    if (pS) { 
-                        pS.classList.remove('loaded'); 
-                        pS.src = project.imageAffiche; 
-                        setTimeout(() => { if (pS.complete) pS.classList.add('loaded'); }, 50);
-                    }
-                    syncBentoDA(); 
-                }
+            if (p.imageAffiche) {
+                pB.src = p.imageAffiche;
+                pC.src = p.imageAffiche;
+                pS.src = p.imageAffiche;
+                
+                // On force l'affichage (opacité)
+                pB.classList.add('loaded');
+                pC.classList.add('loaded');
+                if (isShared) pS.classList.add('loaded');
+            }
+            
+            document.getElementById('form-title').textContent = "Modifier : " + p.titre;
+            
+            // 6. On relance le moteur de visualisation pour caler les object-position
+            setTimeout(syncBentoDA, 100);
+        };
 
                 currentEditId = project.id; currentEditImageUrl = project.imageAffiche; optimizedImageBlob = null;
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`; document.getElementById('btn-save').textContent = "Mettre à jour";
@@ -864,6 +879,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
