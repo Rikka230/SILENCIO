@@ -340,6 +340,8 @@ function initAdmin() {
             setupDropzone(); setupProjectForm(); loadAdminProjects();
             setupTeamDropzone(); setupTeamForm(); loadAdminTeam();
             setupHomeVideo();
+            setupApropos(); loadApropos();
+            setupContact(); loadContact();
         } else {
             loginOverlay.classList.remove('hidden'); document.getElementById('login-box').classList.remove('hidden');
         }
@@ -357,24 +359,13 @@ function initAdmin() {
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(auth).then(() => { window.location.href = 'index.html'; }); });
 
-    // --- GESTION DU SLIDER RÉSEAUX SOCIAUX ---
     const shareToggle = document.getElementById('proj-autoshare');
     const socialZone = document.getElementById('social-crop-zone');
     if (shareToggle && socialZone) {
         shareToggle.addEventListener('change', (e) => {
             const isVisible = e.target.checked;
             socialZone.style.display = isVisible ? 'block' : 'none';
-            
-            // Si on allume le slider, on réactive la visualisation
-            if (isVisible) {
-                // Petit délai pour laisser le temps au navigateur d'afficher la div
-                setTimeout(() => {
-                    syncBentoDA();
-                    // On force l'affichage de l'image si elle est déjà chargée
-                    const pS = document.getElementById('image-preview-social');
-                    if (pS) pS.classList.add('loaded');
-                }, 100);
-            }
+            if (isVisible) { setTimeout(() => { syncBentoDA(); const pS = document.getElementById('image-preview-social'); if (pS) pS.classList.add('loaded'); }, 100); }
         });
     }
 
@@ -397,9 +388,32 @@ function initAdmin() {
             if (!target || target.startsWith('http')) return;
             e.preventDefault(); currentTab = target; navLinks.forEach(l => l.classList.remove('active')); link.classList.add('active');
             allPanels.forEach(panel => panel.classList.add('hidden'));
-            if (target === 'projets') { mainTitle.textContent = "Projets en Production"; document.getElementById('view-list').classList.remove('hidden'); if (btnAddNew) btnAddNew.style.display = 'block'; } 
-            else if (target === 'accueil') { document.getElementById('panel-accueil').classList.remove('hidden'); mainTitle.textContent = "Vidéo d'Accueil"; if (btnAddNew) btnAddNew.style.display = 'none'; } 
-            else if (target === 'equipe') { mainTitle.textContent = "L'Équipe"; document.getElementById('view-team-list').classList.remove('hidden'); if (btnAddNew) btnAddNew.style.display = 'block'; }
+            
+            if (target === 'projets') { 
+                mainTitle.textContent = "Projets en Production"; 
+                document.getElementById('view-list').classList.remove('hidden'); 
+                if (btnAddNew) { btnAddNew.style.display = 'block'; btnAddNew.textContent = "+ Nouveau Projet"; } 
+            } 
+            else if (target === 'accueil') { 
+                document.getElementById('panel-accueil').classList.remove('hidden'); 
+                mainTitle.textContent = "Vidéo d'Accueil"; 
+                if (btnAddNew) btnAddNew.style.display = 'none'; 
+            } 
+            else if (target === 'apropos') { 
+                document.getElementById('panel-apropos').classList.remove('hidden'); 
+                mainTitle.textContent = "À Propos (Texte de présentation)"; 
+                if (btnAddNew) btnAddNew.style.display = 'none'; 
+            } 
+            else if (target === 'contact') { 
+                document.getElementById('panel-contact').classList.remove('hidden'); 
+                mainTitle.textContent = "Contact & Réseaux Sociaux"; 
+                if (btnAddNew) btnAddNew.style.display = 'none'; 
+            } 
+            else if (target === 'equipe') { 
+                mainTitle.textContent = "L'Équipe"; 
+                document.getElementById('view-team-list').classList.remove('hidden'); 
+                if (btnAddNew) { btnAddNew.style.display = 'block'; btnAddNew.textContent = "+ Nouveau Membre"; } 
+            }
         });
     });
 
@@ -903,6 +917,67 @@ document.addEventListener('click', (e) => {
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
 
+// =========================================
+// 13. PARAMÈTRES : À PROPOS & CONTACT
+// =========================================
+async function loadApropos() {
+    try {
+        const snap = await getDoc(doc(db, "settings", "apropos"));
+        if(snap.exists()) document.getElementById('apropos-text').value = snap.data().texte || '';
+    } catch(e) {}
+}
+
+function setupApropos() {
+    const form = document.getElementById('apropos-form');
+    if(!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-apropos');
+        btn.disabled = true; btn.textContent = "Enregistrement...";
+        try {
+            await setDoc(doc(db, "settings", "apropos"), { texte: document.getElementById('apropos-text').value }, { merge: true });
+            UI.showToast("Texte mis à jour !");
+        } catch(e) { UI.showToast("Erreur", "error"); }
+        finally { btn.disabled = false; btn.textContent = "Mettre à jour le texte"; }
+    });
+}
+
+async function loadContact() {
+    try {
+        const snap = await getDoc(doc(db, "settings", "contact"));
+        if(snap.exists()) {
+            const d = snap.data();
+            document.getElementById('contact-email').value = d.email || '';
+            document.getElementById('contact-phone').value = d.phone || '';
+            document.getElementById('contact-phone-visible').checked = d.phoneVisible !== false;
+            document.getElementById('contact-ig').value = d.instagram || '';
+            document.getElementById('contact-li').value = d.linkedin || '';
+            document.getElementById('contact-vi').value = d.vimeo || '';
+        }
+    } catch(e) {}
+}
+
+function setupContact() {
+    const form = document.getElementById('contact-form');
+    if(!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-contact');
+        btn.disabled = true; btn.textContent = "Enregistrement...";
+        try {
+            await setDoc(doc(db, "settings", "contact"), {
+                email: document.getElementById('contact-email').value,
+                phone: document.getElementById('contact-phone').value,
+                phoneVisible: document.getElementById('contact-phone-visible').checked,
+                instagram: document.getElementById('contact-ig').value,
+                linkedin: document.getElementById('contact-li').value,
+                vimeo: document.getElementById('contact-vi').value
+            }, { merge: true });
+            UI.showToast("Contacts mis à jour !");
+        } catch(e) { UI.showToast("Erreur", "error"); }
+        finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
+    });
+}
 
 
 
