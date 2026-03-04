@@ -106,7 +106,7 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
                 canvas.toBlob((blob) => {
                     URL.revokeObjectURL(safeUrl);
                     resolve(blob);
-                }, 'image/jpeg', 0.9); // Sortie en JPG
+                }, 'image/jpeg', 0.9);
             };
             img.onerror = () => reject("Erreur image source");
             img.src = safeUrl;
@@ -147,7 +147,6 @@ async function initHomePage(){
         }, 50);
     } catch (error) {}
     
-    // --- CHARGEMENT DES PROJETS ---
     const bentoContainer = document.querySelector('.bento-container');
     if (bentoContainer) {
         try {
@@ -253,7 +252,6 @@ async function initHomePage(){
         } catch (error) {}
     }
 
-    // --- CHARGEMENT ÉQUIPE ---
     const teamGrid = document.querySelector('.team-grid');
     if (teamGrid) {
         try {
@@ -330,6 +328,9 @@ function renderProject(data) {
     setTimeout(() => { if (heroImage.complete) heroImage.classList.add('loaded'); }, 50);
 }
 
+// =========================================
+// 7. LOGIQUE : INITIALISATION ADMINISTRATION
+// =========================================
 function initAdmin() {
     const loginOverlay = document.getElementById('login-overlay');
     const loginForm = document.getElementById('login-form');
@@ -358,7 +359,6 @@ function initAdmin() {
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(auth).then(() => { window.location.href = 'index.html'; }); });
 
-    // --- GESTION DU SLIDER RÉSEAUX SOCIAUX ---
     const shareToggle = document.getElementById('proj-autoshare');
     const socialZone = document.getElementById('social-crop-zone');
     if (shareToggle && socialZone) {
@@ -400,138 +400,6 @@ function initAdmin() {
 }
 
 // =========================================
-// 7. MOTEUR DE PROJETS (D&D, UPLOAD, CRUD)
-// =========================================
-function syncBentoDA() {
-    const daContainer = document.getElementById('image-da-container');
-    const previewsGroup = document.getElementById('previews-group');
-    const dropText = document.querySelector('.drop-text');
-
-    const previewBloc = document.getElementById('image-preview-bloc');
-    const previewCadrage = document.getElementById('image-preview-cadrage');
-    const previewSocial = document.getElementById('image-preview-social'); // <-- AJOUTÉ
-    const blocWrapper = document.getElementById('da-bloc-wrapper');
-
-    const formatSelect = document.getElementById('proj-format');
-    const focusBentoX = document.getElementById('proj-focus-bento-x');
-    const focusBentoY = document.getElementById('proj-focus-bento-y');
-    const focusHeaderX = document.getElementById('proj-focus-header-x');
-    const focusHeaderY = document.getElementById('proj-focus-header-y');
-    const focusSocialX = document.getElementById('proj-focus-social-x'); // <-- AJOUTÉ
-    const focusSocialY = document.getElementById('proj-focus-social-y'); // <-- AJOUTÉ
-
-    if (!daContainer || !previewsGroup || !previewBloc) return;
-
-    function updateLiveView() {
-        if (!previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
-        blocWrapper.className = '';
-        if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
-        
-        if (focusBentoX && focusBentoY) previewBloc.style.objectPosition = `${focusBentoX.value}% ${focusBentoY.value}%`;
-        if (focusHeaderX && focusHeaderY && previewCadrage) previewCadrage.style.objectPosition = `${focusHeaderX.value}% ${focusHeaderY.value}%`;
-        if (focusSocialX && focusSocialY && previewSocial) previewSocial.style.objectPosition = `${focusSocialX.value}% ${focusSocialY.value}%`; // <-- AJOUTÉ
-    }
-
-    if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
-    if (focusBentoX) focusBentoX.addEventListener('input', updateLiveView);
-    if (focusBentoY) focusBentoY.addEventListener('input', updateLiveView);
-    if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView);
-    if (focusHeaderY) focusHeaderY.addEventListener('input', updateLiveView);
-    if (focusSocialX) focusSocialX.addEventListener('input', updateLiveView); // <-- AJOUTÉ
-    if (focusSocialY) focusSocialY.addEventListener('input', updateLiveView); // <-- AJOUTÉ
-
-    const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
-
-    if (hasImage) {
-        daContainer.classList.remove('da-container-single'); daContainer.classList.add('da-container-split');
-        if(dropText) dropText.style.display = 'none';
-        previewsGroup.classList.remove('previews-hidden'); previewsGroup.classList.add('previews-visible');
-        updateLiveView();
-    } else {
-        daContainer.classList.remove('da-container-split'); daContainer.classList.add('da-container-single');
-        if(dropText) dropText.style.display = 'block';
-        previewsGroup.classList.remove('previews-visible'); previewsGroup.classList.add('previews-hidden');
-    }
-}
-
-function setupDropzone() {
-    const dropzone = document.getElementById('image-dropzone');
-    if (!dropzone) return;
-    const fileInput = document.getElementById('proj-image');
-    const previewBloc = document.getElementById('image-preview-bloc');
-    const previewCadrage = document.getElementById('image-preview-cadrage');
-    const previewSocial = document.getElementById('image-preview-social'); // <-- AJOUTÉ
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, preventDefaults, false); });
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-    ['dragenter', 'dragover'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false); });
-    ['dragleave', 'drop'].forEach(eventName => { dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false); });
-
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
-    fileInput.addEventListener('change', function() { if (this.files.length) handleFile(this.files[0]); });
-
-    function handleFile(file) {
-        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide.", "error"); return; }
-        const reader = new FileReader(); reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image(); img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas'); const MAX_WIDTH = 1920; let width = img.width, height = img.height;
-                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                canvas.toBlob((blob) => {
-                    optimizedImageBlob = blob;
-                    const compressedUrl = URL.createObjectURL(blob);
-                    
-                    if(previewBloc) { previewBloc.classList.remove('loaded'); previewBloc.src = compressedUrl; }
-                    if(previewCadrage) { previewCadrage.classList.remove('loaded'); previewCadrage.src = compressedUrl; }
-                    if(previewSocial) { previewSocial.classList.remove('loaded'); previewSocial.src = compressedUrl; } // <-- AJOUTÉ
-                    
-                    syncBentoDA();
-                }, 'image/webp', 0.8);
-            };
-        };
-    }
-    syncBentoDA();
-}
-
-function returnToListView() {
-    document.getElementById('view-list').classList.remove('hidden');
-    document.getElementById('view-form').classList.add('hidden');
-    const btnAddNew = document.getElementById('btn-add-new');
-    if (btnAddNew) btnAddNew.style.display = 'block';
-    resetProjectForm();
-}
-
-function resetProjectForm() {
-    const form = document.getElementById('project-form');
-    if(!form) return;
-    form.reset();
-    if(document.getElementById('proj-focus-bento-x')) document.getElementById('proj-focus-bento-x').value = 50;
-    if(document.getElementById('proj-focus-bento-y')) document.getElementById('proj-focus-bento-y').value = 50;
-    if(document.getElementById('proj-focus-header-x')) document.getElementById('proj-focus-header-x').value = 50;
-    if(document.getElementById('proj-focus-header-y')) document.getElementById('proj-focus-header-y').value = 50;
-    if(document.getElementById('proj-focus-social-x')) document.getElementById('proj-focus-social-x').value = 50; // <-- AJOUTÉ
-    if(document.getElementById('proj-focus-social-y')) document.getElementById('proj-focus-social-y').value = 50; // <-- AJOUTÉ
-    if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
-
-    const previewBloc = document.getElementById('image-preview-bloc');
-    const previewCadrage = document.getElementById('image-preview-cadrage');
-    const previewSocial = document.getElementById('image-preview-social'); // <-- AJOUTÉ
-    
-    if (previewBloc) { previewBloc.removeAttribute('src'); previewBloc.classList.remove('loaded'); }
-    if (previewCadrage) { previewCadrage.removeAttribute('src'); previewCadrage.classList.remove('loaded'); }
-    if (previewSocial) { previewSocial.removeAttribute('src'); previewSocial.classList.remove('loaded'); } // <-- AJOUTÉ
-    
-    syncBentoDA(); 
-
-    document.getElementById('form-title').textContent = "Ajouter un projet";
-    document.getElementById('btn-save').textContent = "Enregistrer le projet";
-    optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null;
-    currentProjectWasShared = false;
-}
-// =========================================
 // 8. MOTEUR D'ADMINISTRATION : PROJETS
 // =========================================
 function syncBentoDA() {
@@ -549,8 +417,10 @@ function syncBentoDA() {
     const focusHeaderX = document.getElementById('proj-focus-header-x'); const focusHeaderY = document.getElementById('proj-focus-header-y');
     const focusSocialX = document.getElementById('proj-focus-social-x'); const focusSocialY = document.getElementById('proj-focus-social-y');
 
+    if (!daContainer || !previewsGroup || !previewBloc) return;
+
     function updateLiveView() {
-        if (!previewBloc || !previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
+        if (!previewBloc.src || previewBloc.src === "" || previewBloc.src === window.location.href || previewBloc.src.endsWith('admin.html')) return;
         if(blocWrapper) {
             blocWrapper.className = '';
             if (formatSelect && formatSelect.value) blocWrapper.classList.add(formatSelect.value);
@@ -565,13 +435,13 @@ function syncBentoDA() {
     if (focusHeaderX) focusHeaderX.addEventListener('input', updateLiveView); if (focusHeaderY) focusHeaderY.addEventListener('input', updateLiveView);
     if (focusSocialX) focusSocialX.addEventListener('input', updateLiveView); if (focusSocialY) focusSocialY.addEventListener('input', updateLiveView);
 
-    const hasImage = previewBloc && previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
-    if (hasImage && daContainer && previewsGroup) {
+    const hasImage = previewBloc.src && previewBloc.src !== "" && !previewBloc.src.endsWith(window.location.pathname) && !previewBloc.src.endsWith('admin.html');
+    if (hasImage) {
         daContainer.classList.remove('da-container-single'); daContainer.classList.add('da-container-split');
         if(dropText) dropText.style.display = 'none';
         previewsGroup.classList.remove('previews-hidden'); previewsGroup.classList.add('previews-visible');
         updateLiveView();
-    } else if (daContainer && previewsGroup) {
+    } else {
         daContainer.classList.remove('da-container-split'); daContainer.classList.add('da-container-single');
         if(dropText) dropText.style.display = 'block';
         previewsGroup.classList.remove('previews-visible'); previewsGroup.classList.add('previews-hidden');
@@ -700,7 +570,6 @@ function setupProjectForm() {
             if (currentEditId) { await updateDoc(doc(db, "projects", currentEditId), projectData); UI.showToast("Projet mis à jour !"); } 
             else { projectData.ordreAffichage = Date.now(); const newDocRef = await addDoc(collection(db, "projects"), projectData); finalProjectId = newDocRef.id; UI.showToast("Projet publié !"); }
 
-            // --- ENVOI RÉSEAUX & GÉNÉRATION JPG ---
             if (triggerWebhook) {
                 try {
                     let finalSocialImageUrl = projectData.imageAffiche; 
@@ -793,26 +662,20 @@ async function loadAdminProjects() {
                 const headerPos = parsePosition(project.imageFocusHeader || project.imageFocus);
                 document.getElementById('proj-focus-header-x').value = headerPos.x; document.getElementById('proj-focus-header-y').value = headerPos.y;
                 const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
-                document.getElementById('proj-focus-social-x').value = socialPos.x; 
-                document.getElementById('proj-focus-social-y').value = socialPos.y;
+                document.getElementById('proj-focus-social-x').value = socialPos.x; document.getElementById('proj-focus-social-y').value = socialPos.y;
 
                 if (project.imageAffiche) {
                     const pB = document.getElementById('image-preview-bloc'); 
                     const pC = document.getElementById('image-preview-cadrage'); 
-                    const pS = document.getElementById('image-preview-social'); // <-- AJOUT
-                    pB.classList.remove('loaded'); pB.src = project.imageAffiche;
-                    pC.classList.remove('loaded'); pC.src = project.imageAffiche;
-                    if(pS) { pS.classList.remove('loaded'); pS.src = project.imageAffiche; } // <-- AJOUT
-                    syncBentoDA(); 
-                }
-                const socialPos = parsePosition(project.imageFocusSocial || '50% 50%');
-                document.getElementById('proj-focus-social-x').value = socialPos.x; document.getElementById('proj-focus-social-y').value = socialPos.y;
-
-                if (project.imageAffiche) {
-                    const pB = document.getElementById('image-preview-bloc'); const pC = document.getElementById('image-preview-cadrage'); const pS = document.getElementById('image-preview-social');
-                    pB.classList.remove('loaded'); pB.src = project.imageAffiche;
-                    pC.classList.remove('loaded'); pC.src = project.imageAffiche;
-                    pS.classList.remove('loaded'); pS.src = project.imageAffiche;
+                    const pS = document.getElementById('image-preview-social'); 
+                    
+                    if (pB) { pB.classList.remove('loaded'); pB.src = project.imageAffiche; }
+                    if (pC) { pC.classList.remove('loaded'); pC.src = project.imageAffiche; }
+                    if (pS) { 
+                        pS.classList.remove('loaded'); 
+                        pS.src = project.imageAffiche; 
+                        setTimeout(() => { if (pS.complete) pS.classList.add('loaded'); }, 50);
+                    }
                     syncBentoDA(); 
                 }
 
@@ -947,6 +810,3 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
-
-
-
