@@ -416,23 +416,19 @@ function initAdmin() {
 // 8. MOTEUR D'ADMINISTRATION : PROJETS
 // =========================================
 
-// --- 8.1 VISUALISATION DA (SLIDERS) ---
+// --- 8.1 VISUALISATION DA ET BASCULE D'ÉCRAN ---
 function syncBentoDA() {
     const previewBloc = document.getElementById('image-preview-bloc');
     const previewCadrage = document.getElementById('image-preview-cadrage');
     const previewSocial = document.getElementById('image-preview-social');
     const blocWrapper = document.getElementById('da-bloc-wrapper');
     const formatSelect = document.getElementById('proj-format');
-
-    const focusInputs = [
-        'proj-focus-bento-x', 'proj-focus-bento-y',
-        'proj-focus-header-x', 'proj-focus-header-y',
-        'proj-focus-social-x', 'proj-focus-social-y'
-    ];
+    const dropText = document.querySelector('.drop-text'); // Le texte "Glissez votre image"
 
     function updateLiveView() {
-        if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html')) return;
+        if (!previewBloc || !previewBloc.src || previewBloc.src.endsWith('admin.html') || previewBloc.src === window.location.href) return;
 
+        // Si l'image Instagram est vide, on lui donne la même source
         if (previewSocial && (!previewSocial.src || previewSocial.src.endsWith('admin.html') || previewSocial.src === "")) {
             previewSocial.src = previewBloc.src;
         }
@@ -442,46 +438,67 @@ function syncBentoDA() {
             if (formatSelect.value) blocWrapper.classList.add(formatSelect.value);
         }
 
-        previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
-        if (previewCadrage) previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
-        if (previewSocial) previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
+        if (document.getElementById('proj-focus-bento-x')) {
+            previewBloc.style.objectPosition = `${document.getElementById('proj-focus-bento-x').value}% ${document.getElementById('proj-focus-bento-y').value}%`;
+        }
+        if (previewCadrage && document.getElementById('proj-focus-header-x')) {
+            previewCadrage.style.objectPosition = `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`;
+        }
+        if (previewSocial && document.getElementById('proj-focus-social-x')) {
+            previewSocial.style.objectPosition = `${document.getElementById('proj-focus-social-x').value}% ${document.getElementById('proj-focus-social-y').value}%`;
+        }
     }
 
-    focusInputs.forEach(id => {
+    const inputs = ['proj-focus-bento-x', 'proj-focus-bento-y', 'proj-focus-header-x', 'proj-focus-header-y', 'proj-focus-social-x', 'proj-focus-social-y'];
+    inputs.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.oninput = updateLiveView;
+        if (el) el.addEventListener('input', updateLiveView);
     });
-    if (formatSelect) formatSelect.onchange = updateLiveView;
+    if (formatSelect) formatSelect.addEventListener('change', updateLiveView);
 
     const daContainer = document.getElementById('image-da-container');
     const previewsGroup = document.getElementById('previews-group');
-    const hasImage = previewBloc && previewBloc.src && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== "";
+    
+    // Vérification stricte : y a-t-il vraiment une image valide chargée ?
+    const hasImage = previewBloc && previewBloc.getAttribute('src') && previewBloc.getAttribute('src') !== "" && !previewBloc.src.endsWith('admin.html') && previewBloc.src !== window.location.href;
 
     if (hasImage && daContainer && previewsGroup) {
+        // Mode VISUALISATION
         daContainer.classList.remove('da-container-single');
         daContainer.classList.add('da-container-split');
+        if(dropText) dropText.style.display = 'none';
         previewsGroup.classList.remove('previews-hidden');
         previewsGroup.classList.add('previews-visible');
         updateLiveView();
+    } else if (daContainer && previewsGroup) {
+        // Mode DRAG & DROP (Aucune image)
+        daContainer.classList.remove('da-container-split');
+        daContainer.classList.add('da-container-single');
+        if(dropText) dropText.style.display = 'block';
+        previewsGroup.classList.remove('previews-visible');
+        previewsGroup.classList.add('previews-hidden');
     }
 }
 
-// --- 8.2 GESTION DU DRAG & DROP ET IMPORT IMAGE ---
+// --- 8.2 IMPORT D'IMAGE (DRAG & DROP) ---
 function setupDropzone() {
     const dropzone = document.getElementById('image-dropzone');
     if (!dropzone) return;
     const fileInput = document.getElementById('proj-image');
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(name => {
-        dropzone.addEventListener(name, (e) => { e.preventDefault(); e.stopPropagation(); });
+        dropzone.addEventListener(name, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
     });
 
-    dropzone.onclick = () => fileInput.click();
-    dropzone.ondrop = (e) => handleFile(e.dataTransfer.files[0]);
-    fileInput.onchange = (e) => { if (e.target.files.length) handleFile(e.target.files[0]); };
+    ['dragenter', 'dragover'].forEach(name => { dropzone.addEventListener(name, () => dropzone.classList.add('dragover')); });
+    ['dragleave', 'drop'].forEach(name => { dropzone.addEventListener(name, () => dropzone.classList.remove('dragover')); });
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
     function handleFile(file) {
-        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide", "error"); return; }
+        if (!file.type.startsWith('image/')) { UI.showToast("Format invalide.", "error"); return; }
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
@@ -503,18 +520,22 @@ function setupDropzone() {
                     const pC = document.getElementById('image-preview-cadrage');
                     const pS = document.getElementById('image-preview-social');
                     
-                    if(pB) pB.src = compressedUrl;
-                    if(pC) pC.src = compressedUrl;
-                    if(pS) pS.src = compressedUrl;
+                    if(pB) { pB.src = compressedUrl; pB.classList.remove('loaded'); }
+                    if(pC) { pC.src = compressedUrl; pC.classList.remove('loaded'); }
+                    if(pS) { pS.src = compressedUrl; pS.classList.remove('loaded'); }
                     
-                    pB.onload = () => { syncBentoDA(); pB.classList.add('loaded'); };
+                    // On affiche la visualisation
+                    setTimeout(() => {
+                        syncBentoDA(); 
+                        if(pB) pB.classList.add('loaded');
+                    }, 50);
                 }, 'image/webp', 0.8);
             };
         };
     }
 }
 
-// --- 8.3 NAVIGATION ET RESET ---
+// --- 8.3 NAVIGATION ET RESET DU FORMULAIRE ---
 function returnToListView() {
     document.getElementById('view-list').classList.remove('hidden'); 
     document.getElementById('view-form').classList.add('hidden');
@@ -528,32 +549,33 @@ function resetProjectForm() {
     if(!form) return; 
     form.reset();
     
-    // Reset Sliders à 50%
+    // Remise à zéro des sliders
     const inputs = ['proj-focus-bento-x', 'proj-focus-bento-y', 'proj-focus-header-x', 'proj-focus-header-y', 'proj-focus-social-x', 'proj-focus-social-y'];
     inputs.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = 50; });
 
     if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = false;
     if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = 'none';
 
-    // Nettoyage Previews
-    const previews = ['image-preview-bloc', 'image-preview-cadrage', 'image-preview-social'];
-    previews.forEach(id => {
-        const img = document.getElementById(id);
-        if(img) { img.src = ''; img.classList.remove('loaded'); }
-    });
+    // Vider les images pour forcer le retour à l'écran Drag & Drop
+    const pB = document.getElementById('image-preview-bloc');
+    const pC = document.getElementById('image-preview-cadrage');
+    const pS = document.getElementById('image-preview-social');
+    if (pB) { pB.removeAttribute('src'); pB.classList.remove('loaded'); }
+    if (pC) { pC.removeAttribute('src'); pC.classList.remove('loaded'); }
+    if (pS) { pS.removeAttribute('src'); pS.classList.remove('loaded'); }
 
-    syncBentoDA(); 
+    syncBentoDA(); // Retour immédiat à l'écran d'import
+    
     document.getElementById('form-title').textContent = "Ajouter un projet"; 
     document.getElementById('btn-save').textContent = "Enregistrer le projet";
     optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null; currentProjectWasShared = false;
 }
 
-// --- 8.4 ENREGISTREMENT FIREBASE & WEBHOOK ---
+// --- 8.4 SAUVEGARDE & WEBHOOK MAKE ---
 function setupProjectForm() {
     const form = document.getElementById('project-form'); if (!form) return;
     const btnCancelTop = document.querySelector('.btn-cancel-top'); 
     const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
-    
     if (btnCancelTop) btnCancelTop.addEventListener('click', returnToListView); 
     if (btnCancelBottom) btnCancelBottom.addEventListener('click', returnToListView);
 
@@ -567,7 +589,7 @@ function setupProjectForm() {
                 if (confirm("⚠️ Déjà publié sur les réseaux. Forcer un doublon ?")) { triggerWebhook = true; } 
                 else { triggerWebhook = false; autoShareCheckbox.checked = false; }
             } else {
-                if (confirm("⚠️ Publier ce projet sur Instagram ?")) { triggerWebhook = true; } else { return; }
+                if (confirm("⚠️ Publier ce projet sur les réseaux sociaux ?")) { triggerWebhook = true; } else { return; }
             }
         }
 
@@ -591,6 +613,8 @@ function setupProjectForm() {
             visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true,
             partageReseaux: currentProjectWasShared || triggerWebhook
         };
+
+        if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); btnSave.disabled = false; btnSave.textContent = "Enregistrer le projet"; return; }
 
         try {
             let imageUrl = currentEditImageUrl;
@@ -616,30 +640,37 @@ function setupProjectForm() {
             if (triggerWebhook) {
                 let finalSocialImageUrl = projectData.imageAffiche; 
                 const sourceForCrop = optimizedImageBlob || currentEditImageUrl;
+                
                 if (sourceForCrop) {
                     try {
                         btnSave.textContent = "Génération Instagram...";
                         const cropX = document.getElementById('proj-focus-social-x').value;
                         const cropY = document.getElementById('proj-focus-social-y').value;
                         const socialBlob = await generateSocialCropBlob(sourceForCrop, cropX, cropY);
-                        const socialRef = ref(storage, `affiches_social/${Date.now()}_ig.jpg`);
+                        const safeTitle = title.replace(/\s+/g, '-').toLowerCase();
+                        const socialRef = ref(storage, `affiches_social/${Date.now()}_${safeTitle}_ig.jpg`);
                         await uploadBytes(socialRef, socialBlob);
                         finalSocialImageUrl = await getDownloadURL(socialRef);
-                    } catch (e) { console.warn("Crop échoué (CORS), image standard envoyée."); }
+                    } catch (e) { console.warn("Crop échoué", e); }
                 }
 
-                await fetch("https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...projectData, id: finalProjectId, imageSocial: finalSocialImageUrl })
-                });
+                try {
+                    btnSave.textContent = "Envoi à Make...";
+                    const webhookUrl = "https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513"; 
+                    await fetch(webhookUrl, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...projectData, id: finalProjectId, imageSocial: finalSocialImageUrl })
+                    });
+                } catch(e) { console.error("Erreur Webhook", e); }
             }
+
             loadAdminProjects(); returnToListView(); 
         } catch (error) { UI.showToast("Erreur lors de l'envoi", "error"); } 
         finally { btnSave.disabled = false; btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet"; }
     });
 }
 
-// --- 8.5 LISTE DES PROJETS & BOUTON EDIT ---
+// --- 8.5 LISTE DES PROJETS ET BOUTON EDIT ---
 async function loadAdminProjects() {
     const projectList = document.getElementById('project-list'); if (!projectList) return;
     try {
@@ -654,30 +685,34 @@ async function loadAdminProjects() {
             li.className = 'sortable-item'; li.dataset.id = project.id; li.setAttribute('draggable', 'true');
             const focus = project.imageFocusBento || '50% 50%';
             const isHidden = project.visible === false;
+            const hiddenBadge = isHidden ? '<span style="background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 10px; border: 1px solid #555; vertical-align: middle;">MASQUÉ</span>' : '';
             
             li.innerHTML = `
                 <div class="drag-handle">☰</div>
-                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}" onload="this.classList.add('loaded')">
-                <div class="item-info"><strong>${project.titre} ${isHidden ? '[MASQUÉ]' : ''}</strong><span>${project.statut}</span></div>
+                <img src="${project.imageAffiche}" class="item-thumb anti-stretch-img" style="object-position: ${focus}; object-fit: cover !important;" onload="this.classList.add('loaded')">
+                <div class="item-info"><strong>${project.titre} ${hiddenBadge}</strong><span>${project.statut}</span></div>
                 <div class="item-actions">
                     <label class="toggle-switch">
                         <input type="checkbox" class="toggle-visibility-slider" ${isHidden ? '' : 'checked'}>
                         <span class="slider"></span>
                     </label>
-                    <button class="btn-icon edit">✎</button>
-                    <button class="btn-icon delete">✕</button>
+                    <button class="btn-icon edit" title="Modifier">✎</button>
+                    <button class="btn-icon delete" title="Supprimer">✕</button>
                 </div>`;
 
-            li.querySelector('.toggle-visibility-slider').onchange = async (e) => {
+            li.querySelector('.toggle-visibility-slider').addEventListener('change', async (e) => {
                 await updateDoc(doc(db, "projects", project.id), { visible: e.target.checked });
                 loadAdminProjects();
-            };
+            });
 
-            li.querySelector('.delete').onclick = async () => {
+            li.querySelector('.delete').addEventListener('click', async () => {
                 if(confirm(`Supprimer "${project.titre}" ?`)) { await deleteDoc(doc(db, "projects", project.id)); loadAdminProjects(); }
-            };
+            });
 
-            li.querySelector('.edit').onclick = () => {
+            // CHARGEMENT DE L'ÉDITION
+            li.querySelector('.edit').addEventListener('click', () => {
+                resetProjectForm(); // On s'assure que tout est propre d'abord
+                
                 document.getElementById('view-list').classList.add('hidden');
                 document.getElementById('view-form').classList.remove('hidden');
                 if (document.getElementById('btn-add-new')) document.getElementById('btn-add-new').style.display = 'none';
@@ -685,19 +720,21 @@ async function loadAdminProjects() {
                 currentEditId = project.id;
                 currentEditImageUrl = project.imageAffiche;
                 
-                // Remplissage textes
                 document.getElementById('proj-title').value = project.titre || '';
                 document.getElementById('proj-subtitle').value = project.statut || '';
                 document.getElementById('proj-video').value = project.videoTrailer || '';
+                if(document.getElementById('proj-genre')) document.getElementById('proj-genre').value = project.genre || '';
+                if(document.getElementById('proj-annee')) document.getElementById('proj-annee').value = project.annee || '';
+                if(document.getElementById('proj-realisateur')) document.getElementById('proj-realisateur').value = project.realisateur || '';
+                if(document.getElementById('proj-casting')) document.getElementById('proj-casting').value = project.casting || '';
                 if(document.getElementById('proj-synopsis')) document.getElementById('proj-synopsis').value = project.synopsis || '';
                 if(document.getElementById('proj-format')) document.getElementById('proj-format').value = project.formatAffichage || '';
                 
-                // Remplissage Sliders
-                const bPos = parsePosition(project.imageFocusBento || '50% 50%');
+                const bPos = parsePosition(project.imageFocusBento || project.imageFocus || '50% 50%');
                 document.getElementById('proj-focus-bento-x').value = bPos.x;
                 document.getElementById('proj-focus-bento-y').value = bPos.y;
 
-                const hPos = parsePosition(project.imageFocusHeader || '50% 50%');
+                const hPos = parsePosition(project.imageFocusHeader || project.imageFocus || '50% 50%');
                 document.getElementById('proj-focus-header-x').value = hPos.x;
                 document.getElementById('proj-focus-header-y').value = hPos.y;
 
@@ -705,13 +742,14 @@ async function loadAdminProjects() {
                 document.getElementById('proj-focus-social-x').value = sPos.x;
                 document.getElementById('proj-focus-social-y').value = sPos.y;
 
-                // Partage Instagram
+                if(document.getElementById('proj-visible')) document.getElementById('proj-visible').checked = project.visible !== false;
+
                 const isShared = project.partageReseaux === true;
-                document.getElementById('proj-autoshare').checked = isShared;
-                document.getElementById('social-crop-zone').style.display = isShared ? 'block' : 'none';
+                if(document.getElementById('proj-autoshare')) document.getElementById('proj-autoshare').checked = isShared;
+                if(document.getElementById('social-crop-zone')) document.getElementById('social-crop-zone').style.display = isShared ? 'block' : 'none';
                 currentProjectWasShared = isShared;
 
-                // Images Previews
+                // Injection des images
                 const pB = document.getElementById('image-preview-bloc');
                 const pC = document.getElementById('image-preview-cadrage');
                 const pS = document.getElementById('image-preview-social');
@@ -722,8 +760,10 @@ async function loadAdminProjects() {
 
                 document.getElementById('form-title').textContent = `Modifier : ${project.titre}`;
                 document.getElementById('btn-save').textContent = "Mettre à jour";
+                
+                // On force la visualisation
                 setTimeout(syncBentoDA, 100);
-            };
+            });
 
             projectList.appendChild(li);
         });
@@ -851,6 +891,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
