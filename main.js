@@ -190,40 +190,33 @@ async function initHomePage(){
 
             let totalCells = 0; 
             let hasTallOrBig = false; 
-            let projectsHTML = '';
 
             projects.forEach((project) => {
                 const extraClass = project.formatAffichage || '';
-                const focus = project.imageFocusBento || project.imageFocus || '50% 50%';
-
                 if (extraClass === 'bento-big') { totalCells += 4; hasTallOrBig = true; }
                 else if (extraClass === 'bento-tall' || extraClass === 'bento-wide') { totalCells += 2; hasTallOrBig = true; }
                 else { totalCells += 1; }
-
-                projectsHTML += `<a href="projet.html?id=${project.id}" class="bento-item ${extraClass}"><img src="${project.imageAffiche}" alt="${project.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${project.titre.toUpperCase()}</h3><p>${project.statut || project.genre || ''}</p></div></a>`;
             });
 
             const isMobile = window.innerWidth <= 1024;
             const useScrollMode = isMobile ? projects.length > 6 : totalCells > 12;
             
-            const createSilencio = () => `<div class="bento-item silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
-            
-            let itemsHTML = projectsHTML;
+            let itemsHTML = '';
             let gridRows = 1; 
             let gridCols = 4;
 
             if (projects.length === 0) {
-                itemsHTML = `<div class=\"bento-item bento-big silencio-placeholder\" style=\"display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;\"><span style=\"color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;\">SILENCIO</span></div>`;
+                itemsHTML = `<div class="bento-item bento-big silencio-placeholder" style="display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 2rem; font-weight: 400; letter-spacing: 6px;">SILENCIO</span></div>`;
             } else if (projects.length > 0) {
-                // ALGORITHME DE PACKING PARFAIT (Zéro trou, centrage optimisé)
+                
+                // ALGORITHME DE PACKING ABSOLU (Positionnement exact, Centrage de la dernière ligne)
                 let gridMap = [];
                 let mode = useScrollMode ? 'scroll' : 'static';
                 let fixedCount;
                 
                 if (mode === 'scroll') {
-                    fixedCount = isMobile ? 2 : 3; // 2 ou 3 lignes fixes
+                    fixedCount = isMobile ? 2 : 3;
                 } else {
-                    // Optimisation des colonnes fixes pour un centrage parfait (Évite que 2 petits projets ne s'étirent sur tout l'écran)
                     if (isMobile) {
                         fixedCount = 2;
                     } else {
@@ -235,8 +228,6 @@ async function initHomePage(){
                 }
 
                 function isFree(x, y, w, h) {
-                    if (mode === 'static' && x + w > fixedCount) return false;
-                    if (mode === 'scroll' && y + h > fixedCount) return false;
                     for (let dy = 0; dy < h; dy++) {
                         for (let dx = 0; dx < w; dx++) {
                             if (gridMap[y + dy] && gridMap[y + dy][x + dx]) return false;
@@ -255,6 +246,7 @@ async function initHomePage(){
                 }
 
                 let maxCol = 0, maxRow = 0;
+                let placedProjects = [];
 
                 projects.forEach(p => {
                     let w = 1, h = 1;
@@ -267,34 +259,100 @@ async function initHomePage(){
                     
                     if (mode === 'static') {
                         while (!placed) {
-                            if (isFree(x, y, w, h)) { mark(x, y, w, h); maxRow = Math.max(maxRow, y + h); placed = true; } 
-                            else { x++; if (x >= fixedCount) { x = 0; y++; } }
+                            if (x + w <= fixedCount && isFree(x, y, w, h)) { 
+                                mark(x, y, w, h); 
+                                maxRow = Math.max(maxRow, y + h); 
+                                placedProjects.push({...p, gridX: x, gridY: y, w, h});
+                                placed = true; 
+                            } else { 
+                                x++; if (x + w > fixedCount) { x = 0; y++; } 
+                            }
                         }
                     } else {
                         while (!placed) {
-                            if (isFree(x, y, w, h)) { mark(x, y, w, h); maxCol = Math.max(maxCol, x + w); placed = true; } 
-                            else { y++; if (y >= fixedCount) { y = 0; x++; } }
+                            if (y + h <= fixedCount && isFree(x, y, w, h)) { 
+                                mark(x, y, w, h); 
+                                maxCol = Math.max(maxCol, x + w); 
+                                placedProjects.push({...p, gridX: x, gridY: y, w, h});
+                                placed = true; 
+                            } else { 
+                                y++; if (y + h > fixedCount) { y = 0; x++; } 
+                            }
                         }
                     }
                 });
 
-                let holes = 0;
+                // CENTRAGE MAGIQUE DE LA DERNIÈRE LIGNE (Mode Statique uniquement)
+                if (mode === 'static' && maxRow > 0) {
+                    let clearLastRow = true;
+                    let lastRowItems = [];
+                    let usedCellsLastRow = 0;
+
+                    // On regarde quels projets sont posés sur la toute dernière ligne
+                    placedProjects.forEach(p => {
+                        if (p.gridY + p.h - 1 === maxRow - 1) {
+                            lastRowItems.push(p);
+                            usedCellsLastRow += p.w;
+                            // Si un élément "tall" ou "big" déborde depuis le haut, on annule le centrage par sécurité
+                            if (p.gridY < maxRow - 1) clearLastRow = false;
+                        }
+                    });
+
+                    // Si la ligne n'est pas pleine, on calcule l'écart et on pousse les blocs au centre !
+                    if (clearLastRow && usedCellsLastRow < fixedCount) {
+                        let shift = Math.floor((fixedCount - usedCellsLastRow) / 2);
+                        if (shift > 0) {
+                            lastRowItems.forEach(p => { for(let i=0; i<p.w; i++) gridMap[p.gridY][p.gridX + i] = false; });
+                            lastRowItems.forEach(p => {
+                                p.gridX += shift;
+                                for(let i=0; i<p.w; i++) gridMap[p.gridY][p.gridX + i] = true;
+                            });
+                        }
+                    }
+                }
+
+                // GÉNÉRATION HTML DES PROJETS (Avec leurs coordonnées exactes)
+                let finalHTML = '';
+                placedProjects.forEach(p => {
+                    const extraClass = p.formatAffichage || '';
+                    const focus = p.imageFocusBento || p.imageFocus || '50% 50%';
+                    finalHTML += `<a href="projet.html?id=${p.id}" class="bento-item ${extraClass}" style="grid-column: ${p.gridX + 1} / span ${p.w}; grid-row: ${p.gridY + 1} / span ${p.h};"><img src="${p.imageAffiche}" alt="${p.titre}" loading="lazy" class="anti-stretch-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important; object-position: ${focus} !important;" onload="this.classList.add('loaded')"><div class="bento-overlay"><h3>${p.titre.toUpperCase()}</h3><p>${p.statut || p.genre || ''}</p></div></a>`;
+                });
+
+                // GÉNÉRATION DES BLOCS SILENCIO (Uniquement pour les trous "coincés" à l'intérieur de la grille)
                 if (mode === 'static') {
                     for (let y = 0; y < maxRow; y++) {
-                        for (let x = 0; x < fixedCount; x++) { if (!gridMap[y] || !gridMap[y][x]) holes++; }
+                        let firstOccupiedX = 0;
+                        let lastOccupiedX = fixedCount - 1;
+                        
+                        // Sur la dernière ligne, on ignore les trous à gauche et à droite !
+                        if (y === maxRow - 1) {
+                            while (lastOccupiedX >= 0 && (!gridMap[y] || !gridMap[y][lastOccupiedX])) lastOccupiedX--;
+                            while (firstOccupiedX <= lastOccupiedX && (!gridMap[y] || !gridMap[y][firstOccupiedX])) firstOccupiedX++;
+                        }
+                        
+                        for (let x = firstOccupiedX; x <= lastOccupiedX; x++) {
+                            if (!gridMap[y] || !gridMap[y][x]) {
+                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1; grid-row: ${y + 1} / span 1; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
+                            }
+                        }
                     }
                     gridRows = maxRow; gridCols = fixedCount;
                 } else {
                     for (let x = 0; x < maxCol; x++) {
-                        for (let y = 0; y < fixedCount; y++) { if (!gridMap[y] || !gridMap[y][x]) holes++; }
+                        let lastOccupiedY = fixedCount - 1;
+                        if (x === maxCol - 1) {
+                            while(lastOccupiedY >= 0 && (!gridMap[lastOccupiedY] || !gridMap[lastOccupiedY][x])) lastOccupiedY--;
+                        }
+                        for (let y = 0; y <= lastOccupiedY; y++) {
+                            if (!gridMap[y] || !gridMap[y][x]) {
+                                finalHTML += `<div class="bento-item silencio-placeholder" style="grid-column: ${x + 1} / span 1; grid-row: ${y + 1} / span 1; display: flex; align-items: center; justify-content: center; background: #050505; border: 1px solid rgba(255,255,255,0.02); pointer-events: none;"><span style="color: var(--color-accent); opacity: 0.4; font-size: 1.5rem; font-weight: 400; letter-spacing: 4px;">SILENCIO</span></div>`;
+                            }
+                        }
                     }
                     gridRows = fixedCount; gridCols = maxCol;
                 }
-
-                // On ajoute exactement le bon nombre de blocs Silencio pour combler les trous de la grille
-                for (let i = 0; i < holes; i++) {
-                    itemsHTML += createSilencio();
-                }
+                itemsHTML = finalHTML;
             }
 
             // --- RENDU DANS LE DOM ---
@@ -303,11 +361,6 @@ async function initHomePage(){
             
             if (!useScrollMode) {
                 wrapper.className = 'bento-wrapper is-static'; 
-                // Centrage parfait de la grille statique
-                wrapper.style.display = 'flex';
-                wrapper.style.justifyContent = 'center';
-                wrapper.style.width = '100%';
-
                 grid.className = 'bento-grid is-static';
                 
                 if (projects.length <= 1 && !hasTallOrBig) { 
@@ -349,7 +402,7 @@ async function initHomePage(){
         } catch (error) {}
     }
 
-    // L'EQUIPE (Reste identique)
+    // L'EQUIPE
     const teamGrid = document.querySelector('.team-grid');
     if (teamGrid) {
         try {
@@ -1109,6 +1162,7 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
+
 
 
 
