@@ -338,6 +338,7 @@ async function initProjectPage() {
 function renderProject(data) {
     document.querySelector('.project-title').textContent = data.titre;
     document.querySelector('.project-hero p').innerHTML = `${data.genre || ''} &bull; ${data.statut}`;
+    
     const heroImage = document.querySelector('.project-hero img');
     heroImage.className = 'anti-stretch-img';
     heroImage.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover !important;';
@@ -348,20 +349,46 @@ function renderProject(data) {
     document.title = `${data.titre} - Produit par Silencio Pictures`;
     document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>');
     
+    // --- GESTION DES LIENS EXTERNES DU PROJET ---
+    const linkContainer = document.getElementById('dyn-project-links');
+    if (linkContainer) {
+        linkContainer.innerHTML = ''; // On vide
+        
+        const addLink = (url, iconSvg, label) => {
+            if (!url || url.trim() === '') return;
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = "_blank";
+            a.className = "project-link-icon";
+            a.title = label;
+            a.innerHTML = iconSvg;
+            linkContainer.appendChild(a);
+        };
+
+        // Icône Globe pour le Site Officiel
+        addLink(data.linkSite, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`, "Site Officiel");
+        
+        // Icône Instagram
+        addLink(data.linkInstagram, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`, "Instagram");
+
+        // Icône Facebook
+        addLink(data.linkFacebook, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>`, "Facebook");
+    }
+
     setTimeout(() => {
         const synopsisWrapper = document.getElementById('synopsis-wrapper');
         const dynSynopsis = document.getElementById('dyn-synopsis');
         const btnReadMore = document.getElementById('btn-read-more');
         const synopsisFade = document.getElementById('synopsis-fade');
-        if (dynSynopsis.scrollHeight > 140) {
-            btnReadMore.classList.remove('hidden');
+        if (dynSynopsis && dynSynopsis.scrollHeight > 140) {
+            if(btnReadMore) btnReadMore.classList.remove('hidden');
             btnReadMore.addEventListener('click', () => {
                 const isExpanded = synopsisWrapper.classList.contains('is-expanded');
                 if (!isExpanded) { synopsisWrapper.classList.add('is-expanded'); btnReadMore.textContent = 'Réduire'; } 
                 else { synopsisWrapper.classList.remove('is-expanded'); btnReadMore.textContent = 'Lire la suite'; }
             });
         } else { if (synopsisFade) synopsisFade.style.display = 'none'; }
-    }, 50);
+    }, 100);
     
     document.getElementById('dyn-realisateur').textContent = data.realisateur || '-';
     const castingCible = document.getElementById('dyn-casting');
@@ -371,8 +398,10 @@ function renderProject(data) {
     document.getElementById('dyn-annee').textContent = data.annee || '-';
     const videoSection = document.getElementById('dyn-video-section');
     const videoIframe = document.getElementById('dyn-video-iframe');
-    if (data.videoTrailer) { videoIframe.src = data.videoTrailer; videoSection.style.display = 'block'; } else { videoSection.style.display = 'none'; }
-    setTimeout(() => { if (heroImage.complete) heroImage.classList.add('loaded'); }, 50);
+    if (data.videoTrailer) { 
+        videoIframe.src = data.videoTrailer.replace("watch?v=", "embed/"); 
+        videoSection.style.display = 'block'; 
+    } else { videoSection.style.display = 'none'; }
 }
 
 // =========================================
@@ -1029,6 +1058,7 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
+
 
 
 
