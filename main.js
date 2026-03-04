@@ -68,28 +68,32 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
     return new Promise(async (resolve, reject) => {
         try {
             let safeUrl;
+
+            // 1. On récupère l'image sous forme de données brutes (Blob)
             if (sourceUrlOrBlob instanceof Blob) {
                 safeUrl = URL.createObjectURL(sourceUrlOrBlob);
             } else {
-                // ASTUCE ANTI-BLOCAGE FIREBASE : On passe par un pont Proxy si besoin
-                let response;
                 try {
-                    response = await fetch(sourceUrlOrBlob);
+                    const response = await fetch(sourceUrlOrBlob);
+                    if (!response.ok) throw new Error("CORS bloqué");
+                    const blob = await response.blob();
+                    safeUrl = URL.createObjectURL(blob);
                 } catch (e) {
+                    // Plan B anti-blocage Firebase : le Proxy
                     const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sourceUrlOrBlob);
-                    response = await fetch(proxyUrl);
+                    const responseProxy = await fetch(proxyUrl);
+                    const blobProxy = await responseProxy.blob();
+                    safeUrl = URL.createObjectURL(blobProxy);
                 }
-                const blob = await response.blob();
-                safeUrl = URL.createObjectURL(blob);
             }
 
             const img = new Image();
-            img.crossOrigin = "Anonymous"; // Autorise la manipulation des pixels
+            // On a supprimé la ligne crossOrigin qui faisait tout planter !
             
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 canvas.width = 1080;
-                canvas.height = 1350; // Format Réseaux Sociaux 4:5
+                canvas.height = 1350; // Format 4:5
                 const ctx = canvas.getContext('2d');
 
                 const targetRatio = 4 / 5;
@@ -112,15 +116,20 @@ async function generateSocialCropBlob(sourceUrlOrBlob, focusX, focusY) {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
 
-                // GÉNÉRATION DU FICHIER JPG (Compatible LinkedIn)
+                // Génération du JPG forcé !
                 canvas.toBlob((blob) => {
                     URL.revokeObjectURL(safeUrl);
-                    resolve(blob);
+                    if(blob) resolve(blob);
+                    else reject("Échec de la création du fichier JPG");
                 }, 'image/jpeg', 0.9);
             };
-            img.onerror = () => reject("Erreur image source");
+            
+            img.onerror = () => reject("Erreur lors du dessin de l'image");
             img.src = safeUrl;
-        } catch (error) { reject(error); }
+            
+        } catch (error) { 
+            reject(error); 
+        }
     });
 }
 
@@ -901,6 +910,7 @@ document.addEventListener('click', (e) => {
     const transition = document.querySelector('.page-transition');
     if (transition) { e.preventDefault(); transition.classList.add('active'); setTimeout(() => { window.location.href = link.href; }, 500); }
 });
+
 
 
 
