@@ -166,12 +166,42 @@
                             <span>Visible sur le site</span>
                         </div>
 
-                        <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 15px; padding: 15px; background: rgba(215, 39, 37, 0.1); border-left: 3px solid var(--color-accent); border-radius: 4px;">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="proj-autoshare">
-                                <span class="slider"></span>
-                            </label>
-                            <span style="font-weight: 600;">PARTAGE SUR LES RÉSEAUX</span>
+                        <div class="form-group checkbox-group" style="margin-top: 15px; padding: 15px; background: rgba(215, 39, 37, 0.1); border-left: 3px solid var(--color-accent); border-radius: 4px;">
+                            
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="proj-autoshare">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="font-weight: 600;">PARTAGE SUR LES RÉSEAUX</span>
+                            </div>
+
+                            <div id="social-crop-zone" style="display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                                <h4 style="margin-bottom: 15px; font-size: 0.9rem; color: var(--color-accent);">Cadrage Instagram (Format vertical 4:5)</h4>
+                                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                    
+                                    <div style="flex: 0 0 160px;">
+                                        <div style="width: 100%; aspect-ratio: 4/5; background: #050505; overflow: hidden; position: relative; border: 1px solid #333; border-radius: 4px;">
+                                            <img id="image-preview-social" alt="Aperçu Réseaux" class="anti-stretch-img" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="flex: 1; min-width: 200px;">
+                                        <label>Ajustement du focus (X / Y)</label>
+                                        <div style="display: flex; gap: 15px; align-items: center; margin-top: 10px;">
+                                            <input type="range" id="proj-focus-social-x" class="da-slider" min="0" max="100" value="50" title="Gauche / Droite">
+                                            <input type="range" id="proj-focus-social-y" class="da-slider" min="0" max="100" value="50" title="Haut / Bas">
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.65rem; color: #888; text-transform: uppercase;">
+                                            <span style="flex:1; text-align:center;">↔ X (Horiz.)</span>
+                                            <span style="flex:1; text-align:center;">↕ Y (Vertic.)</span>
+                                        </div>
+                                        <p style="font-size: 0.8rem; color: #aaa; margin-top: 15px; line-height: 1.4;">
+                                            Une image <strong>JPG dédiée (1080x1350)</strong> sera automatiquement générée et envoyée au robot lors de la publication.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-actions">
@@ -246,3 +276,4 @@
     <script type="module" src="main.js?v=5.0"></script>
 </body>
 </html>
+
