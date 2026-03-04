@@ -199,7 +199,7 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
 .bento-wrapper.is-static { 
     width: 100%; 
     display: flex; 
-    justify-content: center; 
+    justify-content: center; /* SÉCURITÉ : Centrage parfait de la grille */
     padding: 40px 0; 
     overflow: visible; 
 }
@@ -209,7 +209,7 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
     --cell-size: 250px; 
     --gap: 20px; 
     gap: var(--gap) !important;
-    grid-auto-flow: dense !important; 
+    grid-auto-flow: row dense !important; /* SÉCURITÉ : Aspiration des blocs Silencio dans les trous */
     width: max-content !important; 
     margin: 0 auto !important;
 }
@@ -257,7 +257,7 @@ footer { margin-top: 0; padding-bottom: 2rem; font-size: 0.8rem; opacity: 0.5; b
     --gap: 20px; 
     grid-template-rows: repeat(3, var(--cell-size)) !important; 
     grid-auto-columns: var(--cell-size) !important;
-    grid-auto-flow: column dense !important; 
+    grid-auto-flow: column dense !important; /* SÉCURITÉ : Aspiration des blocs en mode scroll */
     gap: var(--gap) !important; 
     width: max-content !important; 
     padding-right: 0 !important; 
@@ -591,6 +591,7 @@ section#projects, section#about {
 @media (max-width: 600px) {
     .team-card img { filter: grayscale(100%); }
 }
+
 
 
 
