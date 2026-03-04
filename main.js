@@ -25,6 +25,7 @@ const auth = getAuth(app);
 let optimizedImageBlob = null; 
 let currentEditId = null;
 let currentEditImageUrl = null;
+let currentProjectWasShared = false;
 
 let teamOptimizedImageBlob = null;
 let currentTeamEditId = null;
@@ -678,13 +679,13 @@ function resetProjectForm() {
     document.getElementById('form-title').textContent = "Ajouter un projet";
     document.getElementById('btn-save').textContent = "Enregistrer le projet";
     optimizedImageBlob = null; currentEditId = null; currentEditImageUrl = null;
+    currentProjectWasShared = false;
 }
 
 function setupProjectForm() {
     const form = document.getElementById('project-form');
     if (!form) return;
 
-    // --- CORRECTION : Réactivation des boutons Annuler ---
     const btnCancelTop = document.querySelector('.btn-cancel-top');
     const btnCancelBottom = form.querySelector('.btn-cancel-bottom');
 
@@ -694,19 +695,35 @@ function setupProjectForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // 1. On récupère la case à cocher
         const autoShareCheckbox = document.getElementById('proj-autoshare');
+        let triggerWebhook = false; // On part du principe qu'on ne sonne pas Make
         
-        // 2. Sécurité : Confirmation si la case est cochée
+        // --- LA LOGIQUE DE SÉCURITÉ ET DOUBLE VALIDATION ---
         if (autoShareCheckbox && autoShareCheckbox.checked) {
-            const confirmation = confirm("⚠️ ATTENTION : Vous avez coché l'annonce sur les réseaux sociaux.\n\nÊtes-vous sûr(e) de vouloir publier ce projet et l'envoyer sur vos réseaux ?");
-            if (!confirmation) return; 
+            if (currentEditId && currentProjectWasShared) {
+                // Cas 1 : Le projet est en édition ET a déjà été publié
+                const doubleConfirm = confirm("⚠️ ATTENTION : Ce projet a DÉJÀ été publié sur vos réseaux sociaux dans le passé.\n\nVoulez-vous VRAIMENT forcer une NOUVELLE publication ? (Cela créera un doublon sur vos pages)");
+                if (doubleConfirm) {
+                    triggerWebhook = true; // On force la republication
+                } else {
+                    // On annule l'envoi Make, mais on continue l'enregistrement du texte
+                    triggerWebhook = false;
+                    autoShareCheckbox.checked = false; // On décoche visuellement
+                }
+            } else {
+                // Cas 2 : C'est une toute première publication (nouveau projet ou ancien jamais publié)
+                const firstConfirm = confirm("⚠️ ATTENTION : Vous allez publier ce projet sur les réseaux sociaux.\n\nÊtes-vous sûr(e) ?");
+                if (firstConfirm) {
+                    triggerWebhook = true;
+                } else {
+                    return; // On bloque tout pour te laisser décocher la case manuellement
+                }
+            }
         }
 
         const title = document.getElementById('proj-title').value.trim();
         const btnSave = document.getElementById('btn-save');
 
-        // 3. Préparation des données (avec partageReseaux garanti)
         const projectData = {
             titre: title,
             statut: document.getElementById('proj-subtitle').value.trim(),
@@ -721,8 +738,8 @@ function setupProjectForm() {
             imageFocusHeader: `${document.getElementById('proj-focus-header-x').value}% ${document.getElementById('proj-focus-header-y').value}%`,
             visible: document.getElementById('proj-visible') ? document.getElementById('proj-visible').checked : true,
             
-            // On force l'envoi de la donnée (true ou false)
-            partageReseaux: autoShareCheckbox ? autoShareCheckbox.checked : false
+            // On garde le statut "Publié" en mémoire pour l'avenir
+            partageReseaux: currentProjectWasShared || triggerWebhook
         };
 
         if (!currentEditId && !optimizedImageBlob) { UI.showToast("Ajoutez une affiche.", "error"); return; }
@@ -740,21 +757,19 @@ function setupProjectForm() {
 
             let finalProjectId = currentEditId;
 
-            // 1. Sauvegarde dans Firebase
             if (currentEditId) {
                 await updateDoc(doc(db, "projects", currentEditId), projectData);
                 UI.showToast("Projet mis à jour !");
             } else {
                 projectData.ordreAffichage = Date.now();
                 const newDocRef = await addDoc(collection(db, "projects"), projectData);
-                finalProjectId = newDocRef.id; // On récupère l'ID du nouveau projet
+                finalProjectId = newDocRef.id; 
                 UI.showToast("Projet publié !");
             }
 
-            // 2. LA SONNETTE MAKE (WEBHOOK)
-            if (projectData.partageReseaux === true) {
+            // 2. LA SONNETTE MAKE (DÉCLENCHÉE UNIQUEMENT SI VALIDÉE)
+            if (triggerWebhook) {
                 try {
-                    // Remplace ce lien par celui que Make t'a donné !
                     const webhookUrl = "https://hook.eu1.make.com/03eq4k1s3oececcv4xvxqqh24g2pf513"; 
                     
                     await fetch(webhookUrl, {
@@ -778,7 +793,7 @@ function setupProjectForm() {
             returnToListView(); 
         } catch (error) { 
             console.error("Erreur Firebase:", error); 
-            UI.showToast("Erreur lors de l'enregistrement.", "error"); 
+            UI.showToast("Erreur.", "error"); 
         } finally { 
             btnSave.disabled = false; 
             btnSave.textContent = currentEditId ? "Mettre à jour" : "Enregistrer le projet";
@@ -870,6 +885,9 @@ async function loadAdminProjects() {
                 if(document.getElementById('proj-autoshare')) {
                     document.getElementById('proj-autoshare').checked = project.partageReseaux === true;
                 }
+                
+                // Mémoriser si le projet a DÉJÀ été publié
+                currentProjectWasShared = (project.partageReseaux === true); // <-- NOUVELLE LIGNE AJOUTÉE
 
                 const bentoPos = parsePosition(project.imageFocusBento || project.imageFocus);
                 document.getElementById('proj-focus-bento-x').value = bentoPos.x;
@@ -1201,6 +1219,7 @@ document.addEventListener('click', (e) => {
         }, 500); 
     }
 });
+
 
 
 
