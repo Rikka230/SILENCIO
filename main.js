@@ -349,6 +349,18 @@ function renderProject(data) {
     document.title = `${data.titre} - Produit par Silencio Pictures`;
     document.getElementById('dyn-synopsis').innerHTML = (data.synopsis || '').replace(/\n/g, '<br>');
     
+    // --- MISE À JOUR SEO DYNAMIQUE (POUR GOOGLE ET LES RÉSEAUX) ---
+    const metaDesc = document.querySelector('meta[name="description"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    
+    // On crée un résumé propre à partir du synopsis (max 150 caractères pour Google)
+    let cleanSynopsis = data.synopsis ? data.synopsis.replace(/<[^>]*>?/gm, '').trim() : '';
+    if (cleanSynopsis.length > 150) cleanSynopsis = cleanSynopsis.substring(0, 147) + '...';
+    if (cleanSynopsis === '') cleanSynopsis = `Découvrez le projet ${data.titre} produit par Silencio Pictures.`;
+    
+    if (metaDesc) metaDesc.setAttribute("content", cleanSynopsis);
+    if (ogDesc) ogDesc.setAttribute("content", cleanSynopsis);
+    
     // --- GESTION DES LIENS EXTERNES DU PROJET ---
     const linkContainer = document.getElementById('dyn-project-links');
     if (linkContainer) {
@@ -1058,6 +1070,7 @@ function setupContact() {
         finally { btn.disabled = false; btn.textContent = "Mettre à jour les contacts"; }
     });
 }
+
 
 
 
