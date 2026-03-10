@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://www.silenciopictures.com/sitemap.xml
+Sitemap: https://silencio-pictures.com/sitemap.xml
